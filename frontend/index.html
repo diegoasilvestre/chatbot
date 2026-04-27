@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus Bot AI | Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Fontes e Ícones -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+
+    <!-- ── TELA DE LOGIN ────────────────────────────────────────────────── -->
+    <div id="login-page" class="login-screen">
+        <div class="login-card">
+            <div class="logo-container" style="text-align: center;">
+                <div class="logo-main">Nexus Bot AI</div>
+                <div class="logo-sub">By Roboti BR</div>
+            </div>
+            <p style="color: var(--muted); text-align: center; margin-bottom: 2rem; font-size: 0.875rem;">Acesse sua conta para gerenciar seus robôs.</p>
+            
+            <form id="login-form">
+                <div class="form-group">
+                    <label>E-mail</label>
+                    <input type="email" id="email" class="input-field" placeholder="seu@email.com" required>
+                </div>
+                <div class="form-group">
+                    <label>Senha</label>
+                    <input type="password" id="password" class="input-field" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn-primary" style="margin-top: 1rem;">Entrar no Sistema</button>
+            </form>
+            <div id="login-error" style="color: #ef4444; font-size: 0.75rem; margin-top: 1rem; text-align: center;" class="hidden"></div>
+        </div>
+    </div>
+
+    <!-- ── TELA PRINCIPAL ────────────────────────────────────────────────── -->
+    <div id="dashboard-page" class="app-container hidden">
+        
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="logo-container">
+                <div class="logo-main">Roboti BR</div>
+                <div class="logo-sub">BY WAVEPOD</div>
+            </div>
+
+            <div class="sidebar-section-title">Cliente Ativo</div>
+            <select id="client-selector" class="custom-select">
+                <option value="">Selecione um cliente...</option>
+            </select>
+
+            <div class="sidebar-section-title">Visão Geral</div>
+            <nav id="nav-main">
+                <div class="nav-item active" data-tab="dashboard">
+                    <i class="fa-solid fa-chart-line"></i> Dashboard
+                </div>
+            </nav>
+
+            <div class="sidebar-section-title">Inteligência Artificial</div>
+            <nav id="nav-ai">
+                <div class="nav-item" data-tab="config">
+                    <i class="fa-solid fa-robot"></i> Agente & Prompt
+                </div>
+                <div class="nav-item" data-tab="rag">
+                    <i class="fa-solid fa-book"></i> Base de Conhecimento
+                </div>
+                <div class="nav-item" data-tab="scrape">
+                    <i class="fa-solid fa-globe"></i> Web Scraping
+                </div>
+            </nav>
+
+            <div class="sidebar-section-title">Operação</div>
+            <nav id="nav-op">
+                <div class="nav-item" data-tab="omnichat">
+                    <i class="fa-solid fa-comments"></i> Caixa de Entrada
+                </div>
+                <div class="nav-item" data-tab="whatsapp">
+                    <i class="fa-solid fa-mobile-screen"></i> Conexão WhatsApp
+                </div>
+            </nav>
+
+            <div class="sidebar-section-title admin-only hidden">Administração</div>
+            <nav id="nav-admin" class="admin-only hidden">
+                <div class="nav-item" data-tab="gestao">
+                    <i class="fa-solid fa-users-gear"></i> Gestão de Clientes
+                </div>
+                <div class="nav-item" data-tab="diagnostics">
+                    <i class="fa-solid fa-vial-circle-check"></i> Diagnóstico
+                </div>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div id="user-display" style="font-size: 0.7rem; color: var(--muted); margin-bottom: 0.5rem; padding: 0 0.5rem;"></div>
+                <div class="nav-item" id="btn-logout" style="color: #ef4444;">
+                    <i class="fa-solid fa-right-from-bracket"></i> Sair do Sistema
+                </div>
+                <div class="status-indicator">
+                    <div id="server-status-dot" class="dot"></div>
+                    <span id="server-status-text">Servidor Offline</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- MAIN -->
+        <div class="main-wrapper">
+            <header>
+                <div class="header-title" id="current-view-title">Dashboard</div>
+                <div class="user-badge" style="background: var(--primary); color: var(--primary-foreground); padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700;">ADMIN</div>
+            </header>
+
+            <main class="main-content" id="main-view">
+                <!-- Conteúdo injetado via app.js -->
+            </main>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="app.js"></script>
+</body>
+</html>
