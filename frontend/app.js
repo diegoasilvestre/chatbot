@@ -2,6 +2,12 @@
  * app.js — Nexus Bot AI Dashboard Engine
  */
 
+// Se estiver rodando localmente (localhost ou 127.0.0.1), aponte para o IP da VM.
+// Caso contrário, use caminhos relativos (mesmo servidor).
+const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+    ? 'http://129.151.46.223:4000'  // Substitua pelo IP real se este não for o atual
+    : '';
+
 const SUPABASE_URL = 'https://blznrercpctblwbalovv.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJsem5yZXJjcGN0Ymx3YmFsb3Z2Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Njg0MDUzNiwiZXhwIjoyMDkyNDE2NTM2fQ.5FXZkvJ11gG5qtmVqEnu2h-fk8vhx5ShRJqaa2KJwmo';
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -31,7 +37,7 @@ function checkServerStatus() {
     const dot = document.getElementById('server-status-dot');
     const text = document.getElementById('server-status-text');
     
-    fetch('/wa/status/ping').then(() => {
+    fetch(API_BASE + '/wa/status/ping').then(() => {
         dot.classList.add('online');
         text.innerText = 'Servidor Online';
     }).catch(() => {
@@ -74,7 +80,7 @@ async function loadClientSelector() {
     selector.innerHTML = '<option value="">Selecione um cliente...</option>';
 
     if (currentUser.is_admin) {
-        const res = await fetch('/admin/lojas');
+        const res = await fetch(API_BASE + '/admin/lojas');
         const lojas = await res.json();
         lojas.forEach(l => {
             const opt = document.createElement('option');
@@ -164,7 +170,7 @@ function initLogin() {
         const errorDiv = document.getElementById('login-error');
 
         try {
-            const res = await fetch('/auth/login', {
+            const res = await fetch(API_BASE + '/auth/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password })
@@ -217,7 +223,7 @@ async function viewDashboard(container) {
 
     if (currentUser.numero_wa) {
         try {
-            const res = await fetch(`/tenant/stats/${currentUser.numero_wa}`);
+            const res = await fetch(API_BASE + `/tenant/stats/${currentUser.numero_wa}`);
             const data = await res.json();
             document.getElementById('stat-total').innerText = data.total_mensagens || 0;
             document.getElementById('stat-user').innerText = data.mensagens_usuario || 0;
@@ -265,7 +271,7 @@ async function viewConfig(container) {
             regras: document.getElementById('cfg-regras').value
         };
 
-        const res = await fetch('/tenant/config', {
+        const res = await fetch(API_BASE + '/tenant/config', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(updates)
@@ -310,7 +316,7 @@ async function viewWhatsApp(container) {
     const statusDiv = document.getElementById('wa-connection-status');
     const updateStatus = async () => {
         try {
-            const r = await fetch(`/wa/status/${currentUser.numero_wa}`);
+            const r = await fetch(API_BASE + `/wa/status/${currentUser.numero_wa}`);
             const s = await r.json();
             statusDiv.innerText = s.status === 'conectado' ? '✅ WHATSAPP CONECTADO' : '❌ DESCONECTADO';
             statusDiv.style.color = s.status === 'conectado' ? 'var(--primary)' : '#ef4444';
@@ -320,7 +326,7 @@ async function viewWhatsApp(container) {
 
     document.getElementById('btn-wa-connect').onclick = async () => {
         statusDiv.innerText = '⏳ Gerando código...';
-        const res = await fetch('/wa/connect', {
+        const res = await fetch(API_BASE + '/wa/connect', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ numero: currentUser.numero_wa })
@@ -335,7 +341,7 @@ async function viewWhatsApp(container) {
 
     document.getElementById('btn-wa-disconnect').onclick = async () => {
         if (confirm('Tem certeza que deseja desconectar?')) {
-            await fetch('/wa/disconnect', {
+            await fetch(API_BASE + '/wa/disconnect', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ numero: currentUser.numero_wa })
@@ -363,7 +369,7 @@ async function viewRAG(container) {
     `;
 
     const loadRAG = async () => {
-        const res = await fetch(`/cliente/rag/${currentUser.numero_wa}`);
+        const res = await fetch(API_BASE + `/cliente/rag/${currentUser.numero_wa}`);
         const data = await res.json();
         const list = document.getElementById('rag-list-container');
         list.innerHTML = `
@@ -388,7 +394,7 @@ async function viewRAG(container) {
     document.getElementById('btn-rag-save').onclick = async () => {
         const titulo = document.getElementById('rag-titulo').value;
         const conteudo = document.getElementById('rag-conteudo').value;
-        await fetch('/cliente/importar-texto', {
+        await fetch(API_BASE + '/cliente/importar-texto', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ titulo, conteudo, loja_id: currentUser.numero_wa })
@@ -399,7 +405,7 @@ async function viewRAG(container) {
 
 window.deleteRAG = async (id) => {
     if (confirm('Deletar este documento?')) {
-        await fetch(`/cliente/rag/${id}`, { method: 'DELETE' });
+        await fetch(API_BASE + `/cliente/rag/${id}`, { method: 'DELETE' });
         renderView('rag');
     }
 };
@@ -422,7 +428,7 @@ async function viewScrape(container) {
         const url = document.getElementById('scrape-url').value;
         const status = document.getElementById('scrape-status');
         status.innerHTML = '⏳ <span style="color: var(--primary)">Processando site... Isso pode levar alguns minutos.</span>';
-        const res = await fetch('/cliente/scrape', {
+        const res = await fetch(API_BASE + '/cliente/scrape', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ url, loja_id: currentUser.numero_wa })
@@ -447,7 +453,7 @@ async function viewOmnichat(container) {
         </div>
     `;
 
-    const res = await fetch(`/chat/conversas/${currentUser.numero_wa}`);
+    const res = await fetch(API_BASE + `/chat/conversas/${currentUser.numero_wa}`);
     const contacts = await res.json();
     const list = document.getElementById('contact-list');
     list.innerHTML = contacts.map(c => `
@@ -473,7 +479,7 @@ window.openChat = async (telefone) => {
     `;
 
     const loadMessages = async () => {
-        const res = await fetch(`/chat/mensagens/${telefone}`);
+        const res = await fetch(API_BASE + `/chat/mensagens/${telefone}`);
         const msgs = await res.json();
         const box = document.getElementById('chat-messages');
         box.innerHTML = msgs.map(m => `
@@ -486,7 +492,7 @@ window.openChat = async (telefone) => {
     document.getElementById('btn-send').onclick = async () => {
         const msg = document.getElementById('chat-input').value;
         if (!msg) return;
-        await fetch('/chat/send-manual', {
+        await fetch(API_BASE + '/chat/send-manual', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ numero_wa: currentUser.numero_wa, telefone_cliente: telefone, mensagem: msg })
@@ -497,7 +503,7 @@ window.openChat = async (telefone) => {
 };
 
 async function viewGestao(container) {
-    const res = await fetch('/admin/lojas');
+    const res = await fetch(API_BASE + '/admin/lojas');
     const lojas = await res.json();
 
     container.innerHTML = `
@@ -540,7 +546,7 @@ window.openModalCliente = () => {
     const nome = prompt("Nome da Empresa:");
     const wa_id = prompt("Número WA (DDI + DDD + Numero):");
     if (nome && wa_id) {
-        fetch('/admin/lojas', {
+        fetch(API_BASE + '/admin/lojas', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ nome, wa_id })
@@ -557,7 +563,7 @@ async function viewDiagnostics(container) {
             </div>
         </div>
     `;
-    const res = await fetch(`/admin/diagnostics/${currentUser.numero_wa || 'none'}`);
+    const res = await fetch(API_BASE + `/admin/diagnostics/${currentUser.numero_wa || 'none'}`);
     const data = await res.json();
     document.getElementById('diag-results').innerText = JSON.stringify(data, null, 2);
 }
