@@ -5,7 +5,7 @@
 // Se estiver rodando localmente (localhost ou 127.0.0.1), aponte para o IP da VM.
 // Caso contrário, use caminhos relativos (mesmo servidor).
 const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-    ? 'http://129.151.46.223:4000'  // Substitua pelo IP real se este não for o atual
+    ? 'http://64.181.184.32:4000'
     : '';
 
 const SUPABASE_URL = 'https://blznrercpctblwbalovv.supabase.co';
