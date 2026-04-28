@@ -15,6 +15,7 @@ let state = {
 
 let waPolling = null;
 let ocRefreshTimer = null;
+let ocListTimer = null;
 
 // ─── TEMA ─────────────────────────────────────────────────────────────────────
 
@@ -273,8 +274,7 @@ function applyPermissions() {
     }
 }
 
-let ocRefreshTimer = null;
-let ocListTimer = null;
+
 
 function navigate(page) {
     // Para timers antigos antes de mudar de página
