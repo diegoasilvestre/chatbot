@@ -183,7 +183,7 @@ body {
 /* ══ TOPBAR ═════════════════════════════════════════════════════════════════ */
 .topbar {
     height: 70px;
-    background: rgba(255, 255, 255, 0.8);
+    background: rgba(255, 255, 255, 0.9) !important;
     backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--border);
     display: flex;
@@ -742,7 +742,7 @@ body {
     display: none;
     position: fixed;
     inset: 0;
-    background: rgba(9, 9, 11, 0.65);
+    background: rgba(45, 41, 38, 0.4);
     backdrop-filter: blur(4px);
     z-index: 200;
     align-items: center;
@@ -1337,7 +1337,7 @@ body {
     left: 0;
     right: 0;
     height: 65px;
-    background: rgba(18, 18, 20, 0.98);
+    background: rgba(255, 255, 255, 0.98);
     backdrop-filter: blur(15px);
     border-top: 1px solid var(--border);
     z-index: 1000;
