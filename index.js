@@ -547,42 +547,30 @@ app.post('/chat/toggle-ia', async (req, res) => {
 app.post('/chat/send-manual', async (req, res) => {
     const { numero_wa, telefone_cliente, mensagem } = req.body;
     try {
-        console.log(`\n[CHAT] 📨 Pedido de ENVIO MANUAL:`);
-        console.log(`      - De: ${numero_wa}`);
-        console.log(`      - Para: ${telefone_cliente}`);
-        console.log(`      - Msg: "${mensagem}"`);
-
         const sock = activeSessions[numero_wa];
-        if (!sock) {
-            console.error(`[CHAT] ❌ Erro: Sessão ${numero_wa} não encontrada na memória.`);
-            return res.status(400).json({ erro: 'O WhatsApp não está conectado no servidor.' });
-        }
+        if (!sock) return res.status(400).json({ erro: 'WhatsApp não conectado.' });
 
-        // Limpeza rigorosa do JID
-        let cleanPhone = String(telefone_cliente).replace(/\D/g, '');
-        // Se for um número de usuário padrão (não grupo)
-        const jid = cleanPhone.includes('@') ? cleanPhone : `${cleanPhone}@s.whatsapp.net`;
-        
-        console.log(`[CHAT] 🚀 Enviando via Baileys para JID: ${jid}`);
+        const cleanPhone = String(telefone_cliente).replace(/\D/g, '');
+        const jid = `${cleanPhone}@s.whatsapp.net`;
         
         await sock.sendMessage(jid, { text: mensagem });
-        console.log(`[CHAT] ✅ Mensagem enviada com sucesso!`);
 
-        // Salva no histórico do banco
         const { data: contato } = await supabase.from('contatos').select('id').eq('numero_wa', numero_wa).eq('telefone', telefone_cliente).maybeSingle();
         if (contato) {
-            const { data: conversa } = await supabase.from('conversas').select('id').eq('numero_wa', numero_wa).eq('contato_id', contato.id).maybeSingle();
-            if (conversa) {
+            // DESLIGA IA AUTOMATICAMENTE (HANDOFF)
+            await supabase.from('conversas').update({ ia_ativa: false }).eq('numero_wa', numero_wa).eq('contato_id', contato.id);
+
+            const { data: conv } = await supabase.from('conversas').select('id').eq('contato_id', contato.id).maybeSingle();
+            if (conv) {
                 await supabase.from('mensagens').insert([{
-                    conversa_id: conversa.id,
-                    remetente_tipo: 'bot',
+                    conversa_id: conv.id,
+                    remetente_tipo: 'humano',
                     conteudo: mensagem
                 }]);
             }
         }
         res.json({ ok: true });
     } catch (e) {
-        console.error(`[CHAT] ❌ FALHA CRÍTICA NO ENVIO: ${e.message}`);
         res.status(500).json({ erro: e.message });
     }
 });

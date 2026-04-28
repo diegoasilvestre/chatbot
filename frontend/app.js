@@ -235,17 +235,17 @@ const PAGES = {
 
 const PERMISSIONS = {
     superadmin: ['dashboard', 'agente', 'rag', 'scraping', 'conversas', 'whatsapp', 'clientes', 'equipe', 'diagnostics'],
-    admin:      ['dashboard', 'agente', 'rag', 'scraping', 'conversas', 'equipe'],
-    vendedor:   ['dashboard', 'agente', 'conversas'],
-    suporte:    ['dashboard', 'agente', 'conversas']
+    admin: ['dashboard', 'agente', 'rag', 'scraping', 'conversas', 'equipe'],
+    vendedor: ['dashboard', 'agente', 'conversas'],
+    suporte: ['dashboard', 'agente', 'conversas']
 };
 
 function applyPermissions() {
     const role = state.user?.role?.toLowerCase() || 'vendedor';
     const isAdmin = state.admin?.email && ['admin@robotibr.com.br', 'diegossilvestre@live.com', 'diegoasilvestre@live.com'].includes(state.admin.email);
-    
+
     const userPermissions = isAdmin ? PERMISSIONS.superadmin : (PERMISSIONS[role] || PERMISSIONS.vendedor);
-    
+
     // Varre todos os itens de navegação
     Object.keys(TITLES).forEach(page => {
         const el = document.getElementById(`nav-${page}`);
@@ -931,19 +931,13 @@ async function ocLoadMessages(id) {
     try {
         const msgs = await api.get(`/chat/mensagens/${state.lojaId}/${id}`);
         if (!msgs.length) {
-            el.innerHTML = `<div style="text-align:center;padding:40px;font-size:13px;color:var(--muted-foreground)">
-                Nenhuma mensagem ainda.
-            </div>`;
+            el.innerHTML = `<div style="text-align:center;padding:40px;font-size:13px;color:var(--muted-foreground)">Nenhuma mensagem ainda.</div>`;
             return;
         }
-        el.innerHTML = msgs.map(m => `
-        <div class="oc-msg-row${m.remetente_tipo === 'user' ? ' user' : ''}">
-            <div class="oc-bubble${m.remetente_tipo === 'user' ? ' user' : ''}">${esc(m.conteudo).replace(/\n/g, '<br>')}</div>
-            <div class="oc-msg-time">${new Date(m.criado_em).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</div>
-        </div>`).join('');
+        el.innerHTML = msgs.map(m => renderBubble(m)).join('');
         el.scrollTop = el.scrollHeight;
     } catch (e) {
-        el.innerHTML = `<div style="padding:20px;font-size:13px;color:var(--muted-foreground)">Erro ao carregar: ${esc(e.message)}</div>`;
+        el.innerHTML = `<div style="padding:20px;font-size:13px;color:var(--muted-foreground)">Erro: ${esc(e.message)}</div>`;
     }
 }
 
@@ -954,13 +948,38 @@ async function ocSilentRefreshMessages(id) {
         const msgs = await api.get(`/chat/mensagens/${state.lojaId}/${id}`);
         if (!msgs.length) return;
         const wasAtBottom = el.scrollHeight - el.clientHeight - el.scrollTop < 60;
-        el.innerHTML = msgs.map(m => `
-        <div class="oc-msg-row${m.remetente_tipo === 'user' ? ' user' : ''}">
-            <div class="oc-bubble${m.remetente_tipo === 'user' ? ' user' : ''}">${esc(m.conteudo).replace(/\n/g, '<br>')}</div>
-            <div class="oc-msg-time">${new Date(m.criado_em).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</div>
-        </div>`).join('');
+        el.innerHTML = msgs.map(m => renderBubble(m)).join('');
         if (wasAtBottom) el.scrollTop = el.scrollHeight;
-    } catch { /* silencioso */ }
+    } catch { }
+}
+
+function renderBubble(m) {
+    let bubbleClass = '';
+    let icon = '';
+    let label = '';
+    
+    if (m.remetente_tipo === 'user') {
+        bubbleClass = 'user';
+    } else if (m.remetente_tipo === 'assistant' || m.remetente_tipo === 'bot') {
+        bubbleClass = 'assistant';
+        icon = '<i class="fas fa-robot" style="margin-right:4px;font-size:10px"></i>';
+        label = 'IA';
+    } else {
+        bubbleClass = 'human';
+        icon = '<i class="fas fa-user-tie" style="margin-right:4px;font-size:10px"></i>';
+        label = 'Você';
+    }
+
+    return `
+    <div class="oc-msg-row ${bubbleClass}">
+        <div class="oc-bubble ${bubbleClass}">
+            <div style="font-size:10px;font-weight:700;margin-bottom:2px;opacity:0.7;display:flex;align-items:center">
+                ${icon} ${label}
+            </div>
+            ${esc(m.conteudo).replace(/\n/g, '<br>')}
+        </div>
+        <div class="oc-msg-time">${new Date(m.criado_em).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</div>
+    </div>`;
 }
 
 async function ocToggleIA(id) {
@@ -996,16 +1015,25 @@ async function ocSendMessage(id) {
     inp.value = '';
     inp.style.height = 'auto';
 
-    // Feedback visual imediato (Otimista)
+    _ocIaStates[id] = false;
+    const sw = document.querySelector(`#ocIaBtn_${id} .oc-switch`);
+    const lbl = document.getElementById(`ocIaLabel_${id}`);
+    const btn = document.getElementById(`ocIaBtn_${id}`);
+    const banner = document.getElementById(`ocBanner_${id}`);
+    if (sw) sw.className = 'oc-switch off';
+    if (lbl) lbl.textContent = 'IA pausada';
+    if (btn) btn.className = 'oc-ia-toggle-btn off';
+    if (banner) banner.className = 'oc-handoff-banner visible';
+
     const msgsArea = document.getElementById('ocMsgs_' + id);
     const tempId = 'temp-' + Date.now();
     if (msgsArea) {
-        const time = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-        msgsArea.innerHTML += `
-            <div class="oc-msg-row" id="${tempId}">
-                <div class="oc-bubble">${esc(text).replace(/\n/g, '<br>')}</div>
-                <div class="oc-msg-time">${time} <i class="fas fa-clock" style="font-size:9px"></i></div>
-            </div>`;
+        msgsArea.innerHTML += renderBubble({
+            remetente_tipo: 'humano',
+            conteudo: text,
+            criado_em: new Date().toISOString(),
+            _tempId: tempId
+        });
         msgsArea.scrollTop = msgsArea.scrollHeight;
     }
 
@@ -1020,18 +1048,9 @@ async function ocSendMessage(id) {
         const cont = _ocContacts.find(x => x.id === id);
         if (cont) { cont.ultima_msg = text; cont.atualizado_em = new Date().toISOString(); }
         ocRenderContactList(_ocContacts);
-        
-        // Troca relógio por check
-        const tempMsg = document.getElementById(tempId);
-        if (tempMsg) {
-            const icon = tempMsg.querySelector('.fa-clock');
-            if (icon) icon.className = 'fas fa-check';
-        }
     } catch (e) {
-        toast('Erro ao enviar: ' + e.message, 'error');
-        inp.value = text; // Devolve o texto se falhar
-        const tempMsg = document.getElementById(tempId);
-        if (tempMsg) tempMsg.style.opacity = '0.5';
+        toast('Erro: ' + e.message, 'error');
+        inp.value = text;
     } finally {
         if (sendBtn) { sendBtn.innerHTML = '<i class="fas fa-paper-plane"></i>'; sendBtn.disabled = false; }
     }
@@ -1869,14 +1888,14 @@ async function init() {
             document.getElementById('appScreen').style.display = 'flex';
 
             document.getElementById('sidebarUserEmail').textContent = state.user.email;
-            
+
             const isAdmin = state.admin?.email && ['admin@robotibr.com.br', 'diegossilvestre@live.com', 'diegoasilvestre@live.com'].includes(state.admin.email);
             const roleLabel = isAdmin ? 'Super Admin' : (state.user.role === 'admin' ? 'Dono da Loja' : (state.user.role.charAt(0).toUpperCase() + state.user.role.slice(1)));
-            
+
             document.getElementById('sidebarUserRole').textContent = roleLabel;
             document.getElementById('sidebarUserAvatar').textContent =
                 state.user.email.substring(0, 2).toUpperCase();
-            
+
             applyPermissions();
         } catch {
             localStorage.removeItem('robotibr_session');
