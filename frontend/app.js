@@ -3,7 +3,7 @@
 //  Versão: 4.0  |  Design System Dual-Theme · Gestão de Equipe
 // ─────────────────────────────────────────────────────────────────────────────
 
-const API = 'https://grew-reminder-alliance-clay.trycloudflare.com';
+const API = 'https://sunset-routine-locked-cases.trycloudflare.com';
 
 let state = {
     lojas: [],
@@ -313,9 +313,9 @@ function navigate(page) {
 
     // Se entrar no chat, inicia o polling
     if (page === 'conversas') {
-        ocListTimer = setInterval(loadConversas, 5000);
+        ocListTimer = setInterval(ocLoadContacts, 5000);
         ocRefreshTimer = setInterval(() => {
-            if (state.selectedChat) loadMensagens(state.selectedChat);
+            if (state.selectedChat) ocLoadMessages(state.selectedChat);
         }, 3000);
     }
 

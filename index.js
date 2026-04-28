@@ -1,8 +1,4 @@
-/**
- * index.js — Nexus Bot AI
- * Versão: 3.3 — Refactored Event Engine (sock.ev.process) + Deep Debugging
- */
-
+require('dotenv').config();
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
@@ -152,7 +148,7 @@ async function startWhatsApp(numero_wa, res = null) {
                 const textMessage = msg.message.conversation || msg.message.extendedTextMessage?.text || msg.message.imageMessage?.caption || null;
                 if (!textMessage) continue;
 
-                const telefoneCliente = remoteJid.split('@')[0];
+                const telefoneCliente = remoteJid.split('@')[0].split(':')[0];
                 console.log(`\n[WA] 📨 Mensagem de ${telefoneCliente}: "${textMessage}"`);
 
                 try {
@@ -177,6 +173,12 @@ async function startWhatsApp(numero_wa, res = null) {
                         .eq('numero_wa', numero_wa)
                         .eq('telefone_cliente', telefoneCliente)
                         .maybeSingle();
+
+                    if (!contato && !errContato) {
+                        // Tenta fallback por telefone puro se ID der erro de tipo
+                        const { data: fb } = await supabase.from('contatos_crm').select('id').eq('telefone_cliente', telefoneCliente).limit(1).maybeSingle();
+                        if (fb) contato = fb;
+                    }
 
                     if (errContato) console.error(`[DB] Erro ao buscar contato: ${errContato.message}`);
 
@@ -434,7 +436,7 @@ app.delete('/admin/lojas/:id', async (req, res) => {
             await supabase.from('mensagens').delete().in('conversa_id', ids);
             await supabase.from('conversas').delete().in('id', ids);
         }
-        await supabase.from('contatos').delete().eq('numero_wa', id);
+        await supabase.from('contatos_crm').delete().eq('numero_wa', id);
         
         const { error } = await supabase.from('agentes_config').delete().eq('numero_wa', id);
         if (error) throw error;
@@ -517,55 +519,41 @@ app.get('/chat/contato/:numero_wa/:telefone', async (req, res) => {
 });
 
 app.get('/chat/conversas/:numero_wa', async (req, res) => {
-    const { data } = await supabase.from('conversas').select('id, ia_ativa, contatos(nome, telefone)').eq('numero_wa', req.params.numero_wa);
-    res.json(data?.map(c => ({ id: c.contatos.telefone, nome: c.contatos.nome, numero_cliente: c.contatos.telefone, ia_ativa: c.ia_ativa })) || []);
+    try {
+        const { data } = await supabase.from('conversas').select('id, ia_ativa, contato_id, contatos_crm(nome, telefone_cliente)').eq('numero_wa', req.params.numero_wa);
+        res.json(data?.map(c => ({ 
+            id: c.id, 
+            nome: c.contatos_crm?.nome || 'Cliente', 
+            numero_cliente: c.contatos_crm?.telefone_cliente || '', 
+            ia_ativa: c.ia_ativa 
+        })) || []);
+    } catch (e) { res.json([]); }
 });
 
 app.get('/chat/mensagens/:numero_wa/:telefone', async (req, res) => {
     try {
         const { numero_wa, telefone } = req.params;
-        console.log(`[CHAT] Buscando mensagens para Loja: ${numero_wa}, Telefone: ${telefone}`);
+        const isUUID = /^[0-9a-fA-F-]{36}$/.test(telefone);
 
-        // 1. Busca o contato primeiro
-        const { data: contato } = await supabase
-            .from('contatos')
-            .select('id')
-            .eq('numero_wa', numero_wa)
-            .eq('telefone', telefone)
-            .maybeSingle();
+        let convId = null;
 
-        if (!contato) {
-            console.log(`[CHAT] Contato ${telefone} não encontrado.`);
-            return res.json([]);
+        if (isUUID) {
+            convId = telefone;
+        } else {
+            // Busca o contato pelo telefone
+            const { data: contato } = await supabase.from('contatos_crm').select('id').eq('numero_wa', numero_wa).eq('telefone_cliente', telefone).maybeSingle();
+            if (contato) {
+                const { data: conv } = await supabase.from('conversas').select('id').eq('numero_wa', numero_wa).eq('contato_id', contato.id).maybeSingle();
+                if (conv) convId = conv.id;
+            }
         }
 
-        // 2. Busca a conversa ativa
-        const { data: conv } = await supabase
-            .from('conversas')
-            .select('id')
-            .eq('numero_wa', numero_wa)
-            .eq('contato_id', contato.id)
-            .maybeSingle();
+        if (!convId) return res.json([]);
 
-        if (!conv) {
-            console.log(`[CHAT] Nenhuma conversa encontrada para o contato ID ${contato.id}`);
-            return res.json([]);
-        }
-
-        // 3. Busca as mensagens
-        const { data: msgs, error: msgsError } = await supabase
-            .from('mensagens')
-            .select('*')
-            .eq('conversa_id', conv.id)
-            .order('criado_em', { ascending: true });
-
+        const { data: msgs, error: msgsError } = await supabase.from('mensagens').select('*').eq('conversa_id', convId).order('criado_em', { ascending: true });
         if (msgsError) throw msgsError;
-        console.log(`[CHAT] ${msgs?.length || 0} mensagens carregadas.`);
         res.json(msgs || []);
-    } catch (e) {
-        console.error(`[CHAT] Erro ao buscar mensagens: ${e.message}`);
-        res.status(500).json({ erro: e.message });
-    }
+    } catch (e) { res.status(500).json({ erro: e.message }); }
 });
 
 app.get('/admin/diagnostics/:numero_wa', async (req, res) => {
@@ -641,18 +629,20 @@ app.post('/cliente/importar-texto', async (req, res) => {
 app.post('/chat/toggle-ia', async (req, res) => {
     const { loja_id, numero_cliente, ia_ativa } = req.body;
     try {
-        const { data: contato } = await supabase
-            .from('contatos')
-            .select('id')
-            .eq('numero_wa', loja_id)
-            .eq('telefone', numero_cliente)
-            .maybeSingle();
+        const isUUID = /^[0-9a-fA-F-]{36}$/.test(numero_cliente);
+        let convId = isUUID ? numero_cliente : null;
 
-        if (contato) {
-            await supabase.from('conversas')
-                .update({ ia_ativa })
-                .eq('numero_wa', loja_id)
-                .eq('contato_id', contato.id);
+        if (!convId) {
+            const { data: contato } = await supabase.from('contatos_crm').select('id').eq('numero_wa', loja_id).eq('telefone_cliente', numero_cliente).maybeSingle();
+            if (contato) {
+                const { data: conv } = await supabase.from('conversas').select('id').eq('numero_wa', loja_id).eq('contato_id', contato.id).maybeSingle();
+                if (conv) convId = conv.id;
+            }
+        }
+
+        if (convId) {
+            await supabase.from('conversas').update({ ia_ativa }).eq('id', convId);
+            console.log(`[CHAT] 🤖 IA ${ia_ativa ? 'ATIVADA' : 'DESATIVADA'} para conversa ${convId}`);
         }
         res.json({ ok: true });
     } catch (e) { res.status(500).json({ erro: e.message }); }
@@ -686,17 +676,26 @@ app.post('/chat/send-manual', async (req, res) => {
             jid = fallbackJid;
         }
 
-        const { data: contato } = await supabase.from('contatos').select('id').eq('numero_wa', numero_wa).eq('telefone', telefone_cliente).maybeSingle();
-        if (contato) {
-            await supabase.from('conversas').update({ ia_ativa: false }).eq('numero_wa', numero_wa).eq('contato_id', contato.id);
-            const { data: conv } = await supabase.from('conversas').select('id').eq('contato_id', contato.id).maybeSingle();
-            if (conv) {
-                await supabase.from('mensagens').insert([{
-                    conversa_id: conv.id,
-                    remetente_tipo: 'humano',
-                    conteudo: mensagem
-                }]);
+        const isUUID = /^[0-9a-fA-F-]{36}$/.test(telefone_cliente);
+        let convId = null;
+
+        if (isUUID) {
+            convId = telefone_cliente;
+        } else {
+            const { data: contato } = await supabase.from('contatos_crm').select('id').eq('numero_wa', numero_wa).eq('telefone_cliente', telefone_cliente).maybeSingle();
+            if (contato) {
+                const { data: conv } = await supabase.from('conversas').select('id').eq('numero_wa', numero_wa).eq('contato_id', contato.id).maybeSingle();
+                if (conv) convId = conv.id;
             }
+        }
+
+        if (convId) {
+            await supabase.from('conversas').update({ ia_ativa: false }).eq('id', convId);
+            await supabase.from('mensagens').insert([{
+                conversa_id: convId,
+                remetente_tipo: 'humano',
+                conteudo: mensagem
+            }]);
         }
         res.json({ ok: true });
     } catch (e) {
