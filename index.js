@@ -154,6 +154,7 @@ async function startWhatsApp(numero_wa, res = null) {
 
                 const telefoneCliente = remoteJid.split('@')[0];
                 console.log(`\n[WA] 📨 Mensagem de ${telefoneCliente}: "${textMessage}"`);
+                console.log(`[DEBUG] 🆔 JID Completo: ${remoteJid}`);
 
                 try {
                     await delay(3000); // Anti-spam curto
@@ -551,15 +552,30 @@ app.post('/chat/send-manual', async (req, res) => {
         if (!sock) return res.status(400).json({ erro: 'WhatsApp não conectado.' });
 
         const cleanPhone = String(telefone_cliente).replace(/\D/g, '');
-        const jid = `${cleanPhone}@s.whatsapp.net`;
         
-        await sock.sendMessage(jid, { text: mensagem });
+        // Tenta primeiro o formato padrão
+        let jid = `${cleanPhone}@s.whatsapp.net`;
+        
+        // Se o número for muito longo (LID), ajusta o sufixo
+        if (cleanPhone.length > 13) {
+            jid = `${cleanPhone}@lid`;
+        }
+
+        console.log(`[CHAT] 🚀 Tentativa de envio para JID: ${jid}`);
+        
+        try {
+            await sock.sendMessage(jid, { text: mensagem });
+        } catch (err) {
+            console.log(`[CHAT] 🔄 Falha no primeiro JID, tentando fallback...`);
+            // Fallback: se tentou .net e falhou, tenta .lid (ou vice-versa)
+            const fallbackJid = jid.endsWith('@lid') ? `${cleanPhone}@s.whatsapp.net` : `${cleanPhone}@lid`;
+            await sock.sendMessage(fallbackJid, { text: mensagem });
+            jid = fallbackJid;
+        }
 
         const { data: contato } = await supabase.from('contatos').select('id').eq('numero_wa', numero_wa).eq('telefone', telefone_cliente).maybeSingle();
         if (contato) {
-            // DESLIGA IA AUTOMATICAMENTE (HANDOFF)
             await supabase.from('conversas').update({ ia_ativa: false }).eq('numero_wa', numero_wa).eq('contato_id', contato.id);
-
             const { data: conv } = await supabase.from('conversas').select('id').eq('contato_id', contato.id).maybeSingle();
             if (conv) {
                 await supabase.from('mensagens').insert([{
@@ -571,6 +587,7 @@ app.post('/chat/send-manual', async (req, res) => {
         }
         res.json({ ok: true });
     } catch (e) {
+        console.error(`[CHAT] ❌ Erro definitivo no envio: ${e.message}`);
         res.status(500).json({ erro: e.message });
     }
 });
