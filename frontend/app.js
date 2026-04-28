@@ -3,7 +3,7 @@
 //  Versão: 4.0  |  Design System Dual-Theme · Gestão de Equipe
 // ─────────────────────────────────────────────────────────────────────────────
 
-const API = 'https://sunset-routine-locked-cases.trycloudflare.com';
+const API = 'https://grew-reminder-alliance-clay.trycloudflare.com';
 
 let state = {
     lojas: [],
