@@ -13,6 +13,24 @@ const supabase = createClient(
     process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_KEY
 );
 
+// ─── CRM: BUSCA DE CATÁLOGO E CONTATOS ────────────────────────────────────────
+async function getCatalogo(numero_wa) {
+    try {
+        const { data, error } = await supabase
+            .from('catalogo_produtos')
+            .select('nome_produto, preco, descricao')
+            .eq('numero_wa', numero_wa)
+            .eq('disponivel_para_ia', true);
+
+        if (error || !data || data.length === 0) return 'Nenhum produto cadastrado no catálogo.';
+        
+        return data.map(p => `- ${p.nome_produto}: R$ ${p.preco} (${p.descricao || 'Sem descrição'})`).join('\n');
+    } catch (e) {
+        console.error(`[CRM] Erro ao buscar catálogo: ${e.message}`);
+        return 'Erro ao acessar catálogo.';
+    }
+}
+
 // ─── XENOVA: PRÉ-CARREGAMENTO NO BOOT ────────────────────────────────────────
 let _extractor = null;
 
@@ -67,7 +85,7 @@ async function getContext(userMessage, numero_wa) {
 }
 
 // ─── PROMPT ENGINEERING ──────────────────────────────────────────────────────
-function buildSystemPrompt(config, context, isFirstMessage) {
+function buildSystemPrompt(config, context, catalogo, isFirstMessage) {
     const empresa = config.nome_empresa || 'Nossa Empresa';
     const persona = config.prompt_base || 'Você é um assistente virtual útil.';
     const tom = config.tom_voz || 'Profissional e educado';
@@ -77,7 +95,13 @@ function buildSystemPrompt(config, context, isFirstMessage) {
         ? `Inicie com uma saudação breve e pergunte como pode ajudar.` 
         : 'Vá direto ao ponto, evite saudações repetitivas.';
 
-    return `Você é o assistente virtual oficial da empresa "${empresa}".
+    return `Você é um consultor de vendas oficial da empresa "${empresa}".
+
+[CATÁLOGO DE PRODUTOS]
+Estes são os ÚNICOS produtos em estoque e seus preços exatos:
+${catalogo}
+
+REGRA INQUEBRÁVEL: É ESTRITAMENTE PROIBIDO oferecer, inventar ou precificar produtos fora desta lista ou alterar os valores acima.
 
 [PERSONALIDADE E ORIENTAÇÕES]
 ${persona}
@@ -91,7 +115,7 @@ ${regras}
 - Responda de forma concisa.
 - NUNCA invente informações. Se não souber, peça para o cliente aguardar um atendente.
 
-[CONTEXTO DA BASE DE CONHECIMENTO]
+[CONTEXTO ADICIONAL]
 ${context || 'Nenhuma informação específica encontrada na base.'}`;
 }
 
@@ -136,8 +160,11 @@ async function generateResponse(userMessage, numero_wa, remoteJid, conversa_id) 
             throw new Error('Configuração não encontrada.');
         }
 
-        // 2. Busca Contexto (RAG)
-        const context = await getContext(userMessage, numero_wa);
+        // 2. Busca Contexto (RAG) e Catálogo
+        const [context, catalogo] = await Promise.all([
+            getContext(userMessage, numero_wa),
+            getCatalogo(numero_wa)
+        ]);
 
         // 3. Busca Histórico Recente (com Fallback)
         let messages = [];
@@ -154,7 +181,7 @@ async function generateResponse(userMessage, numero_wa, remoteJid, conversa_id) 
             const isFirstMessage = !history || history.length <= 1;
             
             messages = [
-                { role: 'system', content: buildSystemPrompt(config, context, isFirstMessage) },
+                { role: 'system', content: buildSystemPrompt(config, context, catalogo, isFirstMessage) },
                 ...(history || []).reverse().map(m => ({ 
                     role: m.remetente_tipo === 'user' ? 'user' : 'assistant', 
                     content: m.conteudo 
@@ -164,7 +191,7 @@ async function generateResponse(userMessage, numero_wa, remoteJid, conversa_id) 
         } catch (hError) {
             console.error(`[AI] ⚠️ Falha ao recuperar histórico (prosseguindo sem ele): ${hError.message}`);
             messages = [
-                { role: 'system', content: buildSystemPrompt(config, context, true) },
+                { role: 'system', content: buildSystemPrompt(config, context, catalogo, true) },
                 { role: 'user', content: userMessage }
             ];
         }

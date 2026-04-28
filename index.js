@@ -154,18 +154,44 @@ async function startWhatsApp(numero_wa, res = null) {
 
                 const telefoneCliente = remoteJid.split('@')[0];
                 console.log(`\n[WA] 📨 Mensagem de ${telefoneCliente}: "${textMessage}"`);
-                console.log(`[DEBUG] 🆔 JID Completo: ${remoteJid}`);
 
                 try {
-                    await delay(3000); // Anti-spam curto
+                    // 1. Busca Configurações do Tenant (Motor de IA)
+                    const { data: config } = await supabase.from('agentes_config')
+                        .select('delay_resposta_segundos, modo_operacao')
+                        .eq('numero_wa', numero_wa)
+                        .maybeSingle();
 
-                    // Fluxo Supabase
-                    let { data: contato } = await supabase.from('contatos').select('id').eq('numero_wa', numero_wa).eq('telefone', telefoneCliente).maybeSingle();
-                    if (!contato) {
-                        const { data: novo } = await supabase.from('contatos').insert([{ numero_wa, telefone: telefoneCliente, nome: msg.pushName || telefoneCliente }]).select().single();
-                        contato = novo;
+                    if (config?.modo_operacao === 'manual') {
+                        console.log(`[WA] ⏸️ Modo manual ativo para ${numero_wa}. Ignorando IA.`);
+                        continue;
                     }
 
+                    // 2. Delay Dinâmico
+                    const waitTime = (config?.delay_resposta_segundos || 5) * 1000;
+                    await delay(waitTime);
+
+                    // 3. Gestão de Contato CRM
+                    let { data: contato } = await supabase.from('contatos_crm')
+                        .select('id')
+                        .eq('numero_wa', numero_wa)
+                        .eq('telefone_cliente', telefoneCliente)
+                        .maybeSingle();
+
+                    if (!contato) {
+                        const { data: novo } = await supabase.from('contatos_crm').insert([{ 
+                            numero_wa, 
+                            telefone_cliente: telefoneCliente, 
+                            nome: msg.pushName || telefoneCliente,
+                            status: 'Lead',
+                            ultima_interacao: new Date()
+                        }]).select().single();
+                        contato = novo;
+                    } else {
+                        await supabase.from('contatos_crm').update({ ultima_interacao: new Date() }).eq('id', contato.id);
+                    }
+
+                    // 4. Fluxo de Conversa
                     let { data: conversa } = await supabase.from('conversas').select('id, ia_ativa').eq('numero_wa', numero_wa).eq('contato_id', contato.id).maybeSingle();
                     if (!conversa) {
                         const { data: nova } = await supabase.from('conversas').insert([{ numero_wa, contato_id: contato.id, ia_ativa: true }]).select().single();
@@ -186,7 +212,7 @@ async function startWhatsApp(numero_wa, res = null) {
 
                             console.log(`[AI] ✨ Resposta gerada: "${mensagemLimpa.substring(0, 30)}..."`);
 
-                            // Envio para o WhatsApp com try/catch isolado
+                            // Envio para o WhatsApp
                             try {
                                 await sock.sendMessage(remoteJid, { text: mensagemLimpa });
                                 console.log(`[WA] ✅ Mensagem enviada para ${telefoneCliente}`);
@@ -194,11 +220,11 @@ async function startWhatsApp(numero_wa, res = null) {
                                 console.error(`[WA] ❌ FALHA ao enviar mensagem: ${sendError.message}`);
                             }
 
-                            // Registro no banco (Usando 'humano' para contornar restrição do banco)
+                            // Registro no banco
                             await supabase.from('mensagens').insert([{ 
                                 conversa_id: conversa.id, 
                                 remetente_tipo: 'humano', 
-                                conteudo: `🤖 AI: ${mensagemLimpa}` 
+                                conteudo: mensagemLimpa 
                             }]);
 
                             if (handoffTriggered) {
@@ -401,6 +427,60 @@ app.post('/wa/connect', async (req, res) => {
 app.get('/wa/status/:numero_wa', (req, res) => {
     const sock = activeSessions[req.params.numero_wa];
     res.json({ status: sock ? 'conectado' : 'desconectado', numero: req.params.numero_wa });
+});
+
+// ══ CATÁLOGO DE PRODUTOS ══════════════════════════════════════════════════
+app.get('/cliente/catalogo/:numero_wa', async (req, res) => {
+    try {
+        const { data, error } = await supabase.from('catalogo_produtos')
+            .select('*')
+            .eq('numero_wa', req.params.numero_wa)
+            .order('nome_produto', { ascending: true });
+        if (error) throw error;
+        res.json(data || []);
+    } catch (e) { res.status(500).json({ erro: e.message }); }
+});
+
+app.post('/cliente/catalogo', async (req, res) => {
+    const { id, numero_wa, nome_produto, descricao, preco, sku, disponivel_para_ia } = req.body;
+    try {
+        const payload = { numero_wa, nome_produto, descricao, preco, sku, disponivel_para_ia };
+        let error;
+        if (id) {
+            const resSup = await supabase.from('catalogo_produtos').update(payload).eq('id', id);
+            error = resSup.error;
+        } else {
+            const resSup = await supabase.from('catalogo_produtos').insert([payload]);
+            error = resSup.error;
+        }
+        if (error) throw error;
+        res.json({ ok: true });
+    } catch (e) { res.status(500).json({ erro: e.message }); }
+});
+
+app.delete('/cliente/catalogo/:id', async (req, res) => {
+    try {
+        const { error } = await supabase.from('catalogo_produtos').delete().eq('id', req.params.id);
+        if (error) throw error;
+        res.json({ ok: true });
+    } catch (e) { res.status(500).json({ erro: e.message }); }
+});
+
+app.get('/chat/contato/:numero_wa/:telefone', async (req, res) => {
+    try {
+        const { numero_wa, telefone } = req.params;
+        const { data: contato, error } = await supabase
+            .from('contatos_crm')
+            .select('*')
+            .eq('numero_wa', numero_wa)
+            .eq('telefone_cliente', telefone)
+            .maybeSingle();
+        
+        if (error) throw error;
+        res.json(contato || {});
+    } catch (e) {
+        res.status(500).json({ erro: e.message });
+    }
 });
 
 app.get('/chat/conversas/:numero_wa', async (req, res) => {

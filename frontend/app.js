@@ -211,13 +211,15 @@ function onLojaChange() {
 const TITLES = {
     dashboard: 'Dashboard',
     agente: 'Agente & Prompt',
-    rag: 'Base de Conhecimento',
+    rag: 'Cérebro (RAG)',
     scraping: 'Web Scraping',
     conversas: 'Caixa de Entrada',
     whatsapp: 'Conexão WhatsApp',
     clientes: 'Gestão de Clientes',
     equipe: 'Configurações da Equipe',
     diagnostics: 'Diagnóstico do Sistema',
+    contatos: 'Gestão de Leads (CRM)',
+    catalogo: 'Catálogo de Produtos',
     more: 'Mais',
 };
 
@@ -231,13 +233,15 @@ const PAGES = {
     clientes: renderClientes,
     equipe: renderEquipe,
     diagnostics: renderDiagnostics,
+    contatos: renderContatos,
+    catalogo: renderCatalogo,
     more: renderMore,
 };
 
 const PERMISSIONS = {
-    superadmin: ['dashboard', 'agente', 'rag', 'scraping', 'conversas', 'whatsapp', 'clientes', 'equipe', 'diagnostics'],
-    admin: ['dashboard', 'agente', 'rag', 'scraping', 'conversas', 'equipe'],
-    vendedor: ['dashboard', 'agente', 'conversas'],
+    superadmin: ['dashboard', 'agente', 'rag', 'scraping', 'conversas', 'whatsapp', 'clientes', 'equipe', 'diagnostics', 'contatos', 'catalogo'],
+    admin: ['dashboard', 'agente', 'rag', 'scraping', 'conversas', 'equipe', 'contatos', 'catalogo'],
+    vendedor: ['dashboard', 'agente', 'conversas', 'contatos'],
     suporte: ['dashboard', 'agente', 'conversas']
 };
 
@@ -361,83 +365,44 @@ async function renderDashboard() {
             api.get('/cliente/rag/' + state.lojaId),
         ]);
 
-        const waBadge = wa.status === 'conectado'
-            ? '<span class="badge badge-success">● Conectado</span>'
-            : wa.status === 'aguardando'
-                ? '<span class="badge badge-warning">⏳ Aguardando</span>'
-                : '<span class="badge badge-default">○ Desconectado</span>';
-
-        let totalConversas = '—';
-        try {
-            const convs = await api.get('/chat/conversas/' + state.lojaId);
-            totalConversas = convs.length;
-        } catch { /* silencioso */ }
+        const waStatus = wa.status === 'conectado' 
+            ? '<span style="color:var(--primary)">● Conectado</span>' 
+            : '<span style="color:var(--destructive)">○ Desconectado</span>';
 
         c.innerHTML = `
         <div class="stats-grid">
             <div class="stat-card">
-                <div class="stat-label">
-                    <i class="fas fa-robot" style="color:var(--primary)"></i>
-                    Status da IA
-                </div>
-                <div class="stat-value" style="color:var(--success);font-size:18px;margin-top:6px">● Pronta</div>
-                <div class="stat-trend">Monitorando</div>
+                <div class="stat-label"><i class="fas fa-comments"></i> Conversas Ativas</div>
+                <div class="stat-value">--</div>
+                <div style="font-size:11px; color:var(--primary); margin-top:8px">↑ 12% este mês</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">
-                    <i class="fab fa-whatsapp" style="color:#25D366"></i>
-                    WhatsApp
-                </div>
-                <div style="margin-top:10px">${waBadge}</div>
-                <div class="stat-trend" style="background:var(--muted);color:var(--muted-foreground);border-color:var(--border)">
-                    ${esc(state.lojaId)}
-                </div>
+                <div class="stat-label"><i class="fas fa-user-plus"></i> Novos Leads</div>
+                <div class="stat-value">--</div>
+                <div style="font-size:11px; color:var(--primary); margin-top:8px">Capturados via WA</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">
-                    <i class="fas fa-database" style="color:#3b82f6"></i>
-                    Base de Conhecimento
-                </div>
+                <div class="stat-label"><i class="fas fa-brain"></i> Conhecimento</div>
                 <div class="stat-value">${docs.length}</div>
-                <div style="font-size:12px;color:var(--muted-foreground);margin-top:4px">
-                    documento${docs.length !== 1 ? 's' : ''}
-                </div>
+                <div style="font-size:11px; color:var(--muted-foreground); margin-top:8px">Documentos ativos</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">
-                    <i class="fas fa-comments" style="color:#a855f7"></i>
-                    Conversas Ativas
-                </div>
-                <div class="stat-value">${totalConversas}</div>
-                <div class="stat-trend">Caixa de entrada</div>
+                <div class="stat-label"><i class="fab fa-whatsapp"></i> Status WA</div>
+                <div class="stat-value" style="font-size:18px; margin-top:10px">${waStatus}</div>
+                <div style="font-size:11px; color:var(--muted-foreground); margin-top:8px">${esc(state.lojaId)}</div>
             </div>
         </div>
 
-        <div class="card">
-            <div class="card-title" style="margin-bottom:14px">⚡ Ações Rápidas</div>
-            <div style="display:flex;gap:10px;flex-wrap:wrap">
-                ${wa.status !== 'conectado' ? '<button class="btn btn-primary" onclick="navigate(\'whatsapp\')"><i class="fab fa-whatsapp"></i> Conectar WhatsApp</button>' : ''}
-                ${docs.length === 0 ? '<button class="btn btn-primary" onclick="navigate(\'scraping\')"><i class="fas fa-globe"></i> Importar Site</button>' : ''}
-                <button class="btn btn-secondary" onclick="navigate('agente')"><i class="fas fa-robot"></i> Configurar Agente</button>
-                <button class="btn btn-secondary" onclick="navigate('rag')"><i class="fas fa-book"></i> Conhecimento</button>
-                <button class="btn btn-secondary" onclick="navigate('conversas')"><i class="fas fa-comment-alt"></i> Caixa de Entrada</button>
-                <button class="btn btn-ghost" onclick="navigate('diagnostics')"><i class="fas fa-tools"></i> Diagnóstico</button>
+        <div class="card" style="background: linear-gradient(135deg, var(--card) 0%, #1a1f26 100%)">
+            <div class="card-title">🚀 Ações Rápidas</div>
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:12px">
+                <button class="btn btn-primary" onclick="navigate('whatsapp')"><i class="fab fa-whatsapp"></i> Conectar WhatsApp</button>
+                <button class="btn btn-secondary" onclick="navigate('agente')"><i class="fas fa-robot"></i> Configurar IA</button>
+                <button class="btn btn-secondary" onclick="navigate('rag')"><i class="fas fa-brain"></i> Treinar Cérebro</button>
+                <button class="btn btn-ghost" onclick="navigate('conversas')"><i class="fas fa-comment-dots"></i> Abrir Chat</button>
             </div>
         </div>
-
-        ${docs.length > 0 ? `
-        <div class="card">
-            <div class="card-title" style="margin-bottom:16px">📄 Últimos Documentos Importados</div>
-            ${docs.slice(0, 5).map(d => `
-            <div style="padding:10px 0;border-bottom:1px solid var(--border);font-size:13px;display:flex;align-items:center;gap:10px">
-                <i class="fas ${d.tipo === 'web_scraping' ? 'fa-globe' : 'fa-edit'}" style="color:var(--primary);opacity:0.8;flex-shrink:0"></i>
-                <span style="font-weight:600;flex:1">${esc(d.titulo)}</span>
-                <span class="badge badge-default">${d.tipo === 'web_scraping' ? 'Site' : 'Manual'}</span>
-            </div>`).join('')}
-            <button class="btn btn-ghost" style="margin-top:14px;width:100%" onclick="navigate('rag')">
-                Ver todos os documentos →
-            </button>
-        </div>` : ''}`;
+        `;
     } catch (e) { c.innerHTML = errMsg(e); }
 }
 
@@ -781,12 +746,13 @@ async function renderConversas() {
 
     c.innerHTML = `
     <div class="omnichat-layout" id="omnichatLayout">
+        <!-- Coluna 1: Contatos -->
         <div class="oc-sidebar-panel">
             <div class="oc-panel-header">
                 <span class="oc-panel-title">Caixa de Entrada</span>
                 <div style="display:flex;align-items:center;gap:8px">
-                    <span class="oc-badge" id="ocBadge">0</span>
-                    <button class="btn btn-ghost" style="padding:4px 10px;font-size:11px" onclick="ocLoadContacts()" title="Atualizar">
+                    <span class="oc-counter" id="ocBadge">0</span>
+                    <button class="sidebar-logout-btn" style="padding:4px" onclick="ocLoadContacts()" title="Atualizar">
                         <i class="fas fa-sync-alt"></i>
                     </button>
                 </div>
@@ -798,11 +764,21 @@ async function renderConversas() {
                 <div class="spinner" style="margin:24px auto"></div>
             </div>
         </div>
+
+        <!-- Coluna 2: Chat -->
         <div class="oc-chat-panel" id="ocChatPanel">
-            <div class="oc-empty-state">
-                <div style="font-size:52px;opacity:.15">💬</div>
-                <div style="font-size:14px;color:var(--muted-foreground);margin-top:12px;font-weight:600">Selecione uma conversa</div>
-                <div style="font-size:12px;color:var(--muted-foreground);margin-top:4px">para visualizar o histórico</div>
+            <div class="empty-state" style="height:100%; display:flex; flex-direction:column; justify-content:center">
+                <div style="font-size:48px; opacity:0.1; margin-bottom:16px"><i class="fas fa-comment-dots"></i></div>
+                <h3 style="font-size:16px; color:var(--muted-foreground)">Selecione uma conversa</h3>
+                <p style="font-size:12px; color:var(--sidebar-muted)">Clique em um contato na lateral para gerenciar o atendimento.</p>
+            </div>
+        </div>
+
+        <!-- Coluna 3: CRM Profile -->
+        <div class="oc-crm-panel" id="ocCrmPanel">
+            <div style="text-align:center; padding-top:40px; color:var(--sidebar-muted)">
+                <i class="fas fa-user-circle" style="font-size:48px; opacity:0.1; margin-bottom:12px"></i>
+                <div style="font-size:12px">Perfil do Lead</div>
             </div>
         </div>
     </div>`;
@@ -853,17 +829,24 @@ function ocRenderContactList(list) {
         const ia = _ocIaStates[c.id] !== false;
         const active = _ocActiveId === c.id;
         const when = c.atualizado_em
-            ? new Date(c.atualizado_em).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+            ? new Date(c.atualizado_em).toLocaleDateString('pt-BR') === new Date().toLocaleDateString('pt-BR')
+                ? new Date(c.atualizado_em).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+                : 'Ontem'
             : '';
+            
+        const badgeHtml = ia 
+            ? `<span class="crm-score-badge" style="font-size:9px; padding:2px 6px">IA ATIVA</span>`
+            : `<span class="crm-score-badge" style="font-size:9px; padding:2px 6px; background:var(--warning); color:#000">AGUARDANDO</span>`;
+
         return `<div class="oc-contact-item${active ? ' active' : ''}" onclick="ocSelectContact('${esc(c.id)}')">
-            <div class="oc-avatar-sm${!ia ? ' ia-off' : ''}">${ocInitials(c.nome)}</div>
+            <div class="sidebar-user-avatar" style="width:40px; height:40px; font-size:12px; margin-right:12px">${ocInitials(c.nome)}</div>
             <div class="oc-contact-body">
-                <div class="oc-contact-name">${esc(c.nome || c.numero_cliente)}</div>
-                <div class="oc-contact-preview">${esc(c.ultima_msg || '—')}</div>
-            </div>
-            <div class="oc-contact-meta">
-                <span class="oc-contact-time">${when}</span>
-                <div class="oc-ia-indicator${!ia ? ' off' : ''}"></div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px">
+                    <div class="oc-contact-name">${esc(c.nome || c.numero_cliente)}</div>
+                    <span class="oc-contact-time" style="font-size:10px">${when}</span>
+                </div>
+                <div class="oc-contact-preview" style="font-size:12px; margin-bottom:6px">${esc(c.ultima_msg || '—')}</div>
+                ${badgeHtml}
             </div>
         </div>`;
     }).join('');
@@ -888,41 +871,106 @@ async function ocSelectContact(id) {
     const ia = _ocIaStates[id] !== false;
 
     panel.innerHTML = `
-    <div class="oc-chat-header">
-        <button class="oc-back-btn" onclick="ocCloseChat()" title="Voltar">
-            <i class="fas fa-arrow-left"></i>
-        </button>
-        <div class="oc-avatar-sm">${ocInitials(contact.nome)}</div>
-        <div class="oc-chat-header-info">
-            <div class="oc-chat-name">${esc(contact.nome || contact.numero_cliente)}</div>
-            <div class="oc-chat-phone">${esc(contact.numero_cliente)}</div>
+    <div class="oc-chat-header" style="height:80px; border-bottom:1px solid var(--border); display:flex; align-items:center; padding:0 24px; background:var(--card)">
+        <div class="sidebar-user-avatar" style="width:40px; height:40px; margin-right:12px">${ocInitials(contact.nome)}</div>
+        <div style="flex:1">
+            <div style="font-size:15px; font-weight:700; color:var(--foreground)">${esc(contact.nome || contact.numero_cliente)}</div>
+            <div style="font-size:11px; color:var(--sidebar-muted)">${esc(contact.numero_cliente)}</div>
         </div>
         <button class="oc-ia-toggle-btn${!ia ? ' off' : ''}" id="ocIaBtn_${esc(id)}" onclick="ocToggleIA('${esc(id)}')">
             <div class="oc-switch${!ia ? ' off' : ''}"></div>
             <span id="ocIaLabel_${esc(id)}">${ia ? 'IA ativa' : 'IA pausada'}</span>
         </button>
     </div>
-    <div class="oc-handoff-banner${!ia ? ' visible' : ''}" id="ocBanner_${esc(id)}">
-        ⚠️ Modo de atendimento manual ativo — a IA está pausada para este contato.
-    </div>
-    <div class="oc-messages-area" id="ocMsgs_${esc(id)}">
+
+    <div class="oc-messages-area" id="ocMsgs_${esc(id)}" style="flex:1; padding:24px; overflow-y:auto; background:var(--background)">
         <div class="spinner" style="margin:40px auto"></div>
     </div>
-    <div class="oc-composer">
-        <textarea class="oc-composer-input" id="ocInput_${esc(id)}"
-            placeholder="Mensagem..."
-            rows="1"
+
+    <div class="oc-quick-actions">
+        <button class="btn-quick" onclick="ocSendQuick('Saudação', '${esc(id)}')">👋 Saudação</button>
+        <button class="btn-quick" onclick="ocSendQuick('Catálogo', '${esc(id)}')">📂 Catálogo</button>
+        <button class="btn-quick" onclick="ocSendQuick('Pix', '${esc(id)}')">💰 Pix</button>
+        <button class="btn-quick" onclick="ocSendQuick('Aguardar Atendente', '${esc(id)}')">👨‍💻 Aguardar</button>
+    </div>
+
+    <div class="oc-composer" style="padding:20px; background:var(--card); border-top:1px solid var(--border); display:flex; gap:12px; align-items:end">
+        <button class="btn-logout" style="padding:10px; border-radius:10px" title="Anexar"><i class="fas fa-paperclip"></i></button>
+        <textarea class="form-input" id="ocInput_${esc(id)}" 
+            placeholder="Digite sua mensagem aqui..." 
+            style="min-height:44px; max-height:150px; border-radius:12px; resize:none"
             onkeydown="ocHandleKey(event,'${esc(id)}')"
-            oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,120)+'px'"></textarea>
-        <button class="btn btn-primary oc-send-btn" id="ocSendBtn_${esc(id)}" onclick="ocSendMessage('${esc(id)}')">
+            oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea>
+        <button class="btn btn-primary" style="height:44px; width:44px; padding:0" onclick="ocSendMessage('${esc(id)}')">
             <i class="fas fa-paper-plane"></i>
         </button>
     </div>`;
 
-    const layout = document.getElementById('omnichatLayout');
-    if (layout) layout.classList.add('chat-open');
-
+    ocRenderCrmProfile(contact.numero_cliente);
     await ocLoadMessages(id);
+}
+
+async function ocRenderCrmProfile(telefone) {
+    const el = document.getElementById('ocCrmPanel');
+    if (!el) return;
+    el.innerHTML = '<div class="spinner" style="margin:40px auto"></div>';
+    
+    try {
+        const crm = await api.get(`/chat/contato/${state.lojaId}/${telefone}`);
+        
+        el.innerHTML = `
+        <div class="crm-section" style="text-align:center; margin-bottom:32px">
+            <div class="sidebar-user-avatar" style="width:80px; height:80px; font-size:24px; margin:0 auto 16px">${ocInitials(crm.nome || telefone)}</div>
+            <div style="font-size:18px; font-weight:700; color:var(--foreground)">${esc(crm.nome || 'Lead s/ Nome')}</div>
+            <div style="font-size:12px; color:var(--sidebar-muted)">${esc(telefone)}</div>
+        </div>
+
+        <div class="crm-section">
+            <div class="crm-label">Status do CRM</div>
+            <div class="crm-value"><span class="crm-score-badge">${esc(crm.status || 'Lead')}</span></div>
+        </div>
+
+        <div class="crm-section">
+            <div class="crm-label">Intenção de Compra</div>
+            <div class="crm-value" style="color:var(--primary)">Alta - Consultando Preço</div>
+        </div>
+
+        <div class="crm-section">
+            <div class="crm-label">Lead Score</div>
+            <div class="crm-value">🔥 ${crm.lead_score || 0} / 100</div>
+        </div>
+
+        <div class="crm-section">
+            <div class="crm-label">Memória do Contato</div>
+            <div class="crm-memory-box">
+                ${esc(crm.memoria_ia || 'A IA ainda não gerou um resumo para este contato.')}
+            </div>
+        </div>
+
+        <div style="margin-top:auto; padding-top:20px">
+            <button class="btn btn-secondary" style="width:100%; justify-content:center; margin-bottom:10px" onclick="toast('Em breve: Editar dados CRM')">
+                <i class="fas fa-edit" style="margin-right:8px"></i> Editar Perfil
+            </button>
+            <button class="btn btn-primary" style="width:100%; justify-content:center" onclick="ocToggleIA('${esc(telefone)}')">
+                <i class="fas fa-hand-holding-hand" style="margin-right:8px"></i> Assumir Atendimento
+            </button>
+        </div>`;
+    } catch (e) {
+        el.innerHTML = `<div style="padding:20px; font-size:12px; color:var(--destructive)">Erro ao carregar CRM.</div>`;
+    }
+}
+
+async function ocSendQuick(type, id) {
+    const inp = document.getElementById('ocInput_' + id);
+    if (!inp) return;
+    let text = '';
+    if (type === 'Saudação') text = 'Olá! Tudo bem? Como posso te ajudar hoje?';
+    if (type === 'Catálogo') text = 'Vou te enviar nosso catálogo de produtos atualizado. Um momento...';
+    if (type === 'Pix') text = 'Nossa chave Pix é o nosso CNPJ: 12.345.678/0001-90';
+    if (type === 'Aguardar Atendente') text = 'Um de nossos especialistas já vai te atender. Por favor, aguarde um momento.';
+    
+    inp.value = text;
+    inp.focus();
 }
 
 async function ocLoadMessages(id) {
@@ -960,12 +1008,10 @@ function renderBubble(m) {
     
     if (m.remetente_tipo === 'user') {
         bubbleClass = 'user';
-    } else if (m.remetente_tipo === 'assistant' || m.remetente_tipo === 'bot' || m.conteudo.startsWith('🤖 AI:')) {
+    } else if (m.remetente_tipo === 'assistant' || m.remetente_tipo === 'bot') {
         bubbleClass = 'assistant';
         icon = '<i class="fas fa-robot" style="margin-right:4px;font-size:10px"></i>';
         label = 'IA';
-        // Remove o marcador visual para não poluir o balão
-        m.conteudo = m.conteudo.replace('🤖 AI: ', '');
     } else {
         bubbleClass = 'human';
         icon = '<i class="fas fa-user-tie" style="margin-right:4px;font-size:10px"></i>';
@@ -1869,7 +1915,148 @@ async function initLojas() {
         const topbar = document.getElementById('lojaNameTopbar');
         if (topbar) topbar.textContent = state.loja ? state.loja.nome : '';
     } catch (e) { console.error('[RoboTI] Erro ao carregar lojas:', e); }
+}async function renderContatos() {
+    const c = document.getElementById('pageContent');
+    if (!state.lojaId) { c.innerHTML = noLojaMsg(); return; }
+    c.innerHTML = `<div class="card">
+        <div class="card-title">Gestão de Leads (CRM)</div>
+        <p style="color:var(--muted-foreground); margin-bottom: 24px">Leads capturados e qualificados pela IA.</p>
+        <div class="empty-state">
+            <div class="empty-icon" style="color:var(--primary); font-size: 48px"><i class="fas fa-users"></i></div>
+            <h3>Módulo em Integração</h3>
+            <p>Estamos sincronizando os dados da tabela <code>contatos_crm</code> com o painel.</p>
+        </div>
+    </div>`;
 }
+
+async function renderCatalogo() {
+    const c = document.getElementById('pageContent');
+    if (!state.lojaId) { c.innerHTML = noLojaMsg(); return; }
+
+    try {
+        const produtos = await api.get('/cliente/catalogo/' + state.lojaId);
+        
+        c.innerHTML = `
+        <div class="card" style="margin-bottom:24px">
+            <div style="display:flex; justify-content:space-between; align-items:center">
+                <div>
+                    <h2 class="card-title" style="margin-bottom:4px">Catálogo de Produtos</h2>
+                    <p style="font-size:13px; color:var(--muted-foreground)">Gerencie os produtos que a IA está autorizada a consultar e oferecer.</p>
+                </div>
+                <button class="btn btn-primary" onclick="openModalProduto()">
+                    <i class="fas fa-plus"></i> Novo Produto
+                </button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div style="overflow-x:auto">
+                <table style="width:100%; border-collapse:collapse; font-size:14px">
+                    <thead>
+                        <tr style="border-bottom:1px solid var(--border); text-align:left">
+                            <th style="padding:16px; color:var(--sidebar-muted); font-size:11px; text-transform:uppercase">Produto</th>
+                            <th style="padding:16px; color:var(--sidebar-muted); font-size:11px; text-transform:uppercase">SKU</th>
+                            <th style="padding:16px; color:var(--sidebar-muted); font-size:11px; text-transform:uppercase">Preço</th>
+                            <th style="padding:16px; color:var(--sidebar-muted); font-size:11px; text-transform:uppercase">IA</th>
+                            <th style="padding:16px; color:var(--sidebar-muted); font-size:11px; text-transform:uppercase; text-align:right">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="catalogoList">
+                        ${produtos.map(p => `
+                            <tr style="border-bottom:1px solid var(--border)">
+                                <td style="padding:16px">
+                                    <div style="font-weight:600">${esc(p.nome_produto)}</div>
+                                    <div style="font-size:12px; color:var(--muted-foreground)">${esc(p.descricao || '')}</div>
+                                </td>
+                                <td style="padding:16px; font-family:'JetBrains Mono'">${esc(p.sku || '--')}</td>
+                                <td style="padding:16px; font-weight:700; color:var(--primary)">R$ ${Number(p.preco).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
+                                <td style="padding:16px">
+                                    <span class="crm-score-badge" style="background:${p.disponivel_para_ia ? 'var(--primary-glow)' : 'var(--muted)'}; color:${p.disponivel_para_ia ? 'var(--primary)' : 'var(--sidebar-muted)'}">
+                                        ${p.disponivel_para_ia ? 'AUTORIZADO' : 'OCULTO'}
+                                    </span>
+                                </td>
+                                <td style="padding:16px; text-align:right">
+                                    <button class="btn-logout" onclick="openModalProduto('${p.id}')" title="Editar"><i class="fas fa-edit"></i></button>
+                                    <button class="btn-logout" style="color:var(--destructive)" onclick="deleteProduto('${p.id}')" title="Excluir"><i class="fas fa-trash"></i></button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                        ${!produtos.length ? '<tr><td colspan="5" style="padding:40px; text-align:center; color:var(--sidebar-muted)">Nenhum produto cadastrado.</td></tr>' : ''}
+                    </tbody>
+                </table>
+            </div>
+        </div>`;
+    } catch (e) { c.innerHTML = errMsg(e); }
+}
+
+async function openModalProduto(id = null) {
+    let p = { nome_produto: '', descricao: '', preco: '', sku: '', disponivel_para_ia: true };
+    if (id) {
+        try {
+            const produtos = await api.get('/cliente/catalogo/' + state.lojaId);
+            p = produtos.find(item => item.id === id) || p;
+        } catch (e) { toast('Erro ao carregar produto', 'error'); return; }
+    }
+
+    const html = `
+    <h2 class="card-title" style="margin-bottom:24px">${id ? 'Editar' : 'Novo'} Produto</h2>
+    <div class="form-group">
+        <label>Nome do Produto</label>
+        <input type="text" class="form-input" id="p_nome" value="${esc(p.nome_produto)}" placeholder="Ex: iPhone 15 Pro">
+    </div>
+    <div class="form-group">
+        <label>SKU (Código)</label>
+        <input type="text" class="form-input" id="p_sku" value="${esc(p.sku)}" placeholder="Ex: IPH15P-256">
+    </div>
+    <div class="form-group">
+        <label>Preço (R$)</label>
+        <input type="number" step="0.01" class="form-input" id="p_preco" value="${p.preco}" placeholder="0,00">
+    </div>
+    <div class="form-group">
+        <label>Descrição para a IA</label>
+        <textarea class="form-textarea" id="p_desc" placeholder="Detalhes técnicos, cores, garantias...">${esc(p.descricao)}</textarea>
+    </div>
+    <div class="form-group" style="display:flex; align-items:center; gap:10px">
+        <input type="checkbox" id="p_ia" ${p.disponivel_para_ia ? 'checked' : ''} style="width:20px; height:20px; accent-color:var(--primary)">
+        <label style="margin:0">Disponível para consulta da IA</label>
+    </div>
+    <div style="display:flex; gap:12px; margin-top:32px">
+        <button class="btn btn-ghost" style="flex:1" onclick="closeModal()">Cancelar</button>
+        <button class="btn btn-primary" style="flex:1" onclick="saveProduto('${id || ''}')">Salvar Produto</button>
+    </div>`;
+    openModal(html);
+}
+
+async function saveProduto(id) {
+    const payload = {
+        id: id || undefined,
+        numero_wa: state.lojaId,
+        nome_produto: document.getElementById('p_nome').value,
+        sku: document.getElementById('p_sku').value,
+        preco: parseFloat(document.getElementById('p_preco').value) || 0,
+        descricao: document.getElementById('p_desc').value,
+        disponivel_para_ia: document.getElementById('p_ia').checked
+    };
+
+    if (!payload.nome_produto) { toast('Nome é obrigatório', 'error'); return; }
+
+    try {
+        await api.post('/cliente/catalogo', payload);
+        toast('✅ Produto salvo com sucesso!');
+        closeModal();
+        renderCatalogo();
+    } catch (e) { toast(e.message, 'error'); }
+}
+
+async function deleteProduto(id) {
+    if (!confirm('Deseja realmente excluir este produto?')) return;
+    try {
+        await api.delete('/cliente/catalogo/' + id);
+        toast('🗑️ Produto excluído.');
+        renderCatalogo();
+    } catch (e) { toast(e.message, 'error'); }
+}
+
 
 async function init() {
     // 1. Aplica tema salvo (o anti-flash no HTML já aplica, mas atualizamos ícones aqui)
