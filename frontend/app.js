@@ -76,6 +76,7 @@ async function doLogin() {
 
         toast('Bem-vindo ao RoboTI BR! ✨');
         await initLojas();
+        applyPermissions();
 
         if (data.is_admin) {
             navigate('clientes');
@@ -232,7 +233,58 @@ const PAGES = {
     more: renderMore,
 };
 
+const PERMISSIONS = {
+    superadmin: ['dashboard', 'agente', 'rag', 'scraping', 'conversas', 'whatsapp', 'clientes', 'equipe', 'diagnostics'],
+    admin:      ['dashboard', 'agente', 'rag', 'scraping', 'conversas', 'equipe'],
+    vendedor:   ['dashboard', 'agente', 'conversas'],
+    suporte:    ['dashboard', 'agente', 'conversas']
+};
+
+function applyPermissions() {
+    const role = state.user?.role?.toLowerCase() || 'vendedor';
+    const isAdmin = state.admin?.email && ['admin@robotibr.com.br', 'diegossilvestre@live.com', 'diegoasilvestre@live.com'].includes(state.admin.email);
+    
+    const userPermissions = isAdmin ? PERMISSIONS.superadmin : (PERMISSIONS[role] || PERMISSIONS.vendedor);
+    
+    // Varre todos os itens de navegação
+    Object.keys(TITLES).forEach(page => {
+        const el = document.getElementById(`nav-${page}`);
+        if (el) {
+            if (userPermissions.includes(page)) {
+                el.style.display = 'flex';
+            } else {
+                el.style.display = 'none';
+            }
+        }
+    });
+
+    // Trava o seletor de loja se não for superadmin
+    const lojaSelect = document.getElementById('lojaSelect');
+    if (lojaSelect) {
+        if (isAdmin) {
+            lojaSelect.disabled = false;
+            lojaSelect.style.opacity = '1';
+            lojaSelect.style.cursor = 'pointer';
+        } else {
+            lojaSelect.disabled = true;
+            lojaSelect.style.opacity = '0.7';
+            lojaSelect.style.cursor = 'not-allowed';
+        }
+    }
+}
+
 function navigate(page) {
+    // Verifica permissão antes de navegar
+    const role = state.user?.role?.toLowerCase() || 'vendedor';
+    const isAdmin = state.admin?.email && ['admin@robotibr.com.br', 'diegossilvestre@live.com', 'diegoasilvestre@live.com'].includes(state.admin.email);
+    const userPermissions = isAdmin ? PERMISSIONS.superadmin : (PERMISSIONS[role] || PERMISSIONS.vendedor);
+
+    if (!userPermissions.includes(page)) {
+        toast('Acesso restrito ao seu cargo.', 'error');
+        if (page !== 'dashboard') navigate('dashboard');
+        return;
+    }
+
     if (waPolling && page !== 'whatsapp') { clearInterval(waPolling); waPolling = null; }
     if (ocRefreshTimer && page !== 'conversas') { clearInterval(ocRefreshTimer); ocRefreshTimer = null; }
 
@@ -1778,10 +1830,15 @@ async function init() {
             document.getElementById('appScreen').style.display = 'flex';
 
             document.getElementById('sidebarUserEmail').textContent = state.user.email;
-            document.getElementById('sidebarUserRole').textContent =
-                state.user.role === 'admin' ? 'Super Admin' : 'Dono da Loja';
+            
+            const isAdmin = state.admin?.email && ['admin@robotibr.com.br', 'diegossilvestre@live.com', 'diegoasilvestre@live.com'].includes(state.admin.email);
+            const roleLabel = isAdmin ? 'Super Admin' : (state.user.role === 'admin' ? 'Dono da Loja' : (state.user.role.charAt(0).toUpperCase() + state.user.role.slice(1)));
+            
+            document.getElementById('sidebarUserRole').textContent = roleLabel;
             document.getElementById('sidebarUserAvatar').textContent =
                 state.user.email.substring(0, 2).toUpperCase();
+            
+            applyPermissions();
         } catch {
             localStorage.removeItem('robotibr_session');
         }
@@ -1804,7 +1861,8 @@ async function init() {
 
     // 6. Rota inicial
     if (state.admin.logado || saved) {
-        navigate(state.user?.role === 'admin' ? 'clientes' : 'dashboard');
+        const isAdmin = state.admin?.email && ['admin@robotibr.com.br', 'diegossilvestre@live.com', 'diegoasilvestre@live.com'].includes(state.admin.email);
+        navigate(isAdmin ? 'clientes' : 'dashboard');
     }
 }
 
