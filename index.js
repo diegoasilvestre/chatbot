@@ -409,17 +409,36 @@ app.get('/chat/conversas/:numero_wa', async (req, res) => {
 
 app.get('/chat/mensagens/:numero_wa/:telefone', async (req, res) => {
     try {
-        // Busca a conversa cruzando com a tabela de contatos pelo telefone
-        const { data: conv, error: convError } = await supabase
-            .from('conversas')
-            .select('id, contatos!inner(telefone)')
-            .eq('numero_wa', req.params.numero_wa)
-            .eq('contatos.telefone', req.params.telefone)
+        const { numero_wa, telefone } = req.params;
+        console.log(`[CHAT] Buscando mensagens para Loja: ${numero_wa}, Telefone: ${telefone}`);
+
+        // 1. Busca o contato primeiro
+        const { data: contato } = await supabase
+            .from('contatos')
+            .select('id')
+            .eq('numero_wa', numero_wa)
+            .eq('telefone', telefone)
             .maybeSingle();
 
-        if (convError) throw convError;
-        if (!conv) return res.json([]);
+        if (!contato) {
+            console.log(`[CHAT] Contato ${telefone} não encontrado.`);
+            return res.json([]);
+        }
 
+        // 2. Busca a conversa ativa
+        const { data: conv } = await supabase
+            .from('conversas')
+            .select('id')
+            .eq('numero_wa', numero_wa)
+            .eq('contato_id', contato.id)
+            .maybeSingle();
+
+        if (!conv) {
+            console.log(`[CHAT] Nenhuma conversa encontrada para o contato ID ${contato.id}`);
+            return res.json([]);
+        }
+
+        // 3. Busca as mensagens
         const { data: msgs, error: msgsError } = await supabase
             .from('mensagens')
             .select('*')
@@ -427,6 +446,7 @@ app.get('/chat/mensagens/:numero_wa/:telefone', async (req, res) => {
             .order('criado_em', { ascending: true });
 
         if (msgsError) throw msgsError;
+        console.log(`[CHAT] ${msgs?.length || 0} mensagens carregadas.`);
         res.json(msgs || []);
     } catch (e) {
         console.error(`[CHAT] Erro ao buscar mensagens: ${e.message}`);
@@ -527,13 +547,28 @@ app.post('/chat/toggle-ia', async (req, res) => {
 app.post('/chat/send-manual', async (req, res) => {
     const { numero_wa, telefone_cliente, mensagem } = req.body;
     try {
+        console.log(`\n[CHAT] 📨 Pedido de ENVIO MANUAL:`);
+        console.log(`      - De: ${numero_wa}`);
+        console.log(`      - Para: ${telefone_cliente}`);
+        console.log(`      - Msg: "${mensagem}"`);
+
         const sock = activeSessions[numero_wa];
-        if (!sock) return res.status(400).json({ erro: 'Sessão WhatsApp não está ativa.' });
+        if (!sock) {
+            console.error(`[CHAT] ❌ Erro: Sessão ${numero_wa} não encontrada na memória.`);
+            return res.status(400).json({ erro: 'O WhatsApp não está conectado no servidor.' });
+        }
 
-        const jid = `${telefone_cliente}@s.whatsapp.net`;
+        // Limpeza rigorosa do JID
+        let cleanPhone = String(telefone_cliente).replace(/\D/g, '');
+        // Se for um número de usuário padrão (não grupo)
+        const jid = cleanPhone.includes('@') ? cleanPhone : `${cleanPhone}@s.whatsapp.net`;
+        
+        console.log(`[CHAT] 🚀 Enviando via Baileys para JID: ${jid}`);
+        
         await sock.sendMessage(jid, { text: mensagem });
+        console.log(`[CHAT] ✅ Mensagem enviada com sucesso!`);
 
-        // Salva no banco
+        // Salva no histórico do banco
         const { data: contato } = await supabase.from('contatos').select('id').eq('numero_wa', numero_wa).eq('telefone', telefone_cliente).maybeSingle();
         if (contato) {
             const { data: conversa } = await supabase.from('conversas').select('id').eq('numero_wa', numero_wa).eq('contato_id', contato.id).maybeSingle();
@@ -546,7 +581,10 @@ app.post('/chat/send-manual', async (req, res) => {
             }
         }
         res.json({ ok: true });
-    } catch (e) { res.status(500).json({ erro: e.message }); }
+    } catch (e) {
+        console.error(`[CHAT] ❌ FALHA CRÍTICA NO ENVIO: ${e.message}`);
+        res.status(500).json({ erro: e.message });
+    }
 });
 
 app.post('/wa/disconnect', async (req, res) => {
@@ -563,7 +601,23 @@ app.post('/wa/disconnect', async (req, res) => {
 
 // ─── START ────────────────────────────────────────────────────────────────────
 const PORT = process.env.PORT || 4000;
+
+async function autoLoadSessions() {
+    try {
+        const files = fs.readdirSync("./");
+        const sessionFolders = files.filter(f => f.startsWith("auth_info_") && fs.lstatSync(f).isDirectory());
+        for (const folder of sessionFolders) {
+            const numero = folder.replace("auth_info_", "");
+            if (numero && numero.length >= 10) {
+                console.log("[BOOT] Restaurando sessao: " + numero);
+                startWhatsApp(numero).catch(e => console.error("[BOOT] Erro na restauracao: " + e.message));
+            }
+        }
+    } catch (e) { console.error("[BOOT] Erro ao listar sessoes: " + e.message); }
+}
+
 app.listen(PORT, async () => {
-    console.log(`\n🚀 RoboTI BR v3.3 — porta ${PORT}`);
+    console.log("Servidor rodando na porta " + PORT);
     await warmupModel();
+    await autoLoadSessions();
 });

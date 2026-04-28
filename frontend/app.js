@@ -273,7 +273,14 @@ function applyPermissions() {
     }
 }
 
+let ocRefreshTimer = null;
+let ocListTimer = null;
+
 function navigate(page) {
+    // Para timers antigos antes de mudar de página
+    if (ocRefreshTimer) { clearInterval(ocRefreshTimer); ocRefreshTimer = null; }
+    if (ocListTimer) { clearInterval(ocListTimer); ocListTimer = null; }
+
     // Verifica permissão antes de navegar
     const role = state.user?.role?.toLowerCase() || 'vendedor';
     const isAdmin = state.admin?.email && ['admin@robotibr.com.br', 'diegossilvestre@live.com', 'diegoasilvestre@live.com'].includes(state.admin.email);
@@ -286,7 +293,6 @@ function navigate(page) {
     }
 
     if (waPolling && page !== 'whatsapp') { clearInterval(waPolling); waPolling = null; }
-    if (ocRefreshTimer && page !== 'conversas') { clearInterval(ocRefreshTimer); ocRefreshTimer = null; }
 
     state.page = page;
 
@@ -300,6 +306,14 @@ function navigate(page) {
     if (content) content.innerHTML = '<div class="spinner"></div>';
 
     if (PAGES[page]) PAGES[page]();
+
+    // Se entrar no chat, inicia o polling
+    if (page === 'conversas') {
+        ocListTimer = setInterval(loadConversas, 5000);
+        ocRefreshTimer = setInterval(() => {
+            if (state.selectedChat) loadMensagens(state.selectedChat);
+        }, 3000);
+    }
 
     if (window.innerWidth <= 992) {
         const sidebar = document.querySelector('.sidebar');
@@ -799,7 +813,7 @@ async function renderConversas() {
     if (ocRefreshTimer) clearInterval(ocRefreshTimer);
     ocRefreshTimer = setInterval(() => {
         if (state.page === 'conversas') ocLoadContacts();
-    }, 10000);
+    }, 3000); // Polling acelerado para 3s
 }
 
 function ocInitials(name) {
@@ -981,6 +995,20 @@ async function ocSendMessage(id) {
     const text = inp.value.trim();
     inp.value = '';
     inp.style.height = 'auto';
+
+    // Feedback visual imediato (Otimista)
+    const msgsArea = document.getElementById('ocMsgs_' + id);
+    const tempId = 'temp-' + Date.now();
+    if (msgsArea) {
+        const time = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+        msgsArea.innerHTML += `
+            <div class="oc-msg-row" id="${tempId}">
+                <div class="oc-bubble">${esc(text).replace(/\n/g, '<br>')}</div>
+                <div class="oc-msg-time">${time} <i class="fas fa-clock" style="font-size:9px"></i></div>
+            </div>`;
+        msgsArea.scrollTop = msgsArea.scrollHeight;
+    }
+
     if (sendBtn) { sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; sendBtn.disabled = true; }
     try {
         await api.post('/chat/send-manual', {
@@ -988,12 +1016,23 @@ async function ocSendMessage(id) {
             telefone_cliente: id,
             mensagem: text,
         });
+
         const cont = _ocContacts.find(x => x.id === id);
         if (cont) { cont.ultima_msg = text; cont.atualizado_em = new Date().toISOString(); }
         ocRenderContactList(_ocContacts);
-        await ocLoadMessages(id);
-    } catch (e) { toast(e.message, 'error'); inp.value = text; }
-    finally {
+        
+        // Troca relógio por check
+        const tempMsg = document.getElementById(tempId);
+        if (tempMsg) {
+            const icon = tempMsg.querySelector('.fa-clock');
+            if (icon) icon.className = 'fas fa-check';
+        }
+    } catch (e) {
+        toast('Erro ao enviar: ' + e.message, 'error');
+        inp.value = text; // Devolve o texto se falhar
+        const tempMsg = document.getElementById(tempId);
+        if (tempMsg) tempMsg.style.opacity = '0.5';
+    } finally {
         if (sendBtn) { sendBtn.innerHTML = '<i class="fas fa-paper-plane"></i>'; sendBtn.disabled = false; }
     }
 }
