@@ -1,33 +1,34 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&family=Space+Grotesk:wght@500;700&display=swap');
 
 :root {
-    --background: #09090b;
-    --foreground: #f4f4f5;
-    --card: #18181b;
-    --card-hover: #1c1c21;
-    --border: #27272a;
-    --input: #27272a;
-    --primary: #c0ff00;
-    --primary-hover: #d4ff4d;
-    --primary-foreground: #09090b;
-    --secondary: #18181b;
-    --secondary-foreground: #f4f4f5;
-    --muted: #111113;
-    --muted-foreground: #a1a1aa;
-    --sidebar-bg: #09090b;
-    --sidebar-border: #27272a;
-    --sidebar-fg: #f4f4f5;
-    --sidebar-muted: #71717a;
-    --sidebar-hover: #18181b;
+    /* Tema Premium: Branco, Dourado e Bege */
+    --background: #fcfbf9;
+    --foreground: #2d2926;
+    --card: #ffffff;
+    --card-hover: #faf9f6;
+    --border: #e8e4db;
+    --input: #f2f0eb;
+    --primary: #c5a059; /* Dourado Luxo */
+    --primary-hover: #b38d45;
+    --primary-foreground: #ffffff;
+    --secondary: #f2f0eb;
+    --secondary-foreground: #2d2926;
+    --muted: #f7f5f0;
+    --muted-foreground: #8c857d;
+    --sidebar-bg: #ffffff;
+    --sidebar-border: #e8e4db;
+    --sidebar-fg: #2d2926;
+    --sidebar-muted: #8c857d;
+    --sidebar-hover: #f7f5f0;
     --destructive: #ef4444;
     --destructive-foreground: #ffffff;
     --success: #10b981;
     --warning: #f59e0b;
     --radius: 12px;
     --radius-sm: 8px;
-    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
-    --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.5), 0 2px 4px -2px rgb(0 0 0 / 0.5);
-    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.6), 0 4px 6px -4px rgb(0 0 0 / 0.4);
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow: 0 4px 12px rgba(197, 160, 89, 0.08), 0 2px 4px rgba(0, 0, 0, 0.05);
+    --shadow-lg: 0 10px 25px -3px rgba(197, 160, 89, 0.12), 0 4px 12px -4px rgba(0, 0, 0, 0.08);
 }
 
 *,
@@ -61,8 +62,8 @@ body {
     position: absolute;
     inset: 0;
     background-image:
-        linear-gradient(rgba(192, 255, 0, 0.04) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(192, 255, 0, 0.04) 1px, transparent 1px);
+        linear-gradient(rgba(197, 160, 89, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(197, 160, 89, 0.05) 1px, transparent 1px);
     background-size: 40px 40px;
     pointer-events: none;
 }
@@ -71,14 +72,14 @@ body {
     content: '';
     position: absolute;
     inset: 0;
-    background: radial-gradient(ellipse at 50% 50%, rgba(192, 255, 0, 0.06) 0%, transparent 70%);
+    background: radial-gradient(ellipse at 50% 50%, rgba(197, 160, 89, 0.08) 0%, transparent 70%);
 }
 
 .login-card {
     position: relative;
     z-index: 1;
-    background: #111113;
-    border: 1px solid var(--sidebar-border);
+    background: #ffffff;
+    border: 1px solid var(--border);
     border-radius: 20px;
     padding: 48px 40px;
     width: 100%;
