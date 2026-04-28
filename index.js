@@ -648,60 +648,62 @@ app.post('/chat/toggle-ia', async (req, res) => {
     } catch (e) { res.status(500).json({ erro: e.message }); }
 });
 
-app.post('/chat/send-manual', async (req, res) => {
+async function resolveChatData(idOrPhone, numero_wa) {
+    const isUUID = /^[0-9a-fA-F-]{36}$/.test(idOrPhone);
+    let convId = null;
+    let telefoneReal = null;
+
+    if (isUUID) {
+        const { data: conv } = await supabase.from("conversas")
+            .select("id, contatos_crm(telefone_cliente)")
+            .eq("id", idOrPhone)
+            .maybeSingle();
+        if (conv) {
+            convId = conv.id;
+            telefoneReal = conv.contatos_crm?.telefone_cliente;
+        }
+    } else {
+        const { data: contato } = await supabase.from("contatos_crm").select("id, telefone_cliente").eq("numero_wa", numero_wa).eq("telefone_cliente", idOrPhone).maybeSingle();
+        if (contato) {
+            telefoneReal = contato.telefone_cliente;
+            const { data: conv } = await supabase.from("conversas").select("id").eq("numero_wa", numero_wa).eq("contato_id", contato.id).maybeSingle();
+            if (conv) convId = conv.id;
+        }
+    }
+    if (!telefoneReal) return null;
+    const clean = String(telefoneReal).replace(/\D/g, "");
+    const jid = clean.length > 13 ? `${clean}@lid` : `${clean}@s.whatsapp.net`;
+    return { convId, telefoneReal, jid, clean };
+}
+
+app.post("/chat/send-manual", async (req, res) => {
     const { numero_wa, telefone_cliente, mensagem } = req.body;
     try {
         const sock = activeSessions[numero_wa];
-        if (!sock) return res.status(400).json({ erro: 'WhatsApp não conectado.' });
+        if (!sock) return res.status(400).json({ erro: "WhatsApp não conectado." });
 
-        const cleanPhone = String(telefone_cliente).replace(/\D/g, '');
-        
-        // Tenta primeiro o formato padrão
-        let jid = `${cleanPhone}@s.whatsapp.net`;
-        
-        // Se o número for muito longo (LID), ajusta o sufixo
-        if (cleanPhone.length > 13) {
-            jid = `${cleanPhone}@lid`;
-        }
+        const chat = await resolveChatData(telefone_cliente, numero_wa);
+        if (!chat) return res.status(404).json({ erro: "Contato não encontrado." });
 
-        console.log(`[CHAT] 🚀 Tentativa de envio para JID: ${jid}`);
+        console.log(`[CHAT] 🚀 Enviando para ${chat.telefoneReal} (JID: ${chat.jid})`);
         
         try {
-            await sock.sendMessage(jid, { text: mensagem });
+            await sock.sendMessage(chat.jid, { text: mensagem });
         } catch (err) {
-            console.log(`[CHAT] 🔄 Falha no primeiro JID, tentando fallback...`);
-            // Fallback: se tentou .net e falhou, tenta .lid (ou vice-versa)
-            const fallbackJid = jid.endsWith('@lid') ? `${cleanPhone}@s.whatsapp.net` : `${cleanPhone}@lid`;
+            const fallbackJid = chat.jid.endsWith("@lid") ? `${chat.clean}@s.whatsapp.net` : `${chat.clean}@lid`;
             await sock.sendMessage(fallbackJid, { text: mensagem });
-            jid = fallbackJid;
         }
 
-        const isUUID = /^[0-9a-fA-F-]{36}$/.test(telefone_cliente);
-        let convId = null;
-
-        if (isUUID) {
-            convId = telefone_cliente;
-        } else {
-            const { data: contato } = await supabase.from('contatos_crm').select('id').eq('numero_wa', numero_wa).eq('telefone_cliente', telefone_cliente).maybeSingle();
-            if (contato) {
-                const { data: conv } = await supabase.from('conversas').select('id').eq('numero_wa', numero_wa).eq('contato_id', contato.id).maybeSingle();
-                if (conv) convId = conv.id;
-            }
-        }
-
-        if (convId) {
-            await supabase.from('conversas').update({ ia_ativa: false }).eq('id', convId);
-            await supabase.from('mensagens').insert([{
-                conversa_id: convId,
-                remetente_tipo: 'humano',
+        if (chat.convId) {
+            await supabase.from("conversas").update({ ia_ativa: false }).eq("id", chat.convId);
+            await supabase.from("mensagens").insert([{
+                conversa_id: chat.convId,
+                remetente_tipo: "humano",
                 conteudo: mensagem
             }]);
         }
         res.json({ ok: true });
-    } catch (e) {
-        console.error(`[CHAT] ❌ Erro definitivo no envio: ${e.message}`);
-        res.status(500).json({ erro: e.message });
-    }
+    } catch (e) { res.status(500).json({ erro: e.message }); }
 });
 
 app.post('/wa/disconnect', async (req, res) => {
