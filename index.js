@@ -6,6 +6,7 @@
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
+const bcrypt = require('bcryptjs');
 const {
     default: makeWASocket,
     useMultiFileAuthState,
@@ -225,20 +226,104 @@ app.post('/auth/login', async (req, res) => {
     const { email, password } = req.body;
     try {
         const isAdmin = ['admin@robotibr.com.br', 'diegossilvestre@live.com', 'diegoasilvestre@live.com'].includes(email);
-        const { data: authData, error: authError } = await supabase.auth.signInWithPassword({ email, password });
+        
+        // 1. Tenta buscar na nova tabela de usuários
+        const { data: user, error: userError } = await supabase
+            .from('usuarios')
+            .select('*, agentes_config(nome_empresa)')
+            .eq('email', email)
+            .maybeSingle();
 
+        if (user) {
+            const match = await bcrypt.compare(password, user.senha);
+            if (match) {
+                // Atualiza último login (sem travar se der erro)
+                supabase.from('usuarios').update({ ultimo_login: new Date() }).eq('id', user.id).then();
+                
+                return res.json({ 
+                    user: { 
+                        email, 
+                        nome: user.nome, 
+                        numero_wa: user.loja_id, 
+                        role: user.role,
+                        loja_nome: user.agentes_config?.nome_empresa
+                    }, 
+                    is_admin: isAdmin 
+                });
+            }
+        }
+
+        // 2. Fallback para Supabase Auth (retrocompatibilidade)
+        const { data: authData, error: authError } = await supabase.auth.signInWithPassword({ email, password });
         if (!authError && authData.user) {
             const { data: loja } = await supabase.from('agentes_config').select('*').eq('email_dono', email).maybeSingle();
             return res.json({ user: { email, nome: loja?.nome_empresa || email, numero_wa: loja?.numero_wa, role: isAdmin ? 'admin' : 'owner' }, is_admin: isAdmin });
         }
 
-        // Fallback
+        // 3. Fallback para senha direta (apenas se configurado)
         const { data: loja } = await supabase.from('agentes_config').select('*').eq('email_dono', email).maybeSingle();
         if (loja && loja.senha_cliente === password) {
             return res.json({ user: { email, nome: loja.nome_empresa, numero_wa: loja.numero_wa, role: isAdmin ? 'admin' : 'owner' }, is_admin: isAdmin });
         }
+
         res.status(401).json({ erro: 'Credenciais inválidas' });
     } catch (e) { res.status(500).json({ erro: e.message }); }
+});
+
+// ─── ROTAS DE EQUIPE (USER MANAGEMENT) ────────────────────────────────────────
+
+app.get('/admin/equipe/:loja_id', async (req, res) => {
+    const { loja_id } = req.params;
+    const { data, error } = await supabase
+        .from('usuarios')
+        .select('*')
+        .eq('loja_id', loja_id)
+        .order('criado_em', { ascending: true });
+    
+    if (error) return res.status(500).json({ erro: error.message });
+    
+    // Mapeia 'role' para 'cargo' para o frontend
+    const mapped = data.map(u => ({
+        ...u,
+        cargo: u.role.charAt(0).toUpperCase() + u.role.slice(1)
+    }));
+    res.json(mapped);
+});
+
+app.post('/admin/equipe/convidar', async (req, res) => {
+    const { loja_id, email, senha, nome, cargo } = req.body;
+    try {
+        const role = cargo.toLowerCase();
+        const hashed = await bcrypt.hash(senha, 10);
+        const { data, error } = await supabase.from('usuarios').insert([{
+            loja_id,
+            email,
+            senha: hashed,
+            nome,
+            role
+        }]).select();
+        
+        if (error) throw error;
+        res.json({ ok: true, user: data[0] });
+    } catch (e) { res.status(500).json({ erro: e.message }); }
+});
+
+app.post('/admin/equipe/update', async (req, res) => {
+    const { id, nome, cargo } = req.body;
+    try {
+        const updateData = { nome };
+        if (cargo) updateData.role = cargo.toLowerCase();
+        
+        const { error } = await supabase.from('usuarios').update(updateData).eq('id', id);
+        if (error) throw error;
+        res.json({ ok: true });
+    } catch (e) { res.status(500).json({ erro: e.message }); }
+});
+
+app.delete('/admin/equipe/:id', async (req, res) => {
+    const { id } = req.params;
+    const { error } = await supabase.from('usuarios').delete().eq('id', id);
+    res.json({ ok: !error, erro: error?.message });
 });
 
 app.get('/admin/lojas', async (req, res) => {
@@ -248,15 +333,29 @@ app.get('/admin/lojas', async (req, res) => {
 });
 
 app.post('/admin/lojas', async (req, res) => {
-    const { nome, wa_id, prompt_base } = req.body;
+    const { nome, wa_id, prompt_base, email_admin, senha_admin } = req.body;
     try {
-        const { error } = await supabase.from('agentes_config').insert([{
+        // 1. Cria a loja
+        const { error: lojaError } = await supabase.from('agentes_config').insert([{
             numero_wa: wa_id,
             nome_empresa: nome,
             prompt_base: prompt_base || '',
             ativo: true
         }]);
-        if (error) throw error;
+        if (lojaError) throw lojaError;
+
+        // 2. Se enviou email/senha, cria o primeiro admin da equipe
+        if (email_admin && senha_admin) {
+            const hashed = await bcrypt.hash(senha_admin, 10);
+            await supabase.from('usuarios').insert([{
+                loja_id: wa_id,
+                email: email_admin,
+                senha: hashed,
+                nome: 'Administrador ' + nome,
+                role: 'admin'
+            }]);
+        }
+
         res.json({ ok: true });
     } catch (e) {
         res.status(500).json({ erro: e.message });
