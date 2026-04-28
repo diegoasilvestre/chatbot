@@ -172,33 +172,66 @@ async function startWhatsApp(numero_wa, res = null) {
                     await delay(waitTime);
 
                     // 3. Gestão de Contato CRM
-                    let { data: contato } = await supabase.from('contatos_crm')
+                    let { data: contato, error: errContato } = await supabase.from('contatos_crm')
                         .select('id')
                         .eq('numero_wa', numero_wa)
                         .eq('telefone_cliente', telefoneCliente)
                         .maybeSingle();
 
+                    if (errContato) console.error(`[DB] Erro ao buscar contato: ${errContato.message}`);
+
                     if (!contato) {
-                        const { data: novo } = await supabase.from('contatos_crm').insert([{ 
+                        const { data: novo, error: errNovo } = await supabase.from('contatos_crm').insert([{ 
                             numero_wa, 
                             telefone_cliente: telefoneCliente, 
                             nome: msg.pushName || telefoneCliente,
                             status: 'Lead',
                             ultima_interacao: new Date()
                         }]).select().single();
+                        
+                        if (errNovo) {
+                            console.error(`[DB] Erro ao criar contato: ${errNovo.message}`);
+                            continue; // Não podemos prosseguir sem contato
+                        }
                         contato = novo;
                     } else {
                         await supabase.from('contatos_crm').update({ ultima_interacao: new Date() }).eq('id', contato.id);
                     }
 
                     // 4. Fluxo de Conversa
-                    let { data: conversa } = await supabase.from('conversas').select('id, ia_ativa').eq('numero_wa', numero_wa).eq('contato_id', contato.id).maybeSingle();
+                    let { data: conversa, error: errConv } = await supabase.from('conversas')
+                        .select('id, ia_ativa')
+                        .eq('numero_wa', numero_wa)
+                        .eq('contato_id', contato.id)
+                        .maybeSingle();
+
+                    if (errConv) console.error(`[DB] Erro ao buscar conversa: ${errConv.message}`);
+
                     if (!conversa) {
-                        const { data: nova } = await supabase.from('conversas').insert([{ numero_wa, contato_id: contato.id, ia_ativa: true }]).select().single();
+                        const { data: nova, error: errNova } = await supabase.from('conversas').insert([{ 
+                            numero_wa, 
+                            contato_id: contato.id, 
+                            ia_ativa: true 
+                        }]).select().single();
+
+                        if (errNova) {
+                            console.error(`[DB] Erro ao criar conversa: ${errNova.message}`);
+                            continue;
+                        }
                         conversa = nova;
                     }
 
-                    await supabase.from('mensagens').insert([{ conversa_id: conversa.id, remetente_tipo: 'user', conteudo: textMessage }]);
+                    if (!conversa || !conversa.id) {
+                        console.error(`[WA] Falha crítica: Conversa não disponível para ${telefoneCliente}`);
+                        continue;
+                    }
+
+                    const { error: errMsg } = await supabase.from('mensagens').insert([{ 
+                        conversa_id: conversa.id, 
+                        remetente_tipo: 'user', 
+                        conteudo: textMessage 
+                    }]);
+                    if (errMsg) console.error(`[DB] Erro ao salvar mensagem do usuário: ${errMsg.message}`);
 
                     if (conversa.ia_ativa) {
                         console.log(`[AI] 🧠 Gerando resposta para ${telefoneCliente}...`);

@@ -1,44 +1,30 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&family=Space+Grotesk:wght@500;700&display=swap');
 
 :root {
-    /* Design System: Optimus (Dark Neon Evolution) */
-    --background: #0b0d10;
-    --foreground: #f0f2f5;
-    --card: #13161b;
-    --card-hover: #1c2026;
-    --border: #21262d;
-    --input: #1c2026;
-    
-    /* Primary: Neon Highlight */
-    --primary: #00e5a0; 
-    --primary-glow: rgba(0, 229, 160, 0.4);
-    --primary-hover: #00ffb3;
-    --primary-foreground: #000000;
-    
-    /* Secondary & Gold Identity Accent */
-    --secondary: #21262d;
-    --secondary-foreground: #f0f2f5;
-    --accent-gold: #c5a059; /* Identidade original preservada como acento */
-    
-    --muted: #161b22;
-    --muted-foreground: #8b949e;
-    
-    /* Sidebar */
-    --sidebar-bg: #0b0d10;
-    --sidebar-border: #21262d;
-    --sidebar-fg: #f0f2f5;
-    --sidebar-muted: #6e7681;
-    --sidebar-hover: #1c2026;
-    
-    --destructive: #f85149;
-    --destructive-foreground: #ffffff;
-    --success: #3fb950;
-    --warning: #d29922;
-    
-    --radius: 12px;
+    /* Design System: Roboti BR (Luxury & Minimalist) */
+    --primary: #c5a059; /* Dourado Nobre */
+    --primary-glow: rgba(197, 160, 89, 0.12);
+    --secondary: #f4f1ea; /* Bege Suave */
+    --background: #fcfbf9; /* Off-white */
+    --foreground: #1a1a1a;
+    --card: #ffffff;
+    --card-foreground: #1a1a1a;
+    --muted: #f8f6f2;
+    --muted-foreground: #71717a;
+    --accent: #c5a059;
+    --accent-foreground: #ffffff;
+    --border: #e8e4dc;
+    --sidebar-bg: #ffffff;
+    --sidebar-muted: #8e8e93;
+    --input: #e8e4dc;
+    --ring: #c5a059;
+    --radius: 14px;
     --radius-sm: 8px;
-    --shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-    --shadow-lg: 0 10px 25px -3px rgba(0, 0, 0, 0.7);
+    --shadow: 0 8px 32px rgba(197, 160, 89, 0.08);
+    --primary-gradient: linear-gradient(135deg, #c5a059 0%, #e2c08d 100%);
+    --success: #10b981;
+    --destructive: #ef4444;
+    --warning: #f59e0b;
 }
 
 *,
