@@ -1166,6 +1166,11 @@ body {
 }
 
 .oc-msg-row.user {
+    align-self: flex-start;
+    align-items: flex-start;
+}
+
+.oc-msg-row.assistant, .oc-msg-row.human {
     align-self: flex-end;
     align-items: flex-end;
 }
@@ -1180,14 +1185,40 @@ body {
     border: 1px solid var(--border);
     max-width: 100%;
     word-break: break-word;
+    position: relative;
 }
 
 .oc-bubble.user {
-    background: var(--sidebar-bg);
-    color: var(--sidebar-fg);
+    background: var(--muted);
+    border-radius: 12px 12px 12px 3px;
+}
+
+.oc-bubble.assistant {
+    background: var(--primary);
+    color: white;
     border: none;
     border-radius: 12px 12px 3px 12px;
 }
+
+.oc-bubble.human {
+    background: #18181b; /* Zinc 900 */
+    color: white;
+    border: none;
+    border-radius: 12px 12px 3px 12px;
+}
+
+.oc-msg-badge {
+    font-size: 10px;
+    font-weight: 700;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    opacity: 0.8;
+}
+
+.oc-msg-row.assistant .oc-msg-badge { color: var(--primary); }
+.oc-msg-row.human .oc-msg-badge { color: var(--foreground); }
 
 .oc-msg-time {
     font-size: 11px;
