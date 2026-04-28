@@ -1,122 +1,265 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br" data-theme="light">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexus Bot AI | Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>RoboTI BR — Painel Administrativo</title>
+
+    <!-- Anti-flash: aplica tema salvo ANTES de renderizar -->
+    <script>
+        (function () {
+            var t = localStorage.getItem('robotibr_theme') || 'light';
+            document.documentElement.setAttribute('data-theme', t);
+        })();
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    <!-- Fontes e Ícones -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
+
 <body>
 
-    <!-- ── TELA DE LOGIN ────────────────────────────────────────────────── -->
-    <div id="login-page" class="login-screen">
+    <!-- ══ TELA DE LOGIN ══════════════════════════════════════════════════════ -->
+    <div id="loginScreen" class="login-screen">
+        <div class="login-bg-grid"></div>
         <div class="login-card">
-            <div class="logo-container" style="text-align: center;">
-                <div class="logo-main">Nexus Bot AI</div>
-                <div class="logo-sub">By Roboti BR</div>
+            <!-- Logo -->
+            <div class="login-logo">
+                <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path
+                        d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                    <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+                    <line x1="12" y1="22.08" x2="12" y2="12" />
+                </svg>
             </div>
-            <p style="color: var(--muted); text-align: center; margin-bottom: 2rem; font-size: 0.875rem;">Acesse sua conta para gerenciar seus robôs.</p>
-            
-            <form id="login-form">
-                <div class="form-group">
-                    <label>E-mail</label>
-                    <input type="email" id="email" class="input-field" placeholder="seu@email.com" required>
+
+            <div class="login-brand">RoboTI BR</div>
+            <div class="login-sub">by WavePod — Painel de Controle</div>
+
+            <!-- Erro -->
+            <div id="loginError" class="login-error" style="display:none"></div>
+
+            <!-- Campos -->
+            <div class="form-group">
+                <label class="form-label">E-mail</label>
+                <input class="form-input login-input" id="loginEmail" type="email" placeholder="admin@robotibr.com.br"
+                    autocomplete="email">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Senha</label>
+                <div class="input-with-toggle">
+                    <input class="form-input login-input" id="loginPassword" type="password" placeholder="••••••••"
+                        autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+                    <button class="input-toggle-btn" type="button" onclick="togglePasswordVisibility('loginPassword')">
+                        <i class="fas fa-eye" id="loginPasswordIcon"></i>
+                    </button>
                 </div>
-                <div class="form-group">
-                    <label>Senha</label>
-                    <input type="password" id="password" class="input-field" placeholder="••••••••" required>
-                </div>
-                <button type="submit" class="btn-primary" style="margin-top: 1rem;">Entrar no Sistema</button>
-            </form>
-            <div id="login-error" style="color: #ef4444; font-size: 0.75rem; margin-top: 1rem; text-align: center;" class="hidden"></div>
+            </div>
+
+            <button class="btn btn-primary" style="width:100%;justify-content:center;padding:12px;margin-top:8px"
+                onclick="doLogin()" id="loginBtn">
+                <i class="fas fa-sign-in-alt"></i> Entrar no Painel
+            </button>
+
+            <!-- Theme toggle on login -->
+            <div class="login-divider">tema</div>
+            <button class="btn btn-ghost" style="width:100%;justify-content:center;font-size:13px;gap:8px"
+                onclick="toggleTheme()">
+                <span id="loginThemeIcon">🌙</span>
+                <span id="loginThemeLabel">Alternar para Modo Escuro</span>
+            </button>
+
+            <div class="login-footer">Acesso restrito a administradores autorizados</div>
         </div>
     </div>
 
-    <!-- ── TELA PRINCIPAL ────────────────────────────────────────────────── -->
-    <div id="dashboard-page" class="app-container hidden">
-        
-        <!-- SIDEBAR -->
-        <aside class="sidebar">
-            <div class="logo-container">
-                <div class="logo-main">Roboti BR</div>
-                <div class="logo-sub">BY WAVEPOD</div>
+    <!-- ══ APP PRINCIPAL ══════════════════════════════════════════════════════ -->
+    <div id="appScreen" class="app-layout" style="display:none">
+
+        <!-- ── SIDEBAR ─────────────────────────────────────────────────────── -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-brand">
+                <div class="brand-logo">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path
+                            d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                        <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+                        <line x1="12" y1="22.08" x2="12" y2="12" />
+                    </svg>
+                </div>
+                <div>
+                    <div class="brand-name">RoboTI BR</div>
+                    <div class="brand-sub">by WavePod</div>
+                </div>
             </div>
 
-            <div class="sidebar-section-title">Cliente Ativo</div>
-            <select id="client-selector" class="custom-select">
-                <option value="">Selecione um cliente...</option>
-            </select>
+            <!-- Seletor de cliente -->
+            <div class="sidebar-loja">
+                <label>Cliente Ativo</label>
+                <select id="lojaSelect" onchange="onLojaChange()"></select>
+            </div>
 
-            <div class="sidebar-section-title">Visão Geral</div>
-            <nav id="nav-main">
-                <div class="nav-item active" data-tab="dashboard">
-                    <i class="fa-solid fa-chart-line"></i> Dashboard
-                </div>
+            <!-- Navegação -->
+            <nav class="sidebar-nav">
+                <div class="nav-section-title">Visão Geral</div>
+                <a class="nav-item active" data-page="dashboard" href="#" onclick="navigate('dashboard');return false;">
+                    <span class="nav-icon">📊</span> Dashboard
+                </a>
+
+                <div class="nav-section-title">Inteligência Artificial</div>
+                <a class="nav-item" data-page="agente" href="#" onclick="navigate('agente');return false;">
+                    <span class="nav-icon">🤖</span> Agente &amp; Prompt
+                </a>
+                <a class="nav-item" data-page="rag" href="#" onclick="navigate('rag');return false;">
+                    <span class="nav-icon">📚</span> Base de Conhecimento
+                </a>
+                <a class="nav-item" data-page="scraping" href="#" onclick="navigate('scraping');return false;">
+                    <span class="nav-icon">🌐</span> Web Scraping
+                </a>
+
+                <div class="nav-section-title">Operação</div>
+                <a class="nav-item" data-page="conversas" href="#" onclick="navigate('conversas');return false;">
+                    <span class="nav-icon">💬</span> Caixa de Entrada
+                </a>
+                <a class="nav-item" data-page="whatsapp" href="#" onclick="navigate('whatsapp');return false;">
+                    <span class="nav-icon">📱</span> Conexão WhatsApp
+                </a>
+
+                <div class="nav-section-title">Administração</div>
+                <a class="nav-item" data-page="clientes" href="#" onclick="navigate('clientes');return false;">
+                    <span class="nav-icon">🏢</span> Gestão de Clientes
+                </a>
+                <!-- Nova tela de Equipe -->
+                <a class="nav-item" data-page="equipe" href="#" onclick="navigate('equipe');return false;">
+                    <span class="nav-icon">⚙️</span> Configurações da Equipe
+                </a>
+                <a class="nav-item" data-page="diagnostics" href="#" onclick="navigate('diagnostics');return false;">
+                    <span class="nav-icon">🔧</span> Diagnóstico
+                </a>
             </nav>
 
-            <div class="sidebar-section-title">Inteligência Artificial</div>
-            <nav id="nav-ai">
-                <div class="nav-item" data-tab="config">
-                    <i class="fa-solid fa-robot"></i> Agente & Prompt
+            <!-- Rodapé do sidebar: usuário + status -->
+            <div class="sidebar-bottom">
+                <div class="sidebar-user">
+                    <div class="sidebar-user-avatar" id="sidebarUserAvatar">AD</div>
+                    <div class="sidebar-user-info">
+                        <div class="sidebar-user-name" id="sidebarUserEmail">admin</div>
+                        <div class="sidebar-user-role" id="sidebarUserRole">Super Admin</div>
+                    </div>
+                    <button class="sidebar-logout-btn" onclick="doLogout()" title="Sair">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                            <polyline points="16 17 21 12 16 7" />
+                            <line x1="21" y1="12" x2="9" y2="12" />
+                        </svg>
+                    </button>
                 </div>
-                <div class="nav-item" data-tab="rag">
-                    <i class="fa-solid fa-book"></i> Base de Conhecimento
-                </div>
-                <div class="nav-item" data-tab="scrape">
-                    <i class="fa-solid fa-globe"></i> Web Scraping
-                </div>
-            </nav>
-
-            <div class="sidebar-section-title">Operação</div>
-            <nav id="nav-op">
-                <div class="nav-item" data-tab="omnichat">
-                    <i class="fa-solid fa-comments"></i> Caixa de Entrada
-                </div>
-                <div class="nav-item" data-tab="whatsapp">
-                    <i class="fa-solid fa-mobile-screen"></i> Conexão WhatsApp
-                </div>
-            </nav>
-
-            <div class="sidebar-section-title admin-only hidden">Administração</div>
-            <nav id="nav-admin" class="admin-only hidden">
-                <div class="nav-item" data-tab="gestao">
-                    <i class="fa-solid fa-users-gear"></i> Gestão de Clientes
-                </div>
-                <div class="nav-item" data-tab="diagnostics">
-                    <i class="fa-solid fa-vial-circle-check"></i> Diagnóstico
-                </div>
-            </nav>
-
-            <div class="sidebar-footer">
-                <div id="user-display" style="font-size: 0.7rem; color: var(--muted); margin-bottom: 0.5rem; padding: 0 0.5rem;"></div>
-                <div class="nav-item" id="btn-logout" style="color: #ef4444;">
-                    <i class="fa-solid fa-right-from-bracket"></i> Sair do Sistema
-                </div>
-                <div class="status-indicator">
-                    <div id="server-status-dot" class="dot"></div>
-                    <span id="server-status-text">Servidor Offline</span>
+                <div class="server-status-container">
+                    <span class="status-dot" id="serverDotSidebar"></span>
+                    <span id="serverStatusTextSidebar" style="font-size:12px;margin-left:2px">Verificando...</span>
                 </div>
             </div>
         </aside>
 
-        <!-- MAIN -->
-        <div class="main-wrapper">
-            <header>
-                <div class="header-title" id="current-view-title">Dashboard</div>
-                <div class="user-badge" style="background: var(--primary); color: var(--primary-foreground); padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700;">ADMIN</div>
+        <!-- ── MAIN CONTENT ──────────────────────────────────────────────── -->
+        <div class="main-content">
+
+            <!-- Topbar -->
+            <header class="topbar">
+                <!-- Botão menu mobile -->
+                <button id="mobileMenuToggle"
+                    style="display:none;background:none;border:none;font-size:20px;color:var(--foreground);cursor:pointer;margin-right:12px;padding:4px"
+                    onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </button>
+
+                <h1 id="pageTitle">Dashboard</h1>
+
+                <div class="topbar-right">
+                    <!-- Server status -->
+                    <div id="serverStatus" class="server-status">
+                        <div id="serverDot" class="status-dot online"></div>
+                        <span id="serverStatusText" class="status-text">Conectado</span>
+                    </div>
+
+                    <!-- Loja ativa -->
+                    <span id="lojaNameTopbar" class="topbar-loja-name"></span>
+
+                    <!-- ☀️ / 🌙 Theme toggle -->
+                    <button class="btn-theme-toggle" onclick="toggleTheme()" title="Alternar tema" id="themeToggleBtn">
+                        <span id="themeToggleIcon">🌙</span>
+                    </button>
+
+                    <!-- Logout -->
+                    <button onclick="doLogout()" class="btn-logout" title="Sair do sistema">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+
+                    <!-- Avatar -->
+                    <div class="user-profile-mock">
+                        <div class="avatar" id="topbarAvatar">AD</div>
+                    </div>
+                </div>
             </header>
 
-            <main class="main-content" id="main-view">
-                <!-- Conteúdo injetado via app.js -->
-            </main>
+            <!-- Conteúdo da página -->
+            <div class="page-content" id="pageContent">
+                <div class="spinner"></div>
+            </div>
         </div>
     </div>
 
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Modal -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal" id="modalContent"></div>
+    </div>
+
+    <!-- Toasts -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Bottom Navigation Mobile -->
+    <nav class="bottom-nav">
+        <a href="#" class="nav-item active" data-page="dashboard" onclick="navigate('dashboard');return false;">
+            <i class="fas fa-th-large"></i>
+            <span>Dashboard</span>
+        </a>
+        <a href="#" class="nav-item" data-page="whatsapp" onclick="navigate('whatsapp');return false;">
+            <i class="fab fa-whatsapp"></i>
+            <span>WhatsApp</span>
+        </a>
+        <a href="#" class="nav-item" data-page="conversas" onclick="navigate('conversas');return false;">
+            <i class="fas fa-comments"></i>
+            <span>Chat</span>
+        </a>
+        <a href="#" class="nav-item" data-page="rag" onclick="navigate('rag');return false;">
+            <i class="fas fa-book"></i>
+            <span>Cérebro</span>
+        </a>
+        <a href="#" class="nav-item" data-page="more" onclick="navigate('more');return false;">
+            <i class="fas fa-ellipsis-h"></i>
+            <span>Mais</span>
+        </a>
+    </nav>
+
+    <!-- Mobile menu toggle show/hide via CSS -->
+    <style>
+        @media (max-width: 992px) {
+            #mobileMenuToggle {
+                display: block !important;
+            }
+        }
+    </style>
+
     <script src="app.js"></script>
 </body>
+
 </html>

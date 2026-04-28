@@ -4,3 +4,8 @@ auth_info_*/
 .env
 scratch/
 package-lock.json
+backup/
+backups/
+cloudflared*
+*.deb
+*.rpm
