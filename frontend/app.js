@@ -960,10 +960,12 @@ function renderBubble(m) {
     
     if (m.remetente_tipo === 'user') {
         bubbleClass = 'user';
-    } else if (m.remetente_tipo === 'assistant' || m.remetente_tipo === 'bot') {
+    } else if (m.remetente_tipo === 'assistant' || m.remetente_tipo === 'bot' || m.conteudo.startsWith('🤖 AI:')) {
         bubbleClass = 'assistant';
         icon = '<i class="fas fa-robot" style="margin-right:4px;font-size:10px"></i>';
         label = 'IA';
+        // Remove o marcador visual para não poluir o balão
+        m.conteudo = m.conteudo.replace('🤖 AI: ', '');
     } else {
         bubbleClass = 'human';
         icon = '<i class="fas fa-user-tie" style="margin-right:4px;font-size:10px"></i>';
