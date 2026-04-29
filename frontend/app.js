@@ -17,29 +17,6 @@ let waPolling = null;
 let ocRefreshTimer = null;
 let ocListTimer = null;
 
-// ─── TEMA ─────────────────────────────────────────────────────────────────────
-
-function toggleTheme() {
-    const current = document.documentElement.getAttribute('data-theme') || 'light';
-    const next = current === 'dark' ? 'light' : 'dark';
-    document.documentElement.setAttribute('data-theme', next);
-    localStorage.setItem('robotibr_theme', next);
-    _applyThemeIcons(next);
-}
-
-function _applyThemeIcons(theme) {
-    const isDark = theme === 'dark';
-
-    // Topbar toggle
-    const icon = document.getElementById('themeToggleIcon');
-    if (icon) icon.textContent = isDark ? '☀️' : '🌙';
-
-    // Login page toggle
-    const loginIcon = document.getElementById('loginThemeIcon');
-    const loginLabel = document.getElementById('loginThemeLabel');
-    if (loginIcon) loginIcon.textContent = isDark ? '☀️' : '🌙';
-    if (loginLabel) loginLabel.textContent = isDark ? 'Alternar para Modo Claro' : 'Alternar para Modo Escuro';
-}
 
 // ─── AUTENTICAÇÃO ────────────────────────────────────────────────────────────
 
@@ -365,8 +342,8 @@ async function renderDashboard() {
             api.get('/cliente/rag/' + state.lojaId),
         ]);
 
-        const waStatus = wa.status === 'conectado' 
-            ? '<span style="color:var(--primary)">● Conectado</span>' 
+        const waStatus = wa.status === 'conectado'
+            ? '<span style="color:var(--primary)">● Conectado</span>'
             : '<span style="color:var(--destructive)">○ Desconectado</span>';
 
         c.innerHTML = `
@@ -833,8 +810,8 @@ function ocRenderContactList(list) {
                 ? new Date(c.atualizado_em).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
                 : 'Ontem'
             : '';
-            
-        const badgeHtml = ia 
+
+        const badgeHtml = ia
             ? `<span class="crm-score-badge" style="font-size:9px; padding:2px 6px">IA ATIVA</span>`
             : `<span class="crm-score-badge" style="font-size:9px; padding:2px 6px; background:var(--warning); color:#000">AGUARDANDO</span>`;
 
@@ -914,10 +891,10 @@ async function ocRenderCrmProfile(telefone) {
     const el = document.getElementById('ocCrmPanel');
     if (!el) return;
     el.innerHTML = '<div class="spinner" style="margin:40px auto"></div>';
-    
+
     try {
         const crm = await api.get(`/chat/contato/${state.lojaId}/${telefone}`);
-        
+
         el.innerHTML = `
         <div class="crm-section" style="text-align:center; margin-bottom:32px">
             <div class="sidebar-user-avatar" style="width:80px; height:80px; font-size:24px; margin:0 auto 16px">${ocInitials(crm.nome || telefone)}</div>
@@ -968,7 +945,7 @@ async function ocSendQuick(type, id) {
     if (type === 'Catálogo') text = 'Vou te enviar nosso catálogo de produtos atualizado. Um momento...';
     if (type === 'Pix') text = 'Nossa chave Pix é o nosso CNPJ: 12.345.678/0001-90';
     if (type === 'Aguardar Atendente') text = 'Um de nossos especialistas já vai te atender. Por favor, aguarde um momento.';
-    
+
     inp.value = text;
     inp.focus();
 }
@@ -1005,7 +982,7 @@ function renderBubble(m) {
     let bubbleClass = '';
     let icon = '';
     let label = '';
-    
+
     if (m.remetente_tipo === 'user') {
         bubbleClass = 'user';
     } else if (m.remetente_tipo === 'assistant' || m.remetente_tipo === 'bot') {
@@ -1915,7 +1892,7 @@ async function initLojas() {
         const topbar = document.getElementById('lojaNameTopbar');
         if (topbar) topbar.textContent = state.loja ? state.loja.nome : '';
     } catch (e) { console.error('[RoboTI] Erro ao carregar lojas:', e); }
-}async function renderContatos() {
+} async function renderContatos() {
     const c = document.getElementById('pageContent');
     if (!state.lojaId) { c.innerHTML = noLojaMsg(); return; }
     c.innerHTML = `<div class="card">
@@ -1935,7 +1912,7 @@ async function renderCatalogo() {
 
     try {
         const produtos = await api.get('/cliente/catalogo/' + state.lojaId);
-        
+
         c.innerHTML = `
         <div class="card" style="margin-bottom:24px">
             <div style="display:flex; justify-content:space-between; align-items:center">
