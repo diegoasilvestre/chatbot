@@ -727,7 +727,7 @@ async function renderConversas() {
         <!-- Coluna 1: Contatos -->
         <div class="oc-sidebar-panel">
             <div class="oc-panel-header">
-                <span class="oc-panel-title">Caixa de Entrada</span>
+                <span class="oc-panel-title">Caixa de Conversas</span>
                 <div style="display:flex;align-items:center;gap:8px">
                     <span class="oc-counter" id="ocBadge">0</span>
                     <button class="sidebar-logout-btn" style="padding:4px" onclick="ocLoadContacts()" title="Atualizar">

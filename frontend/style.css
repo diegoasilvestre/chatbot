@@ -1234,27 +1234,33 @@ h1, h2, h3, h4, .brand-name, .card-title, .stat-value {
     overflow: hidden;
 }
 
-/* ══ OMNICHAT MESSAGES AREA ═════════════════════════════════════════════════ */
+/* ══ OMNICHAT MESSAGES AREA (FIXED SCROLL & BG) ═════════════════════════════ */
+.omnichat-layout {
+    display: flex;
+    height: 100%;
+    overflow: hidden;
+}
+
 .oc-messages-area {
-    background-color: #0b0b0c;
-    background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');
-    background-size: 400px;
-    background-repeat: repeat;
-    background-blend-mode: overlay;
-    opacity: 1; /* Adjust opacity via blend mode */
+    background-color: #0b0b0c !important;
+    background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png') !important;
+    background-size: 400px !important;
+    background-repeat: repeat !important;
+    background-blend-mode: overlay !important;
     padding: 30px !important;
     display: flex;
     flex-direction: column;
     gap: 16px;
-    overflow-y: auto;
+    overflow-y: auto !important; /* Forces internal scroll */
     position: relative;
+    flex: 1;
 }
 
 .oc-messages-area::before {
     content: '';
     position: absolute;
     inset: 0;
-    background: rgba(11, 11, 12, 0.85); /* Veils the pattern for professional look */
+    background: rgba(11, 11, 12, 0.9); /* Dark overlay for professional look */
     z-index: 0;
     pointer-events: none;
 }
