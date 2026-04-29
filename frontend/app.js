@@ -865,7 +865,7 @@ async function ocSelectContact(id) {
         </button>
     </div>
 
-    <div class="oc-messages-area" id="ocMsgs_${esc(id)}" style="flex:1; padding:24px; overflow-y:auto; background:var(--background)">
+    <div class="oc-messages-area" id="ocMsgs_${esc(id)}">
         <div class="spinner" style="margin:40px auto"></div>
     </div>
 
