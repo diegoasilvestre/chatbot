@@ -1194,17 +1194,31 @@ h1, h2, h3, h4, .brand-name, .card-title, .stat-value {
 /* ══ OMNICHAT MESSAGES AREA ═════════════════════════════════════════════════ */
 .oc-messages-area {
     background-color: #0b0b0c;
-    background-image: 
-        radial-gradient(circle at 2px 2px, rgba(255,255,255,0.02) 1px, transparent 0);
-    background-size: 24px 24px;
+    background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');
+    background-size: 400px;
+    background-repeat: repeat;
+    background-blend-mode: overlay;
+    opacity: 1; /* Adjust opacity via blend mode */
     padding: 30px !important;
     display: flex;
     flex-direction: column;
     gap: 16px;
     overflow-y: auto;
+    position: relative;
+}
+
+.oc-messages-area::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(11, 11, 12, 0.85); /* Veils the pattern for professional look */
+    z-index: 0;
+    pointer-events: none;
 }
 
 .oc-msg-row {
+    position: relative;
+    z-index: 1;
     display: flex;
     flex-direction: column;
     max-width: 80%;

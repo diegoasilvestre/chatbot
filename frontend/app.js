@@ -1217,19 +1217,29 @@ async function desconectarWA() {
 async function renderClientes() {
     const c = document.getElementById('pageContent');
     c.innerHTML = `
-    <div class="card" style="margin-bottom:24px;text-align:center">
-        <div style="display:flex;flex-direction:column;align-items:center;gap:16px">
-            <div>
+    <div class="card" style="margin-bottom:24px">
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:20px; flex-wrap:wrap">
+            <div style="flex:1; min-width:200px">
                 <div class="card-title" style="margin-bottom:4px">Gestão de Clientes</div>
-                <div style="font-size:13px;color:var(--muted-foreground)">Gerencie as instâncias e configurações de cada empresa conectada.</div>
+                <div style="font-size:13px; color:var(--muted-foreground)">Gerencie instâncias e configurações de cada empresa.</div>
             </div>
-            <button class="btn btn-primary" onclick="openModalNovaLoja()" style="width:100%;max-width:300px;justify-content:center;padding:14px">
-                <i class="fas fa-plus"></i> Adicionar Cliente
+            
+            <!-- SEARCH ENGINE: CLIENTES -->
+            <div style="position:relative; width:100%; max-width:340px">
+                <i class="fas fa-search" style="position:absolute; left:14px; top:50%; transform:translateY(-50%); color:var(--muted-foreground); font-size:13px"></i>
+                <input type="text" class="form-input" id="searchClientes" 
+                    placeholder="Buscar empresa ou ID..." 
+                    style="padding-left:40px; border-radius:100px; background:var(--muted); height:42px"
+                    oninput="ocFilterGlobalList('searchClientes', 'clientesListBody', 'tr')">
+            </div>
+
+            <button class="btn btn-primary" onclick="openModalNovaLoja()" style="height:42px; border-radius:100px; padding:0 24px">
+                <i class="fas fa-plus"></i> Novo Cliente
             </button>
         </div>
     </div>
 
-    <div class="card" style="padding:0;overflow:hidden">
+    <div class="card" style="padding:0; overflow:hidden">
         <div id="clientesList"><div class="spinner"></div></div>
     </div>`;
     loadClientes();
@@ -1239,8 +1249,9 @@ async function loadClientes() {
     const el = document.getElementById('clientesList');
     try {
         const lojas = await api.get('/admin/lojas');
+        state.lojas = lojas;
         if (!lojas.length) {
-            el.innerHTML = `<div style="text-align:center;padding:32px;font-size:13px;color:var(--muted-foreground)">
+            el.innerHTML = `<div style="text-align:center; padding:32px; font-size:13px; color:var(--muted-foreground)">
                 Nenhum cliente cadastrado ainda.<br>
                 <button class="btn btn-primary" style="margin-top:16px" onclick="openModalNovaLoja()">+ Criar primeiro cliente</button>
             </div>`;
@@ -1257,7 +1268,7 @@ async function loadClientes() {
                         <th style="text-align:right">Ações</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="clientesListBody">
                     ${lojas.map(l => `
                     <tr>
                         <td>
@@ -1447,6 +1458,15 @@ async function renderEquipe() {
         'Suporte': 'badge-default',
     }[cargo] || 'badge-default');
 
+function ocFilterGlobalList(inputId, targetBodyId, rowSelector) {
+    const q = document.getElementById(inputId).value.toLowerCase();
+    const rows = document.querySelectorAll(`#${targetBodyId} ${rowSelector}`);
+    rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(q) ? '' : 'none';
+    });
+}
+
     const cargoIcon = cargo => ({
         'Admin': '👑',
         'Vendedor': '💼',
@@ -1463,7 +1483,7 @@ async function renderEquipe() {
                 Configurações da Equipe
             </h2>
             <p style="font-size:13px;color:var(--muted-foreground);margin-top:4px">
-                Gerencie os membros, permissões e acessos ao painel de atendimento.
+                Gerencie os membros, permissões e acessos ao painel.
             </p>
         </div>
         <button class="btn btn-primary" onclick="openModalConvidarUsuario()">
@@ -1480,19 +1500,27 @@ async function renderEquipe() {
         <div class="stat-card">
             <div class="stat-label"><i class="fas fa-shield-alt" style="color:var(--primary)"></i> Administradores</div>
             <div class="stat-value">${admins}</div>
-            <div class="stat-trend" style="background:var(--destructive-subtle);color:var(--destructive);border-color:rgba(220,38,38,0.2)">Acesso total</div>
+            <div class="stat-trend">Acesso total</div>
         </div>
         <div class="stat-card">
             <div class="stat-label"><i class="fas fa-headset" style="color:var(--primary)"></i> Operadores</div>
             <div class="stat-value">${operators}</div>
-            <div class="stat-trend" style="background:var(--warning-subtle);color:var(--warning);border-color:rgba(217,119,6,0.2)">Vendedores + Suporte</div>
+            <div class="stat-trend">Vendedores + Suporte</div>
         </div>
     </div>
 
     <div class="card" style="padding:0;overflow:hidden">
-        <div style="padding:18px 22px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+        <div style="padding:18px 22px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px">
             <div class="card-title">Membros da Equipe</div>
-            <span style="font-size:13px;color:var(--muted-foreground)">${users.length} usuário${users.length !== 1 ? 's' : ''}</span>
+            
+            <!-- SEARCH ENGINE: EQUIPE -->
+            <div style="position:relative; width:100%; max-width:300px">
+                <i class="fas fa-search" style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--muted-foreground); font-size:12px"></i>
+                <input type="text" class="form-input" id="searchEquipe" 
+                    placeholder="Buscar por nome ou e-mail..." 
+                    style="padding-left:34px; border-radius:100px; background:var(--muted); height:36px; font-size:12px"
+                    oninput="ocFilterGlobalList('searchEquipe', 'equipeListBody', 'tr')">
+            </div>
         </div>
         <div class="table-responsive">
             <table class="data-table">
@@ -1505,7 +1533,7 @@ async function renderEquipe() {
                         <th style="text-align:right">Ações</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="equipeListBody">
                     ${users.map(u => `
                     <tr>
                         <td>
