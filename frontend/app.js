@@ -10,7 +10,7 @@ let state = {
     lojaId: null,
     loja: null,
     page: 'dashboard',
-    admin: { email: 'admin@robotibr.com.br', logado: false },
+    admin: { email: '', logado: false, isSuperAdmin: false },
 };
 
 let waPolling = null;
@@ -37,6 +37,7 @@ async function doLogin() {
 
         state.admin.logado = true;
         state.admin.email = data.user.email;
+        state.admin.isSuperAdmin = !!data.is_admin;
         state.user = data.user;
 
         localStorage.setItem('robotibr_session', JSON.stringify({
@@ -216,15 +217,15 @@ const PAGES = {
 };
 
 const PERMISSIONS = {
-    superadmin: ['dashboard', 'agente', 'rag', 'scraping', 'conversas', 'whatsapp', 'clientes', 'equipe', 'diagnostics', 'contatos', 'catalogo'],
-    admin: ['dashboard', 'agente', 'rag', 'scraping', 'conversas', 'equipe', 'contatos', 'catalogo'],
-    vendedor: ['dashboard', 'agente', 'conversas', 'contatos'],
-    suporte: ['dashboard', 'agente', 'conversas']
+    superadmin: ['dashboard', 'agente', 'rag', 'scraping', 'conversas', 'whatsapp', 'clientes', 'equipe', 'diagnostics', 'contatos', 'catalogo', 'more'],
+    admin: ['dashboard', 'agente', 'rag', 'scraping', 'conversas', 'equipe', 'contatos', 'catalogo', 'more'],
+    vendedor: ['dashboard', 'agente', 'conversas', 'contatos', 'more'],
+    suporte: ['dashboard', 'agente', 'conversas', 'more']
 };
 
 function applyPermissions() {
     const role = state.user?.role?.toLowerCase() || 'vendedor';
-    const isAdmin = state.admin?.email && ['admin@robotibr.com.br', 'diegossilvestre@live.com', 'diegoasilvestre@live.com'].includes(state.admin.email);
+    const isAdmin = state.admin?.isSuperAdmin === true;
 
     const userPermissions = isAdmin ? PERMISSIONS.superadmin : (PERMISSIONS[role] || PERMISSIONS.vendedor);
 
@@ -264,7 +265,7 @@ function navigate(page) {
 
     // Verifica permissão antes de navegar
     const role = state.user?.role?.toLowerCase() || 'vendedor';
-    const isAdmin = state.admin?.email && ['admin@robotibr.com.br', 'diegossilvestre@live.com', 'diegoasilvestre@live.com'].includes(state.admin.email);
+    const isAdmin = state.admin?.isSuperAdmin === true;
     const userPermissions = isAdmin ? PERMISSIONS.superadmin : (PERMISSIONS[role] || PERMISSIONS.vendedor);
 
     if (!userPermissions.includes(page)) {
@@ -1764,61 +1765,58 @@ async function executarDiagnostico() {
 
 async function renderMore() {
     const c = document.getElementById('pageContent');
-    const isAdmin = state.admin?.email && ['admin@robotibr.com.br', 'diegossilvestre@live.com', 'diegoasilvestre@live.com'].includes(state.admin.email);
+    const isAdmin = state.admin?.isSuperAdmin === true;
     const roleLabel = isAdmin ? '👑 Super Admin' : (state.user?.role === 'admin' ? '💼 Dono da Loja' : '💼 Gestor');
+
+    // Mapeamento de ícones e descrições para o menu "Mais"
+    const menuConfig = {
+        agente: { icon: 'fa-robot', title: 'Agente & Prompt', sub: 'Comportamento da IA' },
+        rag: { icon: 'fa-brain', title: 'Cérebro (RAG)', sub: 'Base de conhecimento' },
+        scraping: { icon: 'fa-globe', title: 'Web Scraping', sub: 'Extração de dados' },
+        whatsapp: { icon: 'fa-whatsapp', title: 'WhatsApp', sub: 'Conexão e status' },
+        clientes: { icon: 'fa-building', title: 'Gestão de Clientes', sub: 'Administrar lojas' },
+        equipe: { icon: 'fa-user-shield', title: 'Permissões', sub: 'Membros e cargos' },
+        diagnostics: { icon: 'fa-tools', title: 'Diagnóstico', sub: 'Saúde do sistema' },
+        contatos: { icon: 'fa-users', title: 'Leads', sub: 'Gestão de contatos' },
+        catalogo: { icon: 'fa-shopping-bag', title: 'Catálogo', sub: 'Produtos e preços' }
+    };
+
+    const role = state.user?.role?.toLowerCase() || 'vendedor';
+    const userPermissions = isAdmin ? PERMISSIONS.superadmin : (PERMISSIONS[role] || PERMISSIONS.vendedor);
+
+    // Filtrar páginas que já estão na bottom nav para não repetir (dashboard, whatsapp, conversas, rag)
+    const hiddenPages = ['dashboard', 'conversas', 'whatsapp', 'rag', 'more'];
+    const extraPages = userPermissions.filter(p => !hiddenPages.includes(p));
+
+    let menuHtml = '';
+    extraPages.forEach(page => {
+        const conf = menuConfig[page];
+        if (conf) {
+            menuHtml += `
+            <div class="more-item" onclick="navigate('${page}')">
+                <i class="fas ${conf.icon}"></i>
+                <div class="more-item-content">
+                    <div class="more-item-title">${conf.title}</div>
+                    <div class="more-item-sub">${conf.sub}</div>
+                </div>
+                <i class="fas fa-chevron-right more-arrow"></i>
+            </div>`;
+        }
+    });
 
     c.innerHTML = `
     <div class="card" style="padding:0;overflow:hidden">
-        <div style="padding:20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px;background:var(--primary-subtle)">
-            <div style="width:50px;height:50px;border-radius:50%;background:var(--primary);color:var(--primary-foreground);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;flex-shrink:0">
-                ${(state.user?.email || 'AD').substring(0, 2).toUpperCase()}
-            </div>
+        <div style="padding:20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px;background:var(--secondary)">
+            <div class="sidebar-user-avatar" style="width:50px;height:50px;font-size:18px">${(state.user?.email || 'AD').substring(0, 2).toUpperCase()}</div>
             <div>
                 <div style="font-weight:700;font-size:16px">${esc(state.user?.email || '')}</div>
-                <div style="font-size:12px;color:var(--muted-foreground)">
-                    ${roleLabel}
-                </div>
+                <div style="font-size:12px;color:var(--muted-foreground)">${roleLabel}</div>
             </div>
         </div>
 
         <div class="more-menu">
-            <div class="more-item" onclick="navigate('agente')">
-                <i class="fas fa-robot"></i>
-                <div class="more-item-content">
-                    <div class="more-item-title">Configurações do Agente</div>
-                    <div class="more-item-sub">Personalize o comportamento da IA</div>
-                </div>
-                <i class="fas fa-chevron-right more-arrow"></i>
-            </div>
-
-            <div class="more-item" onclick="navigate('equipe')">
-                <i class="fas fa-users-cog"></i>
-                <div class="more-item-content">
-                    <div class="more-item-title">Configurações da Equipe</div>
-                    <div class="more-item-sub">Gerencie membros e permissões</div>
-                </div>
-                <i class="fas fa-chevron-right more-arrow"></i>
-            </div>
-
-            <div class="more-item" onclick="navigate('diagnostics')">
-                <i class="fas fa-tools"></i>
-                <div class="more-item-content">
-                    <div class="more-item-title">Diagnóstico do Sistema</div>
-                    <div class="more-item-sub">Verifique chaves de API e conexão</div>
-                </div>
-                <i class="fas fa-chevron-right more-arrow"></i>
-            </div>
-
-            ${isAdmin ? `
-            <div class="more-item" onclick="navigate('clientes')">
-                <i class="fas fa-building"></i>
-                <div class="more-item-content">
-                    <div class="more-item-title">Gestão de Clientes</div>
-                    <div class="more-item-sub">Gerencie lojas e acessos</div>
-                </div>
-                <i class="fas fa-chevron-right more-arrow"></i>
-            </div>` : ''}
-
+            ${menuHtml}
+            
             <div class="more-item" onclick="toggleTheme()">
                 <i class="fas fa-adjust"></i>
                 <div class="more-item-content">
@@ -1832,7 +1830,16 @@ async function renderMore() {
                 <i class="fas fa-sync"></i>
                 <div class="more-item-content">
                     <div class="more-item-title">Recarregar Painel</div>
-                    <div class="more-item-sub">Atualizar dados da interface</div>
+                    <div class="more-item-sub">Atualizar dados</div>
+                </div>
+                <i class="fas fa-chevron-right more-arrow"></i>
+            </div>
+            
+            <div class="more-item" onclick="doLogout()" style="color:var(--destructive)">
+                <i class="fas fa-sign-out-alt"></i>
+                <div class="more-item-content">
+                    <div class="more-item-title">Sair</div>
+                    <div class="more-item-sub">Encerrar sessão</div>
                 </div>
                 <i class="fas fa-chevron-right more-arrow"></i>
             </div>
@@ -1850,14 +1857,10 @@ async function renderMore() {
                 </div>
             </div>
             <div style="font-size:11px;color:var(--muted-foreground);text-align:center">
-                Versão 4.0.0 — RoboTI BR by WavePod
+                Versão 4.0.5 — RoboTI BR by WavePod
             </div>
         </div>
-    </div>
-
-    <button class="btn btn-danger" style="width:100%;margin-top:16px;justify-content:center;padding:14px" onclick="doLogout()">
-        <i class="fas fa-sign-out-alt"></i> Sair do Sistema
-    </button>`;
+    </div>`;
 
     try {
         await api.get('/admin/lojas');
@@ -2068,7 +2071,7 @@ async function init() {
 
             document.getElementById('sidebarUserEmail').textContent = state.user.email;
 
-            const isAdmin = state.admin?.email && ['admin@robotibr.com.br', 'diegossilvestre@live.com', 'diegoasilvestre@live.com'].includes(state.admin.email);
+            const isAdmin = state.admin?.isSuperAdmin === true;
             const roleLabel = isAdmin ? 'Super Admin' : (state.user.role === 'admin' ? 'Dono da Loja' : (state.user.role.charAt(0).toUpperCase() + state.user.role.slice(1)));
 
             document.getElementById('sidebarUserRole').textContent = roleLabel;

@@ -19,7 +19,7 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=5.0">
+    <link rel="stylesheet" href="style.css?v=5.5">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 
@@ -27,21 +27,48 @@
 
     <!-- ══ TELA DE LOGIN ══════════════════════════════════════════════════════ -->
     <div id="loginScreen" class="login-screen">
-        <div class="login-bg-grid"></div>
-        <div class="login-card">
-            <!-- Logo -->
-            <div class="login-logo">
-                <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <path
-                        d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
-                    <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
-                    <line x1="12" y1="22.08" x2="12" y2="12" />
-                </svg>
+        <div class="login-container">
+            <!-- Área de Impacto Visual -->
+            <div class="login-impact">
+                <div class="impact-overlay"></div>
+                <div class="impact-content">
+                    <div class="large-logo">
+                        <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path
+                                d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                            <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+                            <line x1="12" y1="22.08" x2="12" y2="12" />
+                        </svg>
+                    </div>
+                    <h1>A Gestão do Seu Lucro Começa Aqui</h1>
+                    <p>O Roboti BR é a plataforma definitiva para centralizar seu atendimento, automatizar processos com IA e escalar seus lucros através do WhatsApp e outros canais.</p>
+
+                    <div class="impact-badges">
+                        <div class="badge"><i class="fab fa-whatsapp"></i> WhatsApp</div>
+                        <div class="badge"><i class="fas fa-brain"></i> IA RAG</div>
+                        <div class="badge"><i class="fas fa-rocket"></i> Escala</div>
+                    </div>
+                </div>
             </div>
 
-            <div class="login-brand">RoboTI BR</div>
-            <div class="login-sub">by WavePod — Painel de Controle</div>
+            <!-- Área do Formulário -->
+            <div class="login-form-area">
+                <div class="login-bg-grid"></div>
+                <div class="login-card">
+                    <!-- Logo (Mobile only) -->
+                    <div class="login-logo mobile-only">
+                        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--primary)"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path
+                                d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                            <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+                            <line x1="12" y1="22.08" x2="12" y2="12" />
+                        </svg>
+                    </div>
+
+                    <div class="login-brand">RoboTI BR</div>
+                    <div class="login-sub">Painel de Controle — CRM Omnichannel</div>
 
             <!-- Erro -->
             <div id="loginError" class="login-error" style="display:none"></div>

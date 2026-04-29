@@ -50,70 +50,146 @@ h1, h2, h3, h4, .brand-name, .card-title, .stat-value {
 /* ══ LOGIN SCREEN ═══════════════════════════════════════════════════════════ */
 .login-screen {
     min-height: 100vh;
-    background: var(--sidebar-bg);
+    background: #000;
+    display: flex;
+    align-items: stretch;
+    position: relative;
+    overflow-x: hidden;
+}
+
+.login-container {
+    display: flex;
+    width: 100%;
+}
+
+/* Área de Impacto Visual (Esquerda) */
+.login-impact {
+    flex: 1.2;
+    background: linear-gradient(135deg, #09090b 0%, #18181b 100%);
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 60px;
     position: relative;
-    overflow: hidden;
+    color: white;
+}
+
+.impact-overlay {
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle at 2px 2px, rgba(197, 160, 89, 0.05) 1px, transparent 0);
+    background-size: 32px 32px;
+}
+
+.impact-content {
+    position: relative;
+    z-index: 2;
+    max-width: 580px;
+}
+
+.large-logo {
+    color: var(--primary);
+    margin-bottom: 40px;
+    filter: drop-shadow(0 0 20px rgba(197, 160, 89, 0.2));
+}
+
+.impact-content h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 64px;
+    font-weight: 700;
+    line-height: 1.05;
+    margin-bottom: 28px;
+    letter-spacing: -0.05em;
+    background: linear-gradient(to right, #ffffff, var(--primary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.impact-content p {
+    font-size: 18px;
+    color: #a1a1aa;
+    line-height: 1.6;
+    margin-bottom: 48px;
+}
+
+.impact-badges {
+    display: flex;
+    gap: 16px;
+}
+
+.impact-badges .badge {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 10px 18px;
+    border-radius: 50px;
+    font-size: 13px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--primary);
+    backdrop-filter: blur(4px);
+}
+
+/* Área do Formulário (Direita) */
+.login-form-area {
+    flex: 0.8;
+    background: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    position: relative;
 }
 
 .login-bg-grid {
     position: absolute;
     inset: 0;
-    background-image:
-        linear-gradient(rgba(197, 160, 89, 0.05) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(197, 160, 89, 0.05) 1px, transparent 1px);
-    background-size: 40px 40px;
+    background-image: 
+        linear-gradient(rgba(197,160,89,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(197,160,89,0.03) 1px, transparent 1px);
+    background-size: 50px 50px;
     pointer-events: none;
-}
-
-.login-bg-grid::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(ellipse at 50% 50%, rgba(197, 160, 89, 0.08) 0%, transparent 70%);
 }
 
 .login-card {
     position: relative;
-    z-index: 1;
-    background: #ffffff;
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 48px 40px;
+    z-index: 10;
+    background: #09090b;
+    border: 1px solid #27272a;
+    border-radius: 24px;
+    padding: 48px;
     width: 100%;
-    max-width: 420px;
-    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+    max-width: 440px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
 }
 
-.login-logo {
-    width: 56px;
-    height: 56px;
+.login-logo.mobile-only {
+    display: none;
+    width: 50px;
+    height: 50px;
     background: rgba(197, 160, 89, 0.1);
-    border: 1px solid rgba(197, 160, 89, 0.2);
-    border-radius: 16px;
-    display: flex;
+    border-radius: 12px;
     align-items: center;
     justify-content: center;
-    margin: 0 auto 20px;
+    margin: 0 auto 24px;
 }
 
 .login-brand {
     font-family: 'Space Grotesk', sans-serif;
     font-size: 28px;
     font-weight: 700;
-    color: var(--sidebar-fg);
+    color: white;
     text-align: center;
     letter-spacing: -0.04em;
-    margin-bottom: 6px;
+    margin-bottom: 8px;
 }
 
 .login-sub {
-    font-size: 13px;
-    color: var(--sidebar-muted);
+    font-size: 14px;
+    color: #71717a;
     text-align: center;
-    margin-bottom: 36px;
+    margin-bottom: 40px;
 }
 
 .login-input {
@@ -588,6 +664,63 @@ h1, h2, h3, h4, .brand-name, .card-title, .stat-value {
     width: fit-content;
 }
 
+.btn:active {
+    transform: translateY(0);
+}
+
+/* ══ GRIDS ══════════════════════════════════════════════════════════════════ */
+.agente-grid, .rag-grid, .scraping-grid, .whatsapp-grid, .form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+    margin-bottom: 24px;
+}
+
+/* ══ TABLES ══════════════════════════════════════════════════════════════════ */
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    text-align: left;
+}
+
+.data-table thead th {
+    background: var(--muted);
+    color: var(--muted-foreground);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+}
+
+.data-table tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.2s;
+}
+
+.data-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.data-table tbody tr:hover {
+    background: var(--muted);
+}
+
+.data-table tbody td {
+    padding: 16px 20px;
+    vertical-align: middle;
+    color: var(--foreground);
+}
+
 /* ══ BUTTONS ════════════════════════════════════════════════════════════════ */
 .btn {
     display: inline-flex;
@@ -601,7 +734,7 @@ h1, h2, h3, h4, .brand-name, .card-title, .stat-value {
     cursor: pointer;
     transition: 0.15s;
     border: none;
-    font-family: inherit;
+    outline: none;
     white-space: nowrap;
 }
 
@@ -1166,6 +1299,47 @@ h1, h2, h3, h4, .brand-name, .card-title, .stat-value {
 
 /* ══ RESPONSIVE (MOBILE FIRST OVERHAUL) ══════════════════════════════════════ */
 @media (max-width: 992px) {
+    .login-container {
+        flex-direction: column;
+        height: 100vh;
+        overflow-y: auto;
+    }
+
+    .login-impact {
+        flex: none;
+        padding: 60px 24px;
+        text-align: center;
+    }
+
+    .impact-content h1 {
+        font-size: 36px;
+    }
+
+    .impact-content p {
+        font-size: 14px;
+        margin-bottom: 24px;
+    }
+
+    .impact-badges {
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .login-form-area {
+        flex: none;
+        padding: 24px 16px 60px;
+        background: #000;
+    }
+
+    .login-card {
+        padding: 32px 24px;
+        border-radius: 20px;
+    }
+
+    .login-logo.mobile-only {
+        display: flex !important;
+    }
     .sidebar {
         display: none;
     }
