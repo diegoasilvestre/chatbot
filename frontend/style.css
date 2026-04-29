@@ -146,12 +146,12 @@ h1, h2, h3, h4, .brand-name, .card-title, .stat-value {
 }
 
 .login-sub {
-    font-size: 14px;
+    font-size: 13px;
     color: var(--muted-foreground);
     text-align: left;
-    margin-bottom: 48px;
+    margin-bottom: 32px;
     text-transform: uppercase;
-    letter-spacing: 0.2em;
+    letter-spacing: 0.15em;
 }
 
 .login-form-area {
@@ -159,31 +159,32 @@ h1, h2, h3, h4, .brand-name, .card-title, .stat-value {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(0, 0, 0, 0.2);
-    backdrop-filter: blur(4px);
-    border-left: 1px solid var(--border);
+    position: relative;
+    padding: 40px;
 }
 
 .login-card {
-    background: rgba(17, 24, 39, 0.95);
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
-    border: 1px solid var(--border);
+    background: rgba(17, 24, 39, 0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: var(--radius);
-    padding: 64px;
+    padding: 48px;
     width: 100%;
-    max-width: 500px;
-    box-shadow: 0 40px 100px rgba(0, 0, 0, 0.8);
+    max-width: 420px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    position: relative;
+    z-index: 5;
 }
 
 .btn-primary#loginBtn {
     background: var(--primary-gradient);
     color: #000000;
     font-weight: 700;
-    height: 52px;
+    height: 48px;
     border: none;
     border-radius: var(--radius-sm);
-    font-size: 16px;
+    font-size: 15px;
     text-transform: uppercase;
     letter-spacing: 0.05em;
     transition: all 0.2s ease;
