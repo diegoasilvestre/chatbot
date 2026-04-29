@@ -2051,6 +2051,33 @@ async function deleteProduto(id) {
 }
 
 
+// ─── UTILS & THEME ────────────────────────────────────────────────────────────
+
+function toggleTheme() {
+    const html = document.documentElement;
+    const current = html.getAttribute('data-theme') || 'light';
+    const next = current === 'light' ? 'dark' : 'light';
+
+    html.setAttribute('data-theme', next);
+    localStorage.setItem('robotibr_theme', next);
+    _applyThemeIcons(next);
+    toast(`Modo ${next === 'dark' ? 'Escuro' : 'Claro'} ativado`);
+}
+
+function _applyThemeIcons(theme) {
+    const isDark = theme === 'dark';
+    
+    // Login Screen icons
+    const loginIcon = document.getElementById('loginThemeIcon');
+    const loginLabel = document.getElementById('loginThemeLabel');
+    if (loginIcon) loginIcon.textContent = isDark ? '☀️' : '🌙';
+    if (loginLabel) loginLabel.textContent = isDark ? 'Alternar para Modo Claro' : 'Alternar para Modo Escuro';
+
+    // Topbar icon
+    const topbarIcon = document.getElementById('themeToggleIcon');
+    if (topbarIcon) topbarIcon.textContent = isDark ? '☀️' : '🌙';
+}
+
 async function init() {
     // 1. Aplica tema salvo (o anti-flash no HTML já aplica, mas atualizamos ícones aqui)
     const savedTheme = localStorage.getItem('robotibr_theme') || 'light';
