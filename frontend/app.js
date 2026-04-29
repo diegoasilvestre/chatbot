@@ -3,7 +3,7 @@
 //  Versão: 4.0  |  Design System Dual-Theme · Gestão de Equipe
 // ─────────────────────────────────────────────────────────────────────────────
 
-const API = 'https://sunset-routine-locked-cases.trycloudflare.com';
+const API = 'https://spectrum-emission-comparing-retailers.trycloudflare.com';
 
 let state = {
     lojas: [],
