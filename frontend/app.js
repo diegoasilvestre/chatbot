@@ -82,6 +82,15 @@ function doLogout() {
     window.location.reload();
 }
 
+function toggleMobileMenu() {
+    const sidebar = document.getElementById('mobileSidebar');
+    const overlay = document.getElementById('mobileOverlay');
+    if (sidebar && overlay) {
+        sidebar.classList.toggle('active');
+        overlay.classList.toggle('active');
+    }
+}
+
 // ─── CAMADA DE API ────────────────────────────────────────────────────────────
 
 const api = {

@@ -1745,3 +1745,142 @@ h1, h2, h3, h4, .brand-name, .card-title, .stat-value {
         grid-template-columns: repeat(2, 1fr);
     }
 }
+/* ══ MOBILE RESPONSIVENESS (OFF-CANVAS & CLEANUP) ═══════════════════════════ */
+@media (max-width: 768px) {
+    :root {
+        --sidebar-width: 0px; /* Hide desktop sidebar space */
+    }
+
+    .sidebar {
+        display: none !important; /* Hide desktop sidebar */
+    }
+
+    .main-content {
+        margin-left: 0 !important;
+        padding-bottom: 80px; /* Space for bottom nav */
+    }
+
+    .topbar {
+        padding: 0 16px;
+        height: 64px;
+    }
+
+    .topbar h1 {
+        font-size: 18px;
+    }
+
+    .page-content {
+        padding: 16px !important;
+    }
+
+    /* Mobile Sidebar (Off-canvas) */
+    .mobile-sidebar-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(4px);
+        z-index: 998;
+        display: none;
+        animation: fadeIn 0.2s ease;
+    }
+
+    .mobile-sidebar-overlay.active {
+        display: block;
+    }
+
+    .mobile-sidebar {
+        position: fixed;
+        top: 0;
+        right: -280px; /* Hidden by default */
+        width: 280px;
+        height: 100vh;
+        background: #4F4F4F; /* Technical Dark Gray */
+        z-index: 999;
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .mobile-sidebar.active {
+        transform: translateX(-280px);
+    }
+
+    .mobile-nav-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 32px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        padding-bottom: 16px;
+    }
+
+    .mobile-nav-title {
+        color: #ffffff;
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 700;
+        font-size: 20px;
+    }
+
+    .mobile-nav-close {
+        background: transparent;
+        border: none;
+        color: #ffffff;
+        font-size: 24px;
+        cursor: pointer;
+    }
+
+    .mobile-nav-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 16px;
+        color: #cbd5e1; /* Silver/Slate-300 */
+        text-decoration: none;
+        border-radius: 8px;
+        margin-bottom: 8px;
+        font-weight: 500;
+        transition: 0.2s;
+    }
+
+    .mobile-nav-item i {
+        width: 20px;
+        text-align: center;
+        font-size: 18px;
+    }
+
+    .mobile-nav-item.active {
+        background: rgba(255, 215, 0, 0.1);
+        color: var(--primary); /* Vibrant Gold */
+    }
+
+    /* Layout Cleanup */
+    .stats-grid {
+        grid-template-columns: 1fr !important;
+        gap: 12px;
+    }
+
+    .card {
+        padding: 16px !important;
+    }
+
+    .btn {
+        width: 100% !important;
+        justify-content: center;
+    }
+
+    /* Specific UI Fixes */
+    .topbar-right {
+        gap: 8px;
+    }
+
+    .topbar-loja-name {
+        display: none; /* Hide store name on small mobiles to save space */
+    }
+
+    /* Chat Area adjustments */
+    .omnichat-layout {
+        height: calc(100vh - 144px) !important; /* Adjust for bottom nav */
+    }
+}

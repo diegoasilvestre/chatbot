@@ -228,25 +228,60 @@
         <nav class="bottom-nav">
             <a href="#" class="nav-item active" data-page="dashboard" onclick="navigate('dashboard');return false;">
                 <i class="fas fa-th-large"></i>
-                <span>Dashboard</span>
+                <span>Home</span>
             </a>
             <a href="#" class="nav-item" data-page="whatsapp" onclick="navigate('whatsapp');return false;">
                 <i class="fab fa-whatsapp"></i>
-                <span>WhatsApp</span>
+                <span>WA</span>
             </a>
             <a href="#" class="nav-item" data-page="conversas" onclick="navigate('conversas');return false;">
                 <i class="fas fa-comments"></i>
                 <span>Chat</span>
             </a>
-            <a href="#" class="nav-item" data-page="rag" onclick="navigate('rag');return false;">
-                <i class="fas fa-book"></i>
-                <span>Cérebro</span>
+            <a href="#" class="nav-item" data-page="clientes" onclick="navigate('clientes');return false;">
+                <i class="fas fa-building"></i>
+                <span>Clientes</span>
             </a>
-            <a href="#" class="nav-item" data-page="more" onclick="navigate('more');return false;">
+            <a href="#" class="nav-item" id="mobileMenuBtn" onclick="toggleMobileMenu();return false;">
                 <i class="fas fa-ellipsis-h"></i>
                 <span>Mais</span>
             </a>
         </nav>
+
+        <!-- Mobile Sidebar Overlay -->
+        <div class="mobile-sidebar-overlay" id="mobileOverlay" onclick="toggleMobileMenu()"></div>
+
+        <!-- Mobile Sidebar (Off-canvas) -->
+        <aside class="mobile-sidebar" id="mobileSidebar">
+            <div class="mobile-nav-header">
+                <div class="mobile-nav-title">Menu Técnico</div>
+                <button class="mobile-nav-close" onclick="toggleMobileMenu()">&times;</button>
+            </div>
+            
+            <div class="nav-section-title">Inteligência</div>
+            <a class="mobile-nav-item" data-page="agente" href="#" onclick="navigate('agente');toggleMobileMenu();return false;">
+                <i class="fas fa-robot"></i> Agente & Prompt
+            </a>
+            <a class="mobile-nav-item" data-page="rag" href="#" onclick="navigate('rag');toggleMobileMenu();return false;">
+                <i class="fas fa-brain"></i> Cérebro (RAG)
+            </a>
+
+            <div class="nav-section-title">Equipe</div>
+            <a class="mobile-nav-item" data-page="equipe" href="#" onclick="navigate('equipe');toggleMobileMenu();return false;">
+                <i class="fas fa-user-shield"></i> Permissões
+            </a>
+
+            <div class="nav-section-title">Configurações</div>
+            <a class="mobile-nav-item" data-page="diagnostics" href="#" onclick="navigate('diagnostics');toggleMobileMenu();return false;">
+                <i class="fas fa-tools"></i> Diagnóstico
+            </a>
+            
+            <div style="margin-top:auto; padding-top:20px; border-top:1px solid rgba(255,255,255,0.05)">
+                <a class="mobile-nav-item" href="#" onclick="doLogout();return false;" style="color:var(--destructive)">
+                    <i class="fas fa-sign-out-alt"></i> Sair do Painel
+                </a>
+            </div>
+        </aside>
     </div>
 
     <!-- Modal -->
