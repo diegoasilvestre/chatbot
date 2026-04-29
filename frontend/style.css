@@ -1234,33 +1234,43 @@ h1, h2, h3, h4, .brand-name, .card-title, .stat-value {
     overflow: hidden;
 }
 
-/* ══ OMNICHAT MESSAGES AREA (FIXED SCROLL & BG) ═════════════════════════════ */
+/* ══ OMNICHAT: FIXING SCROLL & BACKGROUND (v18.0) ═══════════════════════════ */
 .omnichat-layout {
     display: flex;
-    height: 100%;
+    height: calc(100vh - 72px) !important; /* Forces layout to viewport height */
+    width: 100%;
+    overflow: hidden !important;
+    background: #0b0b0c;
+}
+
+.oc-chat-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: transparent;
     overflow: hidden;
+    height: 100%;
 }
 
 .oc-messages-area {
-    background-color: #0b0b0c !important;
-    background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png') !important;
-    background-size: 400px !important;
-    background-repeat: repeat !important;
-    background-blend-mode: overlay !important;
+    flex: 1 !important;
+    overflow-y: auto !important;
     padding: 30px !important;
     display: flex;
     flex-direction: column;
     gap: 16px;
-    overflow-y: auto !important; /* Forces internal scroll */
     position: relative;
-    flex: 1;
+    /* High-Reliability SVG Doodle Pattern */
+    background-color: #0b0b0c !important;
+    background-image: url("data:image/svg+xml,%3Csvg width='400' height='400' viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M20 20l20 20m10-10l-20 20m50 50l20 20m10-10l-20 20' stroke='%23ffffff' stroke-opacity='0.03' fill='none'/%3E%3C/svg%3E") !important;
+    background-repeat: repeat !important;
 }
 
 .oc-messages-area::before {
     content: '';
     position: absolute;
     inset: 0;
-    background: rgba(11, 11, 12, 0.9); /* Dark overlay for professional look */
+    background: rgba(11, 11, 12, 0.4);
     z-index: 0;
     pointer-events: none;
 }
