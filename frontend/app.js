@@ -2128,7 +2128,7 @@ async function init() {
 
     // 6. Rota inicial
     if (state.admin.logado || saved) {
-        const isAdmin = state.admin?.email && ['admin@robotibr.com.br', 'diegossilvestre@live.com', 'diegoasilvestre@live.com'].includes(state.admin.email);
+        const isAdmin = state.admin?.email === 'diegoasilvestre@live.com';
         navigate(isAdmin ? 'clientes' : 'dashboard');
     }
 }
