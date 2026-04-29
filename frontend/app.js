@@ -841,6 +841,9 @@ async function ocSelectContact(id) {
     _ocActiveId = id;
     ocRenderContactList(_ocContacts);
 
+    const layout = document.getElementById('omnichatLayout');
+    if (layout) layout.classList.add('chat-open');
+
     const panel = document.getElementById('ocChatPanel');
     if (!panel) return;
     const contact = _ocContacts.find(c => c.id === id);
@@ -848,7 +851,8 @@ async function ocSelectContact(id) {
     const ia = _ocIaStates[id] !== false;
 
     panel.innerHTML = `
-    <div class="oc-chat-header" style="height:80px; border-bottom:1px solid var(--border); display:flex; align-items:center; padding:0 24px; background:var(--card)">
+    <div class="oc-chat-header">
+        <button class="oc-back-btn" onclick="backToContacts()"><i class="fas fa-arrow-left"></i></button>
         <div class="sidebar-user-avatar" style="width:40px; height:40px; margin-right:12px">${ocInitials(contact.nome)}</div>
         <div style="flex:1">
             <div style="font-size:15px; font-weight:700; color:var(--foreground)">${esc(contact.nome || contact.numero_cliente)}</div>
@@ -885,6 +889,12 @@ async function ocSelectContact(id) {
 
     ocRenderCrmProfile(contact.numero_cliente);
     await ocLoadMessages(id);
+}
+
+function backToContacts() {
+    const layout = document.getElementById('omnichatLayout');
+    if (layout) layout.classList.remove('chat-open');
+    _ocActiveId = null;
 }
 
 async function ocRenderCrmProfile(telefone) {
