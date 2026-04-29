@@ -1430,12 +1430,23 @@ h1, h2, h3, h4, .brand-name, .card-title, .stat-value {
     left: 3px;
 }
 
+/* ══ MOBILE OVERLAYS (HIDDEN ON DESKTOP) ══════════════════════════════════ */
+.mobile-sidebar, 
+.mobile-sidebar-overlay,
+.bottom-nav {
+    display: none;
+}
+
 /* ══ RESPONSIVE (MOBILE FIRST OVERHAUL) ══════════════════════════════════════ */
 
 /* ══ MOBILE RESPONSIVENESS (OFF-CANVAS & CLEANUP) ═══════════════════════════ */
 @media (max-width: 768px) {
     :root {
         --sidebar-width: 0px; 
+    }
+
+    .bottom-nav {
+        display: flex !important;
     }
 
     /* Blindagem Desktop: Garante que o menu principal suma APENAS no mobile */
@@ -1466,6 +1477,21 @@ h1, h2, h3, h4, .brand-name, .card-title, .stat-value {
     }
 
     /* Mobile Sidebar (Off-canvas) - Fundo Cinza Técnico */
+    .mobile-sidebar {
+        display: flex !important; /* Overrides global none */
+        position: fixed;
+        top: 0;
+        right: -300px;
+        width: 300px;
+        height: 100vh;
+        background: #2a2a2a; 
+        z-index: 2001;
+        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        padding: 30px 24px;
+        flex-direction: column;
+        border-left: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
     .mobile-sidebar-overlay {
         position: fixed;
         inset: 0;
@@ -1474,25 +1500,6 @@ h1, h2, h3, h4, .brand-name, .card-title, .stat-value {
         z-index: 2000;
         display: none;
         animation: fadeIn 0.2s ease;
-    }
-
-    .mobile-sidebar-overlay.active {
-        display: block;
-    }
-
-    .mobile-sidebar {
-        position: fixed;
-        top: 0;
-        right: -300px;
-        width: 300px;
-        height: 100vh;
-        background: #2a2a2a; /* Cinza Técnico Escuro */
-        z-index: 2001;
-        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        padding: 30px 24px;
-        display: flex;
-        flex-direction: column;
-        border-left: 1px solid rgba(255, 255, 255, 0.05);
     }
 
     .mobile-sidebar.active {
