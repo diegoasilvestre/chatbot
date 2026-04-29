@@ -3,7 +3,7 @@
 //  Versão: 4.0  |  Design System Dual-Theme · Gestão de Equipe
 // ─────────────────────────────────────────────────────────────────────────────
 
-const API = 'https://spectrum-emission-comparing-retailers.trycloudflare.com';
+const API = 'https://entries-shipment-fork-hardware.trycloudflare.com';
 
 let state = {
     lojas: [],
