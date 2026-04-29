@@ -49,14 +49,14 @@ h1, h2, h3, h4, .brand-name, .card-title, .stat-value {
     font-family: 'Space Grotesk', sans-serif;
 }
 
-/* ══ IMMERSIVE GOD-MODE BACKGROUND ═════════════════════════════════════════ */
+/* ══ IMMERSIVE MESH BACKGROUND (SENIOR EDITION) ════════════════════════════ */
 .login-screen, .app-layout {
     min-height: 100vh;
-    background-color: #0a0a0b;
+    background-color: #050505;
     background-image: 
-        radial-gradient(circle at 0% 0%, rgba(255, 215, 0, 0.04) 0%, transparent 40%),
-        radial-gradient(circle at 100% 100%, rgba(148, 163, 184, 0.04) 0%, transparent 40%),
-        linear-gradient(135deg, #111827 0%, #0a0a0b 100%);
+        radial-gradient(circle at 0% 0%, rgba(212, 175, 55, 0.07) 0%, transparent 35%),
+        radial-gradient(circle at 100% 0%, rgba(148, 163, 184, 0.05) 0%, transparent 35%),
+        radial-gradient(circle at 50% 50%, rgba(17, 24, 39, 1) 0%, #050505 100%);
     position: relative;
     overflow-x: hidden;
 }
@@ -77,97 +77,103 @@ h1, h2, h3, h4, .brand-name, .card-title, .stat-value {
     background-image: 
         linear-gradient(rgba(255, 255, 255, 0.01) 1px, transparent 1px),
         linear-gradient(90deg, rgba(255, 255, 255, 0.01) 1px, transparent 1px);
-    background-size: 50px 50px;
+    background-size: 40px 40px;
     mask-image: radial-gradient(circle at center, black, transparent 80%);
     -webkit-mask-image: radial-gradient(circle at center, black, transparent 80%);
     pointer-events: none;
     z-index: 2;
 }
 
-/* ══ LOGIN SCREEN REFINEMENTS (SENIOR EDITION) ═════════════════════════════ */
+/* ══ LOGIN SCREEN: RESTORED IMPACT LAYOUT ══════════════════════════════════ */
 .login-container {
     display: flex;
     width: 100%;
-    max-width: 1200px;
+    max-width: 1400px;
     z-index: 10;
-    gap: 80px;
-    align-items: center;
-    position: relative;
-    justify-content: center;
-    padding: 40px;
+    gap: 0;
+    align-items: stretch;
+    min-height: 100vh;
 }
 
 .login-impact {
-    flex: 1;
+    flex: 1.2;
     display: flex;
     flex-direction: column;
     justify-content: center;
+    padding: 80px;
+    position: relative;
 }
 
 .large-logo {
     color: var(--primary);
-    margin-bottom: 24px;
+    margin-bottom: 32px;
+    filter: drop-shadow(0 0 15px rgba(212, 175, 55, 0.3));
 }
 
 .login-impact h1 {
     font-family: 'Space Grotesk', sans-serif;
-    font-size: 52px;
+    font-size: 72px;
     font-weight: 700;
-    line-height: 1.1;
-    margin-bottom: 20px;
-    letter-spacing: -0.04em;
+    line-height: 0.95;
+    margin-bottom: 24px;
+    letter-spacing: -0.06em;
     color: #ffffff;
 }
 
 .login-impact p {
-    font-size: 17px;
+    font-size: 20px;
     color: #94a3b8;
     line-height: 1.6;
-    margin-bottom: 40px;
-    max-width: 460px;
+    margin-bottom: 48px;
+    max-width: 540px;
 }
 
 /* Header Grouping */
 .login-header {
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 12px;
+    justify-content: flex-start;
+    gap: 16px;
     margin-bottom: 8px;
-}
-
-.login-logo-cube {
-    display: flex;
-    align-items: center;
 }
 
 .login-brand {
     font-family: 'Space Grotesk', sans-serif;
-    font-size: 32px;
+    font-size: 42px;
     font-weight: 700;
     color: #ffffff;
-    letter-spacing: -0.04em;
+    letter-spacing: -0.05em;
 }
 
 .login-sub {
-    font-size: 13px;
+    font-size: 14px;
     color: var(--muted-foreground);
-    text-align: center;
-    margin-bottom: 40px;
+    text-align: left;
+    margin-bottom: 48px;
     text-transform: uppercase;
-    letter-spacing: 0.15em;
+    letter-spacing: 0.2em;
+}
+
+.login-form-area {
+    flex: 0.8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(4px);
+    border-left: 1px solid var(--border);
 }
 
 .login-card {
-    background: rgba(17, 24, 39, 0.9);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    background: rgba(17, 24, 39, 0.95);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    padding: 56px;
+    padding: 64px;
     width: 100%;
-    max-width: 460px;
-    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+    max-width: 500px;
+    box-shadow: 0 40px 100px rgba(0, 0, 0, 0.8);
 }
 
 .btn-primary#loginBtn {
