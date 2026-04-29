@@ -1,27 +1,29 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&family=Space+Grotesk:wght@500;700&display=swap');
 
 :root {
-    /* Design System: Roboti BR (Luxury & Minimalist) */
-    --primary: #c5a059; /* Dourado Nobre */
-    --primary-glow: rgba(197, 160, 89, 0.12);
-    --secondary: #f4f1ea; /* Bege Suave */
-    --background: #fcfbf9; /* Off-white */
-    --foreground: #1a1a1a;
-    --card: #ffffff;
-    --card-foreground: #1a1a1a;
-    --muted: #f8f6f2;
-    --muted-foreground: #71717a;
-    --accent: #c5a059;
-    --accent-foreground: #ffffff;
-    --border: #e8e4dc;
-    --sidebar-bg: #ffffff;
-    --sidebar-muted: #8e8e93;
-    --input: #e8e4dc;
-    --ring: #c5a059;
-    --radius: 14px;
-    --radius-sm: 8px;
-    --shadow: 0 8px 32px rgba(197, 160, 89, 0.08);
-    --primary-gradient: linear-gradient(135deg, #c5a059 0%, #e2c08d 100%);
+    /* Design System: Roboti BR (Luxury & Tech) */
+    --primary: #FFD700; /* Vivid Yellow */
+    --primary-glow: rgba(255, 215, 0, 0.15);
+    --secondary: #4F4F4F; /* Tech Grey */
+    --background: #020617; /* Midnight Blue */
+    --foreground: #ffffff;
+    --card: rgba(15, 23, 42, 0.6);
+    --card-foreground: #ffffff;
+    --muted: #4F4F4F;
+    --muted-foreground: #C0C0C0; /* Metallic Silver */
+    --accent: #FFD700;
+    --accent-foreground: #000000;
+    --border: rgba(255, 255, 255, 0.1);
+    --sidebar-bg: rgba(15, 23, 42, 0.8);
+    --sidebar-border: rgba(255, 255, 255, 0.1);
+    --sidebar-fg: #ffffff;
+    --sidebar-muted: #C0C0C0;
+    --input: rgba(255, 255, 255, 0.05);
+    --ring: #FFD700;
+    --radius: 16px;
+    --radius-sm: 10px;
+    --shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    --primary-gradient: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
     --success: #10b981;
     --destructive: #ef4444;
     --warning: #f59e0b;
@@ -47,25 +49,20 @@ h1, h2, h3, h4, .brand-name, .card-title, .stat-value {
     font-family: 'Space Grotesk', sans-serif;
 }
 
-/* ══ LOGIN SCREEN ═══════════════════════════════════════════════════════════ */
-.login-screen {
+/* ══ GLOBAL IMMERSIVE BACKGROUND ═══════════════════════════════════════════ */
+.login-screen, .app-layout {
     min-height: 100vh;
-    background: #020617; /* Deepest blue/black */
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    background: #020617;
     position: relative;
-    overflow: hidden;
-    padding: 20px;
+    overflow-x: hidden;
 }
 
-/* Dynamic background glows with animation */
-.login-screen::before {
+.login-screen::before, .app-layout::before {
     content: '';
     position: absolute;
     width: 800px;
     height: 800px;
-    background: radial-gradient(circle, rgba(197, 160, 89, 0.08) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(255, 215, 0, 0.07) 0%, transparent 70%);
     top: -200px;
     left: -200px;
     z-index: 1;
@@ -73,12 +70,12 @@ h1, h2, h3, h4, .brand-name, .card-title, .stat-value {
     animation: pulseGlow 8s infinite alternate;
 }
 
-.login-screen::after {
+.login-screen::after, .app-layout::after {
     content: '';
     position: absolute;
     width: 1000px;
     height: 1000px;
-    background: radial-gradient(circle, rgba(197, 160, 89, 0.04) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(255, 215, 0, 0.04) 0%, transparent 70%);
     bottom: -300px;
     right: -200px;
     z-index: 1;
@@ -104,6 +101,7 @@ h1, h2, h3, h4, .brand-name, .card-title, .stat-value {
     z-index: 2;
 }
 
+/* ══ LOGIN SCREEN REFINEMENTS ══════════════════════════════════════════════ */
 .login-container {
     display: flex;
     width: 100%;
@@ -112,9 +110,9 @@ h1, h2, h3, h4, .brand-name, .card-title, .stat-value {
     gap: 80px;
     align-items: center;
     position: relative;
+    justify-content: center;
 }
 
-/* Área de Impacto Visual (Esquerda) */
 .login-impact {
     flex: 1.2;
     display: flex;
@@ -126,7 +124,7 @@ h1, h2, h3, h4, .brand-name, .card-title, .stat-value {
 .large-logo {
     color: var(--primary);
     margin-bottom: 32px;
-    filter: drop-shadow(0 0 25px rgba(197, 160, 89, 0.4));
+    filter: drop-shadow(0 0 25px rgba(255, 215, 0, 0.4));
 }
 
 .login-impact h1 {
@@ -148,60 +146,27 @@ h1, h2, h3, h4, .brand-name, .card-title, .stat-value {
     max-width: 540px;
 }
 
-.impact-badges {
-    display: flex;
-    gap: 16px;
-}
-
-.impact-badges .badge {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 12px 24px;
-    border-radius: 50px;
-    font-size: 14px;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    color: #ffffff;
-    backdrop-filter: blur(12px);
-    transition: all 0.3s ease;
-}
-
-.impact-badges .badge:hover {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: var(--primary);
-    transform: translateY(-2px);
-}
-
-/* Área do Formulário (Direita) */
-.login-form-area {
-    flex: 0.8;
+/* New Header Grouping logo+name */
+.login-header {
     display: flex;
     align-items: center;
     justify-content: center;
+    gap: 16px;
+    margin-bottom: 12px;
 }
 
-.login-card {
-    background: rgba(15, 23, 42, 0.4);
-    backdrop-filter: blur(32px);
-    -webkit-backdrop-filter: blur(32px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 40px;
-    padding: 64px 56px;
-    width: 100%;
-    max-width: 500px;
-    box-shadow: 0 40px 120px -20px rgba(0, 0, 0, 0.7);
+.login-logo-cube {
+    filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.4));
+    display: flex;
+    align-items: center;
 }
 
 .login-brand {
     font-family: 'Space Grotesk', sans-serif;
-    font-size: 38px;
+    font-size: 42px;
     font-weight: 700;
     color: #ffffff;
-    text-align: center;
     letter-spacing: -0.06em;
-    margin-bottom: 8px;
 }
 
 .login-sub {
@@ -211,130 +176,30 @@ h1, h2, h3, h4, .brand-name, .card-title, .stat-value {
     margin-bottom: 48px;
 }
 
-/* Campos de Entrada de Alta Visibilidade */
-.form-group {
-    margin-bottom: 28px;
+.login-card {
+    background: var(--card);
+    backdrop-filter: blur(40px);
+    -webkit-backdrop-filter: blur(40px);
+    border: 1px solid var(--border);
+    border-radius: 40px;
+    padding: 64px 56px;
+    width: 100%;
+    max-width: 500px;
+    box-shadow: 0 40px 120px -20px rgba(0, 0, 0, 0.7);
 }
 
-.form-label {
-    color: #ffffff !important; /* Pure White */
-    font-size: 14px;
-    font-weight: 600;
-    margin-bottom: 10px;
-    display: block;
-    letter-spacing: 0.03em;
-}
-
-.login-input {
-    background: rgba(255, 255, 255, 0.05) !important;
-    border: 1px solid rgba(255, 255, 255, 0.15) !important;
-    color: #ffffff !important;
-    padding: 16px 20px !important;
-    border-radius: 16px !important;
-    font-size: 16px !important;
-    width: 100% !important;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-}
-
-.login-input:focus {
-    background: rgba(255, 255, 255, 0.08) !important;
-    border-color: var(--primary) !important;
-    box-shadow: 0 0 0 5px rgba(197, 160, 89, 0.2) !important;
-    outline: none !important;
-}
-
-.login-input::placeholder {
-    color: #475569 !important;
-}
-
-/* Botão Entrar no Painel */
-.btn-primary#loginBtn {
-    background: var(--primary-gradient);
-    color: #000000;
-    font-weight: 800;
-    height: 56px;
-    border: none;
-    border-radius: 16px;
-    font-size: 17px;
-    text-transform: uppercase;
-    letter-spacing: 0.02em;
-    box-shadow: 0 12px 35px rgba(197, 160, 89, 0.25);
-    transition: all 0.3s ease;
-}
-
-.btn-primary#loginBtn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 18px 45px rgba(197, 160, 89, 0.4);
-    filter: brightness(1.1);
-}
-
-.input-toggle-btn {
-    color: #64748b !important;
-    font-size: 18px !important;
-}
-
-.login-error {
-    background: rgba(239, 68, 68, 0.2);
-    border: 1px solid rgba(239, 68, 68, 0.3);
-    color: #fca5a5;
-    font-size: 14px;
-    padding: 16px;
-    border-radius: 14px;
-    margin-bottom: 28px;
-    text-align: center;
-}
-
-.login-footer {
-    margin-top: 40px;
-    font-size: 13px;
-    color: #475569;
-    text-align: center;
-}
-
-.bottom-nav { display: none; }
-
-@media (max-width: 1200px) {
-    .login-container { gap: 40px; padding: 0 40px; }
-    .login-impact h1 { font-size: 52px; }
-}
-
-@media (max-width: 992px) {
-    .login-screen {
-        align-items: center;
-        overflow-y: auto;
-        padding: 60px 24px;
-    }
-    .login-container {
-        flex-direction: column;
-        height: auto;
-        gap: 60px;
-    }
-    .login-impact {
-        text-align: center;
-        align-items: center;
-        flex: none;
-    }
-    .login-impact h1 { font-size: 44px; }
-    .login-impact p { margin-bottom: 32px; font-size: 17px; }
-    .login-form-area {
-        width: 100%;
-        flex: none;
-    }
-    .login-card {
-        padding: 48px 32px;
-    }
-}
-
-/* ══ APP LAYOUT ═════════════════════════════════════════════════════════════ */
+/* ══ APP LAYOUT (IMMERSIVE) ═════════════════════════════════════════════════ */
 .app-layout {
     display: flex;
     min-height: 100vh;
+    background: #020617; /* Unified background */
 }
 
 .sidebar {
     width: 280px;
-    background-color: var(--sidebar-bg);
-    border-right: 1px solid var(--sidebar-border);
+    background: rgba(15, 23, 42, 0.7);
+    backdrop-filter: blur(24px);
+    border-right: 1px solid var(--border);
     display: flex;
     flex-direction: column;
     position: fixed;
@@ -343,7 +208,6 @@ h1, h2, h3, h4, .brand-name, .card-title, .stat-value {
     bottom: 0;
     z-index: 100;
     overflow-y: auto;
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .main-content {
@@ -351,31 +215,43 @@ h1, h2, h3, h4, .brand-name, .card-title, .stat-value {
     flex: 1;
     display: flex;
     flex-direction: column;
+    background: transparent; /* Shows immersive background */
+    padding: 32px;
 }
 
-/* ══ TOPBAR ═════════════════════════════════════════════════════════════════ */
+/* ══ TOPBAR (IMMERSIVE) ═════════════════════════════════════════════════════ */
 .topbar {
     height: 80px;
-    background: rgba(11, 13, 16, 0.8);
+    background: rgba(15, 23, 42, 0.5);
     backdrop-filter: blur(16px);
-    border-bottom: 1px solid var(--border);
+    border: 1px solid var(--border);
+    border-radius: 20px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 40px;
+    padding: 0 32px;
     position: sticky;
-    top: 0;
+    top: 20px;
+    margin-bottom: 32px;
     z-index: 50;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.card {
+    background: var(--card);
+    backdrop-filter: blur(16px);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
 }
 
 .server-status {
     display: flex;
     align-items: center;
     gap: 8px;
-    margin-right: 16px;
-    padding: 6px 12px;
-    background: rgba(161, 161, 170, 0.05);
-    border-radius: 20px;
+    padding: 8px 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 30px;
     border: 1px solid var(--border);
 }
 
@@ -387,19 +263,19 @@ h1, h2, h3, h4, .brand-name, .card-title, .stat-value {
 
 .status-dot.online {
     background: var(--success);
-    box-shadow: 0 0 8px var(--success);
+    box-shadow: 0 0 10px var(--success);
 }
 
 .status-dot.offline {
     background: var(--destructive);
-    box-shadow: 0 0 8px var(--destructive);
+    box-shadow: 0 0 10px var(--destructive);
 }
 
 .status-text {
-    font-size: 11px;
-    font-weight: 500;
-    color: var(--muted-foreground);
-    white-space: nowrap;
+    font-size: 12px;
+    font-weight: 600;
+    color: #ffffff;
+}
 }
 
 .btn-logout {
