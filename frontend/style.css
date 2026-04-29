@@ -1431,338 +1431,30 @@ h1, h2, h3, h4, .brand-name, .card-title, .stat-value {
 }
 
 /* ══ RESPONSIVE (MOBILE FIRST OVERHAUL) ══════════════════════════════════════ */
-@media (max-width: 992px) {
-    .login-container {
-        flex-direction: column;
-        height: 100vh;
-        overflow-y: auto;
-    }
 
-    .login-impact {
-        flex: none;
-        padding: 60px 24px;
-        text-align: center;
-    }
-
-    .impact-content h1 {
-        font-size: 36px;
-    }
-
-    .impact-content p {
-        font-size: 14px;
-        margin-bottom: 24px;
-    }
-
-    .impact-badges {
-        justify-content: center;
-        flex-wrap: wrap;
-        gap: 10px;
-    }
-
-    .login-form-area {
-        flex: none;
-        padding: 24px 16px 60px;
-        background: #f9f9f9;
-    }
-
-    [data-theme="dark"] .login-form-area {
-        background: #000;
-    }
-
-    .login-card {
-        padding: 32px 24px;
-        border-radius: 20px;
-    }
-
-    .login-logo.mobile-only {
-        display: flex !important;
-    }
-    .sidebar {
-        display: none;
-    }
-
-    .main-content {
-        margin-left: 0;
-        padding-bottom: 75px;
-    }
-
-    .topbar {
-        height: 60px;
-        padding: 0 16px;
-        background: var(--card);
-        border-bottom: 1px solid var(--border);
-        justify-content: center;
-        position: sticky;
-        top: 0;
-        z-index: 1000;
-    }
-
-    #mobileMenuToggle {
-        display: none !important;
-    }
-
-    .topbar h1 {
-        font-size: 17px;
-        font-weight: 700;
-        text-align: center;
-    }
-
-    .topbar-right {
-        position: absolute;
-        right: 12px;
-    }
-
-    .page-content {
-        padding: 16px 12px;
-        width: 100%;
-        overflow-x: hidden;
-    }
-
-    /* Compact Stats for Mobile */
-    .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 8px;
-        margin-bottom: 16px;
-    }
-
-    .stat-card {
-        padding: 12px;
-        min-height: 90px;
-        border-radius: 14px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-        background: var(--card);
-        border: 1px solid var(--border);
-    }
-
-    .stat-value {
-        font-size: 22px;
-        margin: 2px 0;
-        font-weight: 700;
-        color: var(--primary);
-    }
-
-    .stat-label {
-        font-size: 9px;
-        color: var(--muted-foreground);
-        text-transform: uppercase;
-        letter-spacing: 0.02em;
-    }
-
-    /* Premium Card Look */
-    .card {
-        padding: 20px 16px;
-        margin-bottom: 16px;
-        border-radius: 16px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.02);
-    }
-
-    .card-title {
-        font-size: 15px;
-        margin-bottom: 16px;
-        text-align: center;
-    }
-
-    .agente-grid, .rag-grid, .scraping-grid, .whatsapp-grid, .form-grid {
-        grid-template-columns: 1fr !important;
-        gap: 12px;
-    }
-
-    /* Navigation */
-    .bottom-nav {
-        display: flex;
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        height: 70px;
-        background: rgba(255, 255, 255, 0.98);
-        backdrop-filter: blur(10px);
-        border-top: 1px solid var(--border);
-        z-index: 1100;
-        padding-bottom: env(safe-area-inset-bottom);
-    }
-
-    .bottom-nav .nav-item {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 3px;
-        color: var(--sidebar-muted);
-        text-decoration: none;
-        font-size: 10px;
-        font-weight: 600;
-        background: transparent !important;
-    }
-
-    .bottom-nav .nav-item i {
-        font-size: 20px;
-    }
-
-    .bottom-nav .nav-item.active {
-        color: var(--primary) !important;
-    }
-
-    /* WhatsApp Style Omnichat */
-    .omnichat-layout {
-        height: calc(100vh - 130px);
-        margin: -16px -12px;
-        border-radius: 0;
-        border: none;
-        background: transparent;
-        display: block;
-    }
-
-    .oc-sidebar-panel {
-        display: block;
-        width: 100%;
-        height: 100%;
-        background: var(--card);
-    }
-
-    .oc-chat-panel {
-        display: none;
-        position: fixed;
-        inset: 0;
-        z-index: 1200;
-        background: #e5ddd5;
-        flex-direction: column;
-        padding-bottom: 0;
-    }
-
-    .oc-crm-panel {
-        display: none !important;
-    }
-
-    .omnichat-layout.chat-open .oc-chat-panel {
-        display: flex;
-    }
-
-    .omnichat-layout.chat-open .oc-sidebar-panel {
-        display: none;
-    }
-
-    .oc-chat-header {
-        height: 60px !important;
-        padding: 0 12px !important;
-        background: #f0f2f5 !important;
-        border-bottom: 1px solid rgba(0,0,0,0.05) !important;
-        display: flex !important;
-        align-items: center !important;
-    }
-
-    .oc-back-btn {
-        display: flex !important;
-        align-items: center;
-        justify-content: center;
-        width: 36px;
-        height: 36px;
-        margin-right: 4px;
-        color: #54656f;
-        background: transparent;
-        border: none;
-        font-size: 18px;
-        cursor: pointer;
-    }
-
-    /* WhatsApp Bubbles */
-    .oc-messages-area {
-        background-color: #e5ddd5;
-        background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');
-        background-blend-mode: overlay;
-        padding: 12px !important;
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-    }
-
-    .oc-bubble {
-        max-width: 85% !important;
-        border-radius: 8px !important;
-        box-shadow: 0 1px 0.5px rgba(0,0,0,0.13) !important;
-        padding: 8px 12px !important;
-        font-size: 14px !important;
-        position: relative;
-    }
-
-    .oc-bubble.user {
-        background: #ffffff !important;
-        border-radius: 0 8px 8px 8px !important;
-        align-self: flex-start !important;
-    }
-
-    .oc-bubble.assistant, .oc-bubble.human {
-        background: #dcf8c6 !important;
-        color: #000 !important;
-        border-radius: 8px 0 8px 8px !important;
-        align-self: flex-end !important;
-    }
-
-    .oc-composer {
-        background: #f0f2f5 !important;
-        padding: 8px 12px !important;
-        gap: 8px !important;
-        border: none !important;
-    }
-
-    .oc-composer textarea {
-        background: #fff !important;
-        border: none !important;
-        border-radius: 20px !important;
-        padding: 10px 15px !important;
-        font-size: 14px !important;
-        flex: 1;
-        min-height: 40px !important;
-    }
-
-    .oc-composer .btn-primary {
-        border-radius: 50% !important;
-        width: 44px !important;
-        height: 44px !important;
-        padding: 0 !important;
-        background: #00a884 !important;
-        border: none !important;
-        color: white !important;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .oc-quick-actions {
-        padding: 6px 12px !important;
-        background: #f0f2f5 !important;
-        border: none !important;
-    }
-}
-
-@media (max-width: 480px) {
-    .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
 /* ══ MOBILE RESPONSIVENESS (OFF-CANVAS & CLEANUP) ═══════════════════════════ */
 @media (max-width: 768px) {
     :root {
-        --sidebar-width: 0px; /* Hide desktop sidebar space */
+        --sidebar-width: 0px; 
     }
 
+    /* Blindagem Desktop: Garante que o menu principal suma APENAS no mobile */
     .sidebar {
-        display: none !important; /* Hide desktop sidebar */
+        display: none !important;
     }
 
     .main-content {
         margin-left: 0 !important;
-        padding-bottom: 80px; /* Space for bottom nav */
+        padding-bottom: 80px; 
     }
 
     .topbar {
         padding: 0 16px;
         height: 64px;
+        position: sticky;
+        top: 0;
+        background: rgba(17, 24, 39, 0.8);
+        backdrop-filter: blur(12px);
     }
 
     .topbar h1 {
@@ -1773,13 +1465,13 @@ h1, h2, h3, h4, .brand-name, .card-title, .stat-value {
         padding: 16px !important;
     }
 
-    /* Mobile Sidebar (Off-canvas) */
+    /* Mobile Sidebar (Off-canvas) - Fundo Cinza Técnico */
     .mobile-sidebar-overlay {
         position: fixed;
         inset: 0;
-        background: rgba(0, 0, 0, 0.7);
-        backdrop-filter: blur(4px);
-        z-index: 998;
+        background: rgba(0, 0, 0, 0.85);
+        backdrop-filter: blur(8px);
+        z-index: 2000;
         display: none;
         animation: fadeIn 0.2s ease;
     }
@@ -1791,29 +1483,29 @@ h1, h2, h3, h4, .brand-name, .card-title, .stat-value {
     .mobile-sidebar {
         position: fixed;
         top: 0;
-        right: -280px; /* Hidden by default */
-        width: 280px;
+        right: -300px;
+        width: 300px;
         height: 100vh;
-        background: #4F4F4F; /* Technical Dark Gray */
-        z-index: 999;
-        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        padding: 24px;
+        background: #2a2a2a; /* Cinza Técnico Escuro */
+        z-index: 2001;
+        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        padding: 30px 24px;
         display: flex;
         flex-direction: column;
-        box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+        border-left: 1px solid rgba(255, 255, 255, 0.05);
     }
 
     .mobile-sidebar.active {
-        transform: translateX(-280px);
+        transform: translateX(-300px);
     }
 
     .mobile-nav-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 32px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        padding-bottom: 16px;
+        margin-bottom: 40px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        padding-bottom: 20px;
     }
 
     .mobile-nav-title {
@@ -1821,66 +1513,69 @@ h1, h2, h3, h4, .brand-name, .card-title, .stat-value {
         font-family: 'Space Grotesk', sans-serif;
         font-weight: 700;
         font-size: 20px;
+        letter-spacing: -0.02em;
     }
 
     .mobile-nav-close {
-        background: transparent;
-        border: none;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
         color: #ffffff;
-        font-size: 24px;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         cursor: pointer;
     }
 
     .mobile-nav-item {
         display: flex;
         align-items: center;
-        gap: 12px;
-        padding: 14px 16px;
-        color: #cbd5e1; /* Silver/Slate-300 */
+        gap: 14px;
+        padding: 16px;
+        color: #e2e8f0; /* Prata/Silver */
         text-decoration: none;
-        border-radius: 8px;
-        margin-bottom: 8px;
+        border-radius: 12px;
+        margin-bottom: 10px;
         font-weight: 500;
         transition: 0.2s;
+        background: rgba(255, 255, 255, 0.02);
     }
 
     .mobile-nav-item i {
         width: 20px;
         text-align: center;
         font-size: 18px;
+        color: var(--primary);
     }
 
     .mobile-nav-item.active {
-        background: rgba(255, 215, 0, 0.1);
-        color: var(--primary); /* Vibrant Gold */
+        background: rgba(255, 215, 0, 0.08);
+        color: var(--primary);
+        border: 1px solid rgba(255, 215, 0, 0.15);
     }
 
-    /* Layout Cleanup */
+    /* Layout Cleaning Mobile */
     .stats-grid {
         grid-template-columns: 1fr !important;
-        gap: 12px;
+        gap: 16px;
     }
 
     .card {
-        padding: 16px !important;
+        padding: 20px !important;
+        border-radius: 16px !important;
     }
 
     .btn {
         width: 100% !important;
+        height: 48px !important;
         justify-content: center;
+        font-weight: 700;
     }
 
-    /* Specific UI Fixes */
-    .topbar-right {
-        gap: 8px;
-    }
-
-    .topbar-loja-name {
-        display: none; /* Hide store name on small mobiles to save space */
-    }
-
-    /* Chat Area adjustments */
+    /* Specific Chat Fix for Mobile */
     .omnichat-layout {
-        height: calc(100vh - 144px) !important; /* Adjust for bottom nav */
+        height: calc(100vh - 134px) !important;
     }
 }
