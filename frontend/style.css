@@ -347,6 +347,34 @@ h1, h2, h3, h4, .brand-name, .card-title, .stat-value {
     font-size: 11px;
 }
 
+/* ══ SCROLLBARS (MINIMALIST SENIOR) ═════════════════════════════════════════ */
+::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-glow);
+}
+
+/* Hide scrollbars for specific containers */
+.sidebar::-webkit-scrollbar,
+.oc-contact-list::-webkit-scrollbar,
+.oc-crm-panel::-webkit-scrollbar {
+    display: none;
+}
+
+.sidebar, .oc-contact-list, .oc-crm-panel {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
 .page-content {
     flex: 1;
     padding: 32px;
@@ -354,12 +382,14 @@ h1, h2, h3, h4, .brand-name, .card-title, .stat-value {
     animation: fadeIn 0.3s ease;
     display: flex;
     flex-direction: column;
+    overflow: hidden; /* Important for inner scrolls */
 }
 
 /* Fix for full-screen components like Omnichat */
 .page-content:has(.omnichat-layout), 
 .page-content:has(.whatsapp-layout) {
     padding: 0 !important;
+    height: calc(100vh - 72px); /* Subtract topbar height */
 }
 
 @keyframes fadeIn {
@@ -367,7 +397,6 @@ h1, h2, h3, h4, .brand-name, .card-title, .stat-value {
         opacity: 0;
         transform: translateY(8px);
     }
-
     to {
         opacity: 1;
         transform: translateY(0);
@@ -375,6 +404,20 @@ h1, h2, h3, h4, .brand-name, .card-title, .stat-value {
 }
 
 /* ══ SIDEBAR ════════════════════════════════════════════════════════════════ */
+.sidebar {
+    width: 260px;
+    background: var(--sidebar-bg);
+    border-right: 1px solid var(--sidebar-border);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 100;
+    overflow-y: auto;
+}
+
 .sidebar-brand {
     padding: 28px 24px 20px;
     display: flex;
