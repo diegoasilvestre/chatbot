@@ -1754,6 +1754,9 @@ async function executarDiagnostico() {
 
 async function renderMore() {
     const c = document.getElementById('pageContent');
+    const isAdmin = state.admin?.email && ['admin@robotibr.com.br', 'diegossilvestre@live.com', 'diegoasilvestre@live.com'].includes(state.admin.email);
+    const roleLabel = isAdmin ? '👑 Super Admin' : (state.user?.role === 'admin' ? '💼 Dono da Loja' : '💼 Gestor');
+
     c.innerHTML = `
     <div class="card" style="padding:0;overflow:hidden">
         <div style="padding:20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px;background:var(--primary-subtle)">
@@ -1763,7 +1766,7 @@ async function renderMore() {
             <div>
                 <div style="font-weight:700;font-size:16px">${esc(state.user?.email || '')}</div>
                 <div style="font-size:12px;color:var(--muted-foreground)">
-                    ${state.user?.role === 'admin' ? '👑 Super Admin' : '💼 Gestor de Loja'}
+                    ${roleLabel}
                 </div>
             </div>
         </div>
@@ -1796,7 +1799,7 @@ async function renderMore() {
                 <i class="fas fa-chevron-right more-arrow"></i>
             </div>
 
-            ${state.user?.role === 'admin' ? `
+            ${isAdmin ? `
             <div class="more-item" onclick="navigate('clientes')">
                 <i class="fas fa-building"></i>
                 <div class="more-item-content">
