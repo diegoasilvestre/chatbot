@@ -155,7 +155,7 @@ function noLojaMsg() {
             <div class="empty-state">
                 <div class="empty-icon" style="font-size:48px; margin-bottom:16px">🏢</div>
                 <h3 style="margin-bottom:8px">Nenhum cliente selecionado</h3>
-                <p style="color:var(--muted-foreground); margin-bottom:24px">Selecione uma empresa no topo para gerenciar as configurações.</p>
+                <p style="color:var(--text-secondary); margin-bottom:24px">Selecione uma empresa no topo para gerenciar as configurações.</p>
                 <button class="btn btn-primary" onclick="navigate('clientes')">Gestão de Clientes</button>
             </div>
         </div>
@@ -168,7 +168,7 @@ function errMsg(e) {
             <div class="empty-state">
                 <div class="empty-icon" style="font-size:48px; margin-bottom:16px">⚠️</div>
                 <h3 style="margin-bottom:8px">Erro de Carregamento</h3>
-                <p style="font-family:monospace; font-size:12px; background:var(--muted); padding:12px; border-radius:8px; margin-bottom:20px; border:1px solid var(--border)">${e.message}</p>
+                <p style="font-family:monospace; font-size:12px; background:var(--bg-secondary); padding:12px; border-radius:8px; margin-bottom:20px; border:1px solid var(--border-color)">${e.message}</p>
                 <button class="btn btn-secondary" onclick="window.location.reload()">Recarregar Painel</button>
             </div>
         </div>
@@ -367,38 +367,63 @@ async function renderDashboard() {
         c.innerHTML = `
         <div class="page-wrapper">
             <div class="page-header">
-                <h1 class="page-title">Painel Geral</h1>
+                <div>
+                    <h1 class="page-title">Visão Geral</h1>
+                    <p class="text-muted">Acompanhe o desempenho do seu assistente em tempo real.</p>
+                </div>
                 <div class="page-actions">
-                    <span class="status-badge" style="font-size:12px; opacity:0.8">Live Feed</span>
+                    <button class="btn btn-secondary" onclick="renderDashboard()">
+                        <i class="fas fa-sync-alt"></i> Atualizar
+                    </button>
                 </div>
             </div>
             <div class="page-body">
                 <div class="stats-grid">
-                    <div class="card stat-card">
-                        <div class="stat-label">Conversas Ativas</div>
-                        <div class="stat-value" id="dashAtivas">--</div>
+                    <div class="card">
+                        <div class="text-muted" style="margin-bottom:8px">Conversas Ativas</div>
+                        <div style="font-size:32px; font-weight:700" id="dashAtivas">--</div>
+                        <div style="font-size:12px; color:var(--success); margin-top:8px">
+                            <i class="fas fa-arrow-up"></i> Fluxo de atendimento ativo
+                        </div>
                     </div>
-                    <div class="card stat-card">
-                        <div class="stat-label">Base de Conhecimento</div>
-                        <div class="stat-value">${docs.length}</div>
+                    <div class="card">
+                        <div class="text-muted" style="margin-bottom:8px">Base de Conhecimento</div>
+                        <div style="font-size:32px; font-weight:700">${docs.length}</div>
+                        <div class="text-muted" style="margin-top:8px">Documentos indexados</div>
                     </div>
-                    <div class="card stat-card">
-                        <div class="stat-label">Status WhatsApp</div>
-                        <div class="stat-value" style="font-size:14px; margin-top:8px">${waStatus}</div>
+                    <div class="card">
+                        <div class="text-muted" style="margin-bottom:8px">Status do WhatsApp</div>
+                        <div style="margin-top:12px">${waStatus}</div>
+                        <div class="text-muted" style="margin-top:8px">${wa.numero || 'Canal de atendimento'}</div>
                     </div>
-                    <div class="card stat-card">
-                        <div class="stat-label">Sistema</div>
-                        <div class="stat-value" style="color:var(--success); font-size:14px">Operacional</div>
+                    <div class="card">
+                        <div class="text-muted" style="margin-bottom:8px">Nível de IA</div>
+                        <div style="font-size:32px; font-weight:700">Groq</div>
+                        <div style="font-size:12px; color:var(--accent); margin-top:8px">Modelo: Llama 3 (Ultra Rápido)</div>
                     </div>
                 </div>
                 
-                <div class="card" style="margin-top:24px">
-                    <div class="card-title">🚀 Ações Rápidas</div>
-                    <div class="grid-2" style="margin-top:16px">
-                        <button class="btn btn-primary" onclick="navigate('whatsapp')"><i class="fab fa-whatsapp"></i> Conectar WhatsApp</button>
-                        <button class="btn btn-secondary" onclick="navigate('agente')"><i class="fas fa-robot"></i> Configurar IA</button>
-                        <button class="btn btn-secondary" onclick="navigate('rag')"><i class="fas fa-brain"></i> Treinar Cérebro</button>
-                        <button class="btn btn-ghost" onclick="navigate('conversas')"><i class="fas fa-comment-dots"></i> Abrir Chat</button>
+                <div style="margin-top:32px">
+                    <h2 style="font-size:16px; font-weight:600; margin-bottom:16px">🚀 Ações Sugeridas</h2>
+                    <div class="stats-grid">
+                        <div class="card" style="display:flex; align-items:center; gap:16px; cursor:pointer" onclick="navigate('whatsapp')">
+                            <div style="width:48px; height:48px; border-radius:12px; background:rgba(37, 211, 102, 0.1); color:#25D366; display:flex; align-items:center; justify-content:center; font-size:20px">
+                                <i class="fab fa-whatsapp"></i>
+                            </div>
+                            <div>
+                                <div style="font-weight:600">Conectar WhatsApp</div>
+                                <div class="text-muted">Inicie conversas com seus clientes.</div>
+                            </div>
+                        </div>
+                        <div class="card" style="display:flex; align-items:center; gap:16px; cursor:pointer" onclick="navigate('rag')">
+                            <div style="width:48px; height:48px; border-radius:12px; background:rgba(255, 215, 0, 0.1); color:var(--accent); display:flex; align-items:center; justify-content:center; font-size:20px">
+                                <i class="fas fa-brain"></i>
+                            </div>
+                            <div>
+                                <div style="font-weight:600">Treinar Cérebro</div>
+                                <div class="text-muted">Adicione novos conhecimentos à IA.</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -421,72 +446,68 @@ async function renderAgente() {
         c.innerHTML = `
         <div class="page-wrapper">
             <div class="page-header">
-                <h1 class="page-title">Personalidade do Agente</h1>
+                <div>
+                    <h1 class="page-title">Personalidade da IA</h1>
+                    <p class="text-muted">Defina como o seu assistente deve se comportar e interagir.</p>
+                </div>
                 <div class="page-actions">
-                    <button class="btn btn-primary" id="btnSalvarAgente" onclick="salvarAgente()" style="height:36px; padding:0 16px; font-size:13px">
-                        <i class="fas fa-save"></i> Salvar Alterações
+                    <button class="btn btn-primary" id="btnSalvarAgente" onclick="salvarAgente()" style="height:44px; padding:0 24px">
+                        <i class="fas fa-save"></i> Salvar Configurações
                     </button>
                 </div>
             </div>
             <div class="page-body">
-                <div class="agente-layout">
+                <div class="stats-grid">
                     <div class="card">
-                        <div class="card-title" style="margin-bottom:20px;text-align:center">🤖 Configurar Agente IA</div>
-                        <div class="agente-grid">
-                            <div class="form-group">
-                                <label class="form-label">Nome da Empresa</label>
-                                <input class="form-input" id="agNome" value="${esc(loja.nome || '')}" placeholder="Ex: Clínica Sorriso">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Nicho / Segmento</label>
-                                <input class="form-input" id="agNicho" value="${esc(cfg.nicho || '')}" placeholder="Ex: Clínica Odontológica, Pet Shop...">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Tom de Voz</label>
-                                <select class="form-input form-select" id="agTom">
-                                    ${['Profissional e educado', 'Amigável e descontraído', 'Formal e objetivo', 'Entusiasmado e vendedor'].map(t =>
-                                        `<option value="${t}" ${cfg.tom_voz === t ? 'selected' : ''}>${t}</option>`
-                                    ).join('')}
-                                </select>
-                            </div>
+                        <h2 style="font-size:16px; font-weight:600; margin-bottom:24px; display:flex; align-items:center; gap:8px">
+                            <i class="fas fa-sliders-h" style="color:var(--accent)"></i> Ajustes de Identidade
+                        </h2>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Nome Comercial</label>
+                            <input class="form-input" id="agNome" value="${esc(loja.nome || '')}" placeholder="Ex: Clínica Sorriso">
                         </div>
 
-                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">
-                            <button class="btn btn-secondary" onclick="toggleField('agRegrasContainer')" style="justify-content:center;padding:12px">
-                                <i class="fas fa-list-check" style="margin-right:8px"></i> Regras Estritas
-                            </button>
-                            <button class="btn btn-secondary" onclick="toggleField('agPromptContainer')" style="justify-content:center;padding:12px">
-                                <i class="fas fa-terminal" style="margin-right:8px"></i> Prompt Principal
-                            </button>
+                        <div class="form-group">
+                            <label class="form-label">Nicho de Atuação</label>
+                            <input class="form-input" id="agNicho" value="${esc(cfg.nicho || '')}" placeholder="Ex: Odontologia, Vendas de Carros...">
                         </div>
 
-                        <div id="agRegrasContainer" style="display:none;margin-top:20px;animation:fadeIn 0.3s ease">
-                            <div class="form-group">
-                                <label class="form-label">Regras Estritas (Instruções Proibitivas)</label>
-                                <textarea class="form-textarea" id="agRegras" style="height:120px"
-                                    placeholder="Ex: Nunca revelar preços sem consultar tabela. Nunca falar de concorrentes.">${esc(cfg.regras || '')}</textarea>
-                            </div>
+                        <div class="form-group">
+                            <label class="form-label">Tom de Voz</label>
+                            <select class="form-input form-select" id="agTom">
+                                ${['Profissional e educado', 'Amigável e descontraído', 'Formal e objetivo', 'Entusiasmado e vendedor'].map(t =>
+                                    `<option value="${t}" ${cfg.tom_voz === t ? 'selected' : ''}>${t}</option>`
+                                ).join('')}
+                            </select>
                         </div>
 
-                        <div id="agPromptContainer" style="display:none;margin-top:20px;animation:fadeIn 0.3s ease">
-                            <div class="form-group">
-                                <label class="form-label">Prompt Principal — Comportamento e Personalidade</label>
-                                <textarea class="form-textarea" id="agPrompt" style="height:250px"
-                                    placeholder="Ex: Você é a Mia, assistente virtual...">${esc(loja.prompt_base || '')}</textarea>
-                            </div>
+                        <div style="background:var(--bg-primary); padding:20px; border-radius:12px; margin-top:24px; border:1px dashed var(--border-color)">
+                            <div style="font-weight:600; font-size:14px; margin-bottom:8px">💡 Dica de Ouro</div>
+                            <p style="font-size:13px; color:var(--text-secondary); line-height:1.6">
+                                IA com tons "Amigáveis" tendem a converter 30% mais leads em nichos de serviços locais.
+                            </p>
                         </div>
-                        <div id="agenteStatus" style="font-size:12px;color:var(--muted-foreground);text-align:center;margin-top:12px"></div>
                     </div>
 
-                    <div class="card" style="background:var(--success-subtle);border-color:rgba(5,150,105,0.2)">
-                        <div class="card-title" style="margin-bottom:8px;font-size:14px;color:var(--success)">💡 Como escrever um bom prompt</div>
-                        <p style="font-size:13px;color:var(--muted-foreground);line-height:1.8">
-                            Pense como se estivesse contratando um funcionário e descrevendo a função dele:<br>
-                            <strong>① Quem é a empresa</strong> — nome, segmento, diferenciais.<br>
-                            <strong>② O que a IA deve fazer</strong> — agendar, tirar dúvidas, qualificar leads.<br>
-                            <strong>③ Como deve falar</strong> — tom, emoji, formalidade.<br>
-                            <strong>④ O que nunca deve fazer</strong> — inventar preços, mencionar concorrentes.
-                        </p>
+                    <div class="card">
+                        <h2 style="font-size:16px; font-weight:600; margin-bottom:24px; display:flex; align-items:center; gap:8px">
+                            <i class="fas fa-brain" style="color:var(--accent)"></i> Instruções Avançadas
+                        </h2>
+
+                        <div class="form-group">
+                            <label class="form-label">Prompt de Personalidade (O que ela é?)</label>
+                            <textarea class="form-textarea" id="agPrompt" style="height:150px"
+                                placeholder="Ex: Você é a atendente virtual da Clínica Sorriso, seu objetivo é agendar consultas...">${esc(loja.prompt_base || '')}</textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Regras Estritas (O que ela NÃO pode fazer?)</label>
+                            <textarea class="form-textarea" id="agRules" style="height:120px"
+                                placeholder="Ex: Nunca dê descontos acima de 10%. Nunca mencione concorrentes.">${esc(cfg.regras || '')}</textarea>
+                        </div>
+                        
+                        <div id="agenteStatus" style="font-size:12px; color:var(--text-secondary); margin-top:12px; text-align:right"></div>
                     </div>
                 </div>
             </div>
@@ -524,33 +545,40 @@ async function renderRAG() {
     c.innerHTML = `
     <div class="page-wrapper">
         <div class="page-header">
-            <h1 class="page-title">Cérebro do Bot (Base de Conhecimento)</h1>
+            <div>
+                <h1 class="page-title">Base de Conhecimento</h1>
+                <p class="text-muted">Treine sua IA com informações específicas do seu negócio.</p>
+            </div>
             <div class="page-actions">
-                <button class="btn btn-ghost" onclick="navigate('scraping')" style="font-size:13px">
-                    <i class="fas fa-globe"></i> Scraping Web
+                <button class="btn btn-secondary" onclick="navigate('scraping')">
+                    <i class="fas fa-globe"></i> Importar Website
                 </button>
             </div>
         </div>
         <div class="page-body">
-            <div class="rag-grid">
+            <div class="stats-grid">
                 <div class="card">
-                    <div class="card-title" style="margin-bottom:16px">✏️ Adicionar Texto Manualmente</div>
+                    <h2 style="font-size:16px; font-weight:600; margin-bottom:20px; display:flex; align-items:center; gap:8px">
+                        <i class="fas fa-edit" style="color:var(--accent)"></i> Adicionar Conhecimento
+                    </h2>
                     <div class="form-group">
-                        <label class="form-label">Título</label>
-                        <input class="form-input" id="ragTitulo" placeholder="Ex: Tabela de Preços, Horários de Atendimento...">
+                        <label class="form-label">Título do Documento</label>
+                        <input class="form-input" id="ragTitulo" placeholder="Ex: Política de Reembolso, Tabela de Preços...">
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Conteúdo</label>
-                        <textarea class="form-textarea" id="ragConteudo" style="height:180px"
-                            placeholder="Cole aqui as informações para a IA usar como base..."></textarea>
+                        <label class="form-label">Conteúdo Detalhado</label>
+                        <textarea class="form-textarea" id="ragConteudo" style="height:200px"
+                            placeholder="Descreva aqui as informações que a IA deve saber..."></textarea>
                     </div>
-                    <button class="btn btn-primary" id="btnSalvarRAG" onclick="salvarTextoRAG()" style="width:100%;justify-content:center">
-                        <i class="fas fa-save"></i> Salvar no Banco Vetorial
+                    <button class="btn btn-primary" id="btnSalvarRAG" onclick="salvarTextoRAG()" style="width:100%; justify-content:center; height:48px">
+                        <i class="fas fa-brain"></i> Ensinar ao Assistente
                     </button>
                 </div>
-                <div class="card">
-                    <div class="card-title" style="margin-bottom:16px">📚 Conhecimento Salvo</div>
-                    <div id="ragList"><div class="spinner"></div></div>
+                <div class="card" style="display:flex; flex-direction:column">
+                    <h2 style="font-size:16px; font-weight:600; margin-bottom:20px; display:flex; align-items:center; gap:8px">
+                        <i class="fas fa-book" style="color:var(--accent)"></i> Biblioteca de Dados
+                    </h2>
+                    <div id="ragList" style="flex:1"><div class="spinner"></div></div>
                 </div>
             </div>
         </div>
@@ -564,25 +592,26 @@ async function loadRAGDocs() {
     try {
         const docs = await api.get('/cliente/rag/' + state.lojaId);
         if (!docs.length) {
-            el.innerHTML = `<div style="text-align:center;padding:32px 0">
-                <p style="font-size:13px;color:var(--muted-foreground);margin-bottom:16px">Nenhum documento salvo ainda.</p>
-                <button class="btn btn-primary" onclick="navigate('scraping')">
-                    <i class="fas fa-globe"></i> Importar site do cliente
-                </button>
+            el.innerHTML = `<div style="text-align:center; padding:40px 20px">
+                <div style="font-size:40px; opacity:0.1; margin-bottom:16px"><i class="fas fa-folder-open"></i></div>
+                <p class="text-muted">Sua biblioteca está vazia.</p>
+                <button class="btn btn-secondary" style="margin-top:16px" onclick="navigate('scraping')">Começar com um site</button>
             </div>`;
             return;
         }
         el.innerHTML = docs.map(d => `
-        <div style="padding:12px;border:1px solid var(--border);border-radius:var(--radius);margin-bottom:10px;transition:border-color 0.15s">
-            <div style="display:flex;justify-content:space-between;align-items:start;gap:8px">
-                <div style="flex:1;min-width:0">
-                    <div style="font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(d.titulo)}</div>
-                    <div style="font-size:11px;color:var(--muted-foreground);margin-top:4px;display:flex;gap:8px;align-items:center">
-                        <span class="badge badge-default">${d.tipo === 'web_scraping' ? '🌐 Site' : '✏️ Manual'}</span>
-                        ${d.url_fonte ? `<a href="${esc(d.url_fonte)}" target="_blank" style="color:var(--primary);font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:160px">${esc(d.url_fonte)}</a>` : ''}
+        <div class="card" style="padding:16px; margin-bottom:12px; background:var(--bg-primary); border-radius:12px">
+            <div style="display:flex; justify-content:space-between; align-items:start; gap:12px">
+                <div style="flex:1; min-width:0">
+                    <div style="font-weight:600; font-size:14px; margin-bottom:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis" title="${esc(d.titulo)}">${esc(d.titulo)}</div>
+                    <div style="display:flex; align-items:center; gap:8px">
+                        <span style="font-size:10px; padding:2px 8px; border-radius:10px; background:var(--bg-secondary); color:var(--text-secondary); border:1px solid var(--border-color)">
+                            ${d.tipo === 'web_scraping' ? '🌐 Website' : '✏️ Manual'}
+                        </span>
+                        <span style="font-size:11px; color:var(--text-secondary)">${new Date(d.criado_em).toLocaleDateString('pt-BR')}</span>
                     </div>
                 </div>
-                <button class="btn btn-danger" style="padding:4px 10px;font-size:11px;flex-shrink:0" onclick="deletarRAG('${d.id}')">
+                <button class="btn btn-ghost" style="color:var(--danger); padding:8px; width:32px; height:32px" onclick="deletarRAG('${d.id}')">
                     <i class="fas fa-trash-alt"></i>
                 </button>
             </div>
@@ -635,7 +664,7 @@ async function renderScraping() {
         <div class="page-body">
             <div class="card" style="margin-bottom:24px">
                 <div class="card-title" style="margin-bottom:6px">🌐 Importar de Sites</div>
-                <p style="font-size:13px;color:var(--muted-foreground);margin-bottom:20px">
+                <p style="font-size:13px;color:var(--text-secondary);margin-bottom:20px">
                     Cole a URL de qualquer página do site do cliente para extrair informações automaticamente.
                 </p>
                 <div style="display:grid;grid-template-columns:1fr auto;gap:12px;align-items:end;margin-bottom:12px">
@@ -657,7 +686,7 @@ async function renderScraping() {
             <div class="grid-2">
                 <div class="card" style="background:var(--success-subtle);border-color:rgba(5,150,105,0.15)">
                     <div class="card-title" style="margin-bottom:8px;font-size:14px;color:var(--success)">✅ Alto valor</div>
-                    <ul style="color:var(--muted-foreground);line-height:2;padding-left:16px;font-size:13px">
+                    <ul style="color:var(--text-secondary);line-height:2;padding-left:16px;font-size:13px">
                         <li>Serviços / produtos</li>
                         <li>Tabela de preços</li>
                         <li>Sobre a empresa</li>
@@ -667,7 +696,7 @@ async function renderScraping() {
                 </div>
                 <div class="card" style="background:var(--warning-subtle);border-color:rgba(217,119,6,0.15)">
                     <div class="card-title" style="margin-bottom:8px;font-size:14px;color:var(--warning)">⚠️ Geralmente desnecessário</div>
-                    <ul style="color:var(--muted-foreground);line-height:2;padding-left:16px;font-size:13px">
+                    <ul style="color:var(--text-secondary);line-height:2;padding-left:16px;font-size:13px">
                         <li>Página inicial genérica</li>
                         <li>Blog / notícias antigas</li>
                         <li>Páginas de login</li>
@@ -679,7 +708,7 @@ async function renderScraping() {
             <div class="card" style="margin-top:24px">
                 <div class="card-title" style="margin-bottom:12px">📋 Documentação e Histórico</div>
                 <div id="scrapingHistory">
-                    <p style="font-size:13px;color:var(--muted-foreground)">As páginas importadas aparecerão na Base de Conhecimento.</p>
+                    <p style="font-size:13px;color:var(--text-secondary)">As páginas importadas aparecerão na Base de Conhecimento.</p>
                 </div>
             </div>
         </div>
@@ -694,12 +723,12 @@ async function loadScrapeDocs() {
     try {
         const docs = await api.get('/cliente/rag/' + state.lojaId);
         if (countEl) countEl.textContent = `${docs.length} documento${docs.length !== 1 ? 's' : ''}`;
-        if (!docs.length) { el.innerHTML = '<p style="font-size:13px;color:var(--muted-foreground)">Nenhum documento salvo ainda.</p>'; return; }
+        if (!docs.length) { el.innerHTML = '<p style="font-size:13px;color:var(--text-secondary)">Nenhum documento salvo ainda.</p>'; return; }
         el.innerHTML = docs.map(d => `
-        <div style="padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius);margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;gap:8px">
+        <div style="padding:10px 12px;border:1px solid var(--border-color);border-radius:var(--radius);margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;gap:8px">
             <div style="flex:1;min-width:0">
                 <div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(d.titulo)}</div>
-                ${d.url_fonte ? `<div style="font-size:11px;color:var(--muted-foreground);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(d.url_fonte)}</div>` : ''}
+                ${d.url_fonte ? `<div style="font-size:11px;color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(d.url_fonte)}</div>` : ''}
             </div>
             <span class="badge badge-default" style="flex-shrink:0">${d.tipo === 'web_scraping' ? '🌐 Site' : '✏️ Manual'}</span>
             <button class="btn btn-danger" style="padding:4px 10px;font-size:11px;flex-shrink:0" onclick="deletarRAGScrape('${d.id}')">✕</button>
@@ -727,7 +756,7 @@ async function executarScraping() {
 
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Importando...'; btn.disabled = true;
     resultEl.innerHTML = `
-    <div style="padding:14px;background:var(--muted);border-radius:var(--radius);font-size:13px;color:var(--muted-foreground);margin-top:12px">
+    <div style="padding:14px;background:var(--bg-secondary);border-radius:var(--radius);font-size:13px;color:var(--text-secondary);margin-top:12px">
         ⏳ Acessando <strong>${esc(url)}</strong>...<br>
         <small>Isso pode levar alguns segundos.</small>
     </div>`;
@@ -789,7 +818,7 @@ async function renderConversas() {
         <div class="oc-chat-panel" id="ocChatPanel">
             <div class="empty-state" style="height:100%; display:flex; flex-direction:column; justify-content:center">
                 <div style="font-size:48px; opacity:0.1; margin-bottom:16px"><i class="fas fa-comment-dots"></i></div>
-                <h3 style="font-size:16px; color:var(--muted-foreground)">Selecione uma conversa</h3>
+                <h3 style="font-size:16px; color:var(--text-secondary)">Selecione uma conversa</h3>
                 <p style="font-size:12px; color:var(--sidebar-muted)">Clique em um contato na lateral para gerenciar o atendimento.</p>
             </div>
         </div>
@@ -829,7 +858,7 @@ async function ocLoadContacts() {
         if (_ocActiveId) ocSilentRefreshMessages(_ocActiveId);
     } catch (e) {
         const el = document.getElementById('ocContactList');
-        if (el) el.innerHTML = `<div style="padding:20px;font-size:13px;color:var(--muted-foreground);text-align:center">
+        if (el) el.innerHTML = `<div style="padding:20px;font-size:13px;color:var(--text-secondary);text-align:center">
             <div style="margin-bottom:8px">⚠️ Sem conversas ainda</div>
             <div style="font-size:12px">As conversas aparecerão aqui assim que clientes enviarem mensagens via WhatsApp.</div>
         </div>`;
@@ -840,7 +869,7 @@ function ocRenderContactList(list) {
     const el = document.getElementById('ocContactList');
     if (!el) return;
     if (!list.length) {
-        el.innerHTML = `<div style="padding:32px 16px;text-align:center;font-size:13px;color:var(--muted-foreground)">
+        el.innerHTML = `<div style="padding:32px 16px;text-align:center;font-size:13px;color:var(--text-secondary)">
             Nenhuma conversa encontrada
         </div>`;
         return;
@@ -894,39 +923,41 @@ async function ocSelectContact(id) {
     const ia = _ocIaStates[id] !== false;
 
     panel.innerHTML = `
-    <div class="oc-chat-header">
-        <button class="oc-back-btn" onclick="backToContacts()"><i class="fas fa-arrow-left"></i></button>
-        <div class="sidebar-user-avatar" style="width:40px; height:40px; margin-right:12px">${ocInitials(contact.nome)}</div>
+    <div class="oc-chat-header" style="background:var(--card-bg); border-bottom:1px solid var(--border-color); padding:12px 20px; display:flex; align-items:center; gap:12px">
+        <button class="oc-back-btn" onclick="backToContacts()" style="background:transparent; border:none; color:var(--text-primary); cursor:pointer"><i class="fas fa-arrow-left"></i></button>
+        <div class="sidebar-user-avatar" style="width:40px; height:40px; font-size:14px">${ocInitials(contact.nome)}</div>
         <div style="flex:1">
-            <div style="font-size:15px; font-weight:700; color:var(--foreground)">${esc(contact.nome || contact.numero_cliente)}</div>
-            <div style="font-size:11px; color:var(--sidebar-muted)">${esc(contact.numero_cliente)}</div>
+            <div style="font-size:15px; font-weight:600; color:var(--text-primary)">${esc(contact.nome || contact.numero_cliente)}</div>
+            <div style="font-size:11px; color:var(--text-secondary)">${esc(contact.numero_cliente)}</div>
         </div>
-        <button class="oc-ia-toggle-btn${!ia ? ' off' : ''}" id="ocIaBtn_${esc(id)}" onclick="ocToggleIA('${esc(id)}')">
-            <div class="oc-switch${!ia ? ' off' : ''}"></div>
-            <span id="ocIaLabel_${esc(id)}">${ia ? 'IA ativa' : 'IA pausada'}</span>
-        </button>
+        <div class="oc-ia-toggle-btn${!ia ? ' off' : ''}" id="ocIaBtn_${esc(id)}" onclick="ocToggleIA('${esc(id)}')" style="cursor:pointer; display:flex; align-items:center; gap:8px; padding:6px 12px; border-radius:30px; background:var(--bg-primary); border:1px solid var(--border-color)">
+            <div class="oc-switch${!ia ? ' off' : ''}" style="width:24px; height:12px; border-radius:10px; background:var(--success); position:relative">
+                <div style="position:absolute; width:8px; height:8px; background:#fff; border-radius:50%; top:2px; left:${ia ? '14px' : '2px'}; transition:0.2s"></div>
+            </div>
+            <span style="font-size:11px; font-weight:600" id="ocIaLabel_${esc(id)}">${ia ? 'IA ATIVA' : 'IA PAUSADA'}</span>
+        </div>
     </div>
 
-    <div class="oc-messages-area" id="ocMsgs_${esc(id)}">
+    <div class="oc-messages-area" id="ocMsgs_${esc(id)}" style="flex:1; overflow-y:auto; padding:20px; background:var(--bg-primary); background-image:radial-gradient(var(--border-color) 1px, transparent 1px); background-size:20px 20px">
         <div class="spinner" style="margin:40px auto"></div>
     </div>
 
-    <div class="oc-quick-actions">
-        <button class="btn-quick" onclick="ocSendQuick('Saudação', '${esc(id)}')">👋 Saudação</button>
-        <button class="btn-quick" onclick="ocSendQuick('Catálogo', '${esc(id)}')">📂 Catálogo</button>
-        <button class="btn-quick" onclick="ocSendQuick('Pix', '${esc(id)}')">💰 Pix</button>
-        <button class="btn-quick" onclick="ocSendQuick('Aguardar Atendente', '${esc(id)}')">👨‍💻 Aguardar</button>
+    <div class="oc-quick-actions" style="padding:8px 16px; display:flex; gap:8px; overflow-x:auto; background:var(--bg-primary); border-top:1px solid var(--border-color)">
+        <button class="btn btn-secondary" style="font-size:11px; padding:6px 12px; border-radius:20px; white-space:nowrap" onclick="ocSendQuick('Saudação', '${esc(id)}')">👋 Saudação</button>
+        <button class="btn btn-secondary" style="font-size:11px; padding:6px 12px; border-radius:20px; white-space:nowrap" onclick="ocSendQuick('Catálogo', '${esc(id)}')">📂 Catálogo</button>
+        <button class="btn btn-secondary" style="font-size:11px; padding:6px 12px; border-radius:20px; white-space:nowrap" onclick="ocSendQuick('Pix', '${esc(id)}')">💰 Pix</button>
+        <button class="btn btn-secondary" style="font-size:11px; padding:6px 12px; border-radius:20px; white-space:nowrap" onclick="ocSendQuick('Aguardar Atendente', '${esc(id)}')">👨‍💻 Aguardar</button>
     </div>
 
-    <div class="oc-composer" style="padding:20px; background:var(--card); border-top:1px solid var(--border); display:flex; gap:12px; align-items:end">
-        <button class="btn-logout" style="padding:10px; border-radius:10px" title="Anexar"><i class="fas fa-paperclip"></i></button>
+    <div class="oc-composer" style="padding:16px 20px; background:var(--card-bg); border-top:1px solid var(--border-color); display:flex; gap:12px; align-items:end">
+        <button class="btn-ghost" style="padding:10px; border-radius:50%; width:40px; height:40px" title="Anexar"><i class="fas fa-plus"></i></button>
         <textarea class="form-input" id="ocInput_${esc(id)}" 
-            placeholder="Digite sua mensagem aqui..." 
-            style="min-height:44px; max-height:150px; border-radius:12px; resize:none"
+            placeholder="Mensagem..." 
+            style="min-height:40px; max-height:150px; border-radius:20px; resize:none; background:var(--bg-primary); padding:10px 16px"
             onkeydown="ocHandleKey(event,'${esc(id)}')"
             oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea>
-        <button class="btn btn-primary" style="height:44px; width:44px; padding:0" onclick="ocSendMessage('${esc(id)}')">
-            <i class="fas fa-paper-plane"></i>
+        <button class="btn btn-primary" style="height:40px; width:40px; min-width:40px; border-radius:50%; padding:0" onclick="ocSendMessage('${esc(id)}')">
+            <i class="fas fa-paper-plane" style="font-size:14px"></i>
         </button>
     </div>`;
 
@@ -951,7 +982,7 @@ async function ocRenderCrmProfile(telefone) {
         el.innerHTML = `
         <div class="crm-section" style="text-align:center; margin-bottom:32px">
             <div class="sidebar-user-avatar" style="width:80px; height:80px; font-size:24px; margin:0 auto 16px">${ocInitials(crm.nome || telefone)}</div>
-            <div style="font-size:18px; font-weight:700; color:var(--foreground)">${esc(crm.nome || 'Lead s/ Nome')}</div>
+            <div style="font-size:18px; font-weight:700; color:var(--text-primary)">${esc(crm.nome || 'Lead s/ Nome')}</div>
             <div style="font-size:12px; color:var(--sidebar-muted)">${esc(telefone)}</div>
         </div>
 
@@ -962,7 +993,7 @@ async function ocRenderCrmProfile(telefone) {
 
         <div class="crm-section">
             <div class="crm-label">Intenção de Compra</div>
-            <div class="crm-value" style="color:var(--primary)">Alta - Consultando Preço</div>
+            <div class="crm-value" style="color:var(--accent)">Alta - Consultando Preço</div>
         </div>
 
         <div class="crm-section">
@@ -1009,13 +1040,13 @@ async function ocLoadMessages(id) {
     try {
         const msgs = await api.get(`/chat/mensagens/${state.lojaId}/${id}`);
         if (!msgs.length) {
-            el.innerHTML = `<div style="text-align:center;padding:40px;font-size:13px;color:var(--muted-foreground)">Nenhuma mensagem ainda.</div>`;
+            el.innerHTML = `<div style="text-align:center;padding:40px;font-size:13px;color:var(--text-secondary)">Nenhuma mensagem ainda.</div>`;
             return;
         }
         el.innerHTML = msgs.map(m => renderBubble(m)).join('');
         el.scrollTop = el.scrollHeight;
     } catch (e) {
-        el.innerHTML = `<div style="padding:20px;font-size:13px;color:var(--muted-foreground)">Erro: ${esc(e.message)}</div>`;
+        el.innerHTML = `<div style="padding:20px;font-size:13px;color:var(--text-secondary)">Erro: ${esc(e.message)}</div>`;
     }
 }
 
@@ -1033,30 +1064,42 @@ async function ocSilentRefreshMessages(id) {
 
 function renderBubble(m) {
     let bubbleClass = '';
-    let icon = '';
     let label = '';
+    let bgColor = '';
+    let align = '';
 
     if (m.remetente_tipo === 'user') {
         bubbleClass = 'user';
+        bgColor = 'var(--bg-secondary)';
+        align = 'flex-start';
+        label = 'Cliente';
     } else if (m.remetente_tipo === 'assistant' || m.remetente_tipo === 'bot') {
         bubbleClass = 'assistant';
-        icon = '<i class="fas fa-robot" style="margin-right:4px;font-size:10px"></i>';
-        label = 'IA';
+        bgColor = 'rgba(255, 215, 0, 0.15)';
+        align = 'flex-end';
+        label = 'IA Assistente';
     } else {
         bubbleClass = 'human';
-        icon = '<i class="fas fa-user-tie" style="margin-right:4px;font-size:10px"></i>';
+        bgColor = 'var(--accent)';
+        align = 'flex-end';
         label = 'Você';
     }
 
+    const isUser = m.remetente_tipo === 'user';
+
     return `
-    <div class="oc-msg-row ${bubbleClass}">
-        <div class="oc-bubble ${bubbleClass}">
-            <div style="font-size:10px;font-weight:700;margin-bottom:2px;opacity:0.7;display:flex;align-items:center">
-                ${icon} ${label}
+    <div style="display:flex; flex-direction:column; align-items:${align}; margin-bottom:16px; width:100%">
+        <div style="max-width:85%; padding:12px 16px; border-radius:${isUser ? '4px 16px 16px 16px' : '16px 4px 16px 16px'}; background:${bgColor}; border:1px solid ${isUser ? 'var(--border-color)' : 'rgba(255,215,0,0.2)'}; position:relative; box-shadow:var(--shadow-sm)">
+            <div style="font-size:10px; font-weight:700; margin-bottom:4px; opacity:0.6; color:${isUser ? 'var(--text-secondary)' : 'var(--accent-foreground)'}">
+                ${label}
             </div>
-            ${esc(m.conteudo).replace(/\n/g, '<br>')}
+            <div style="font-size:14px; color:${isUser ? 'var(--text-primary)' : 'var(--bg-primary)'}; line-height:1.5; word-break:break-word">
+                ${esc(m.conteudo).replace(/\n/g, '<br>')}
+            </div>
+            <div style="font-size:10px; opacity:0.5; margin-top:4px; text-align:right; color:${isUser ? 'var(--text-secondary)' : 'var(--bg-primary)'}">
+                ${new Date(m.criado_em).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+            </div>
         </div>
-        <div class="oc-msg-time">${new Date(m.criado_em).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</div>
     </div>`;
 }
 
@@ -1150,40 +1193,61 @@ async function renderWhatsApp() {
     c.innerHTML = `
     <div class="page-wrapper">
         <div class="page-header">
-            <h1 class="page-title">Conexão WhatsApp</h1>
+            <div>
+                <h1 class="page-title">Canal de Atendimento</h1>
+                <p class="text-muted">Gerencie a conexão oficial do seu WhatsApp.</p>
+            </div>
             <div class="page-actions">
-                <button class="btn btn-ghost" onclick="renderWhatsApp()" style="width:36px; height:36px; padding:0">
-                    <i class="fas fa-sync-alt"></i>
+                <button class="btn btn-secondary" onclick="renderWhatsApp()">
+                    <i class="fas fa-sync-alt"></i> Sincronizar
                 </button>
             </div>
         </div>
         <div class="page-body">
-            <div class="whatsapp-grid">
-                <div class="card wa-status-card" id="waStatusCard"><div class="spinner"></div></div>
-                <div>
-                    <div class="card">
-                        <div class="card-title" style="margin-bottom:16px">📱 Conectar Dispositivo</div>
-                        <div style="font-size:13px;color:var(--muted-foreground);margin-bottom:20px;line-height:2">
-                            <strong>Passo 1:</strong> Clique em "Gerar Código"<br>
-                            <strong>Passo 2:</strong> Abra o WhatsApp no celular<br>
-                            <strong>Passo 3:</strong> Vá em <strong>Aparelhos Conectados</strong><br>
-                            <strong>Passo 4:</strong> Digite o código de 8 dígitos
+            <div style="max-width:800px; margin:0 auto">
+                <div class="card wa-status-card" id="waStatusCard" style="margin-bottom:24px; border-radius:16px"><div class="spinner"></div></div>
+                
+                <div class="card" style="border-radius:20px; overflow:hidden">
+                    <div style="display:flex; align-items:flex-start; gap:32px; flex-wrap:wrap">
+                        <div style="flex:1; min-width:300px">
+                            <h2 style="font-size:18px; font-weight:600; margin-bottom:20px">📱 Vincular Novo Aparelho</h2>
+                            <div style="font-size:14px; color:var(--text-secondary); line-height:1.8">
+                                <div style="display:flex; gap:16px; margin-bottom:16px">
+                                    <div style="width:28px; height:28px; min-width:28px; border-radius:50%; background:var(--bg-primary); color:var(--accent); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; border:1px solid var(--border-color)">1</div>
+                                    <div>Clique no botão <strong>Gerar Código</strong> ao lado.</div>
+                                </div>
+                                <div style="display:flex; gap:16px; margin-bottom:16px">
+                                    <div style="width:28px; height:28px; min-width:28px; border-radius:50%; background:var(--bg-primary); color:var(--accent); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; border:1px solid var(--border-color)">2</div>
+                                    <div>Abra o WhatsApp no seu celular.</div>
+                                </div>
+                                <div style="display:flex; gap:16px; margin-bottom:16px">
+                                    <div style="width:28px; height:28px; min-width:28px; border-radius:50%; background:var(--bg-primary); color:var(--accent); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; border:1px solid var(--border-color)">3</div>
+                                    <div>Vá em <strong>Configurações</strong> > <strong>Aparelhos Conectados</strong>.</div>
+                                </div>
+                                <div style="display:flex; gap:16px">
+                                    <div style="width:28px; height:28px; min-width:28px; border-radius:50%; background:var(--bg-primary); color:var(--accent); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; border:1px solid var(--border-color)">4</div>
+                                    <div>Toque em <strong>Conectar um aparelho</strong> e use o código de 8 dígitos.</div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">Número do Cliente (ID)</label>
-                            <input class="form-input" id="waNumero" value="${esc(state.lojaId)}" disabled style="background:var(--muted);font-weight:700;font-family:'JetBrains Mono',monospace">
-                        </div>
-                        <div id="pairingCodeBox" style="display:none;margin-bottom:20px">
-                            <label class="form-label">Código de Pareamento</label>
-                            <div class="pairing-code" id="pairingCodeValue" title="Clique para copiar"
-                                onclick="navigator.clipboard.writeText(this.textContent.replace(/-/g,''));toast('Código copiado!')">----</div>
-                        </div>
-                        <div style="display:flex;flex-direction:column;gap:8px">
-                            <button class="btn btn-primary" style="justify-content:center" onclick="conectarWA()" id="btnWA">
-                                <i class="fab fa-whatsapp"></i> Gerar Código de Pareamento
+                        <div style="flex:1; min-width:300px; background:var(--bg-primary); padding:24px; border-radius:16px; border:1px solid var(--border-color)">
+                            <div class="form-group" style="margin-bottom:24px">
+                                <label class="form-label" style="text-align:center">ID do Cliente</label>
+                                <input class="form-input" id="waNumero" value="${esc(state.lojaId)}" disabled style="background:transparent; font-weight:700; font-family:'JetBrains Mono',monospace; text-align:center; font-size:16px; letter-spacing:1px">
+                            </div>
+                            
+                            <div id="pairingCodeBox" style="display:none; margin:24px 0; text-align:center; animation:fadeIn 0.5s ease">
+                                <label class="form-label">Código de Pareamento</label>
+                                <div id="pairingCodeValue" style="font-size:32px; font-weight:700; letter-spacing:4px; color:var(--accent); padding:16px; border:2px dashed var(--accent); border-radius:12px; cursor:pointer; background:rgba(255,215,0,0.05)" title="Clique para copiar"
+                                    onclick="navigator.clipboard.writeText(this.textContent.replace(/-/g,''));toast('Código copiado!')">----</div>
+                                <p style="font-size:11px; color:var(--text-secondary); margin-top:12px">Este código expira rapidamente.</p>
+                            </div>
+
+                            <button class="btn btn-primary" style="width:100%; justify-content:center; height:52px; font-size:15px" onclick="conectarWA()" id="btnWA">
+                                <i class="fab fa-whatsapp"></i> Gerar Código
                             </button>
-                            <button class="btn btn-danger" style="justify-content:center;display:none" onclick="desconectarWA()" id="btnDesconectar">
-                                <i class="fas fa-unlink"></i> Desconectar
+                            <button class="btn btn-danger" style="width:100%; justify-content:center; margin-top:12px; height:48px; display:none" onclick="desconectarWA()" id="btnDesconectar">
+                                <i class="fas fa-unlink"></i> Desconectar Conta
                             </button>
                         </div>
                     </div>
@@ -1209,7 +1273,7 @@ async function loadWAStatus() {
             card.innerHTML = `
             <div class="wa-status-icon">📱</div>
             <div style="font-size:20px;font-weight:700;color:var(--success);font-family:'Space Grotesk',sans-serif">Conectado!</div>
-            <div style="font-size:13px;color:var(--muted-foreground);margin:8px 0">Número: ${esc(wa.numero)}</div>
+            <div style="font-size:13px;color:var(--text-secondary);margin:8px 0">Número: ${esc(wa.numero)}</div>
             <span class="badge badge-success" style="margin-top:4px">● Operante — IA respondendo</span>`;
             if (btnWA) btnWA.style.display = 'none';
             if (btnD) btnD.style.display = 'flex';
@@ -1218,7 +1282,7 @@ async function loadWAStatus() {
             card.innerHTML = `
             <div class="wa-status-icon">⏳</div>
             <div style="font-size:18px;font-weight:700;font-family:'Space Grotesk',sans-serif">Aguardando Pareamento</div>
-            <div style="font-size:13px;color:var(--muted-foreground);margin-top:10px">Digite o código no WhatsApp do celular.</div>`;
+            <div style="font-size:13px;color:var(--text-secondary);margin-top:10px">Digite o código no WhatsApp do celular.</div>`;
             if (wa.pairingCode) {
                 const val = document.getElementById('pairingCodeValue');
                 if (val) val.textContent = wa.pairingCode;
@@ -1228,7 +1292,7 @@ async function loadWAStatus() {
             card.innerHTML = `
             <div class="wa-status-icon">🔌</div>
             <div style="font-size:18px;font-weight:700;font-family:'Space Grotesk',sans-serif">Desconectado</div>
-            <div style="font-size:13px;color:var(--muted-foreground);margin-top:10px">Gere o código para conectar o WhatsApp.</div>`;
+            <div style="font-size:13px;color:var(--text-secondary);margin-top:10px">Gere o código para conectar o WhatsApp.</div>`;
             if (btnWA) btnWA.style.display = 'flex';
             if (btnD) btnD.style.display = 'none';
         }
@@ -1272,24 +1336,18 @@ async function renderClientes() {
     c.innerHTML = `
     <div class="page-wrapper">
         <div class="page-header">
-            <h1 class="page-title">Gestão de Clientes</h1>
+            <div>
+                <h1 class="page-title">Gestão de Clientes</h1>
+                <p class="text-muted">Gerencie as instâncias e contas conectadas ao sistema.</p>
+            </div>
             <div class="page-actions">
-                <div style="position:relative; width:200px" class="desktop-only">
-                    <i class="fas fa-search" style="position:absolute; left:12px; top:50%; transform:translateY(-50%); font-size:12px; color:var(--muted-foreground)"></i>
-                    <input type="text" class="form-input" id="searchClientes" 
-                        placeholder="Buscar..." 
-                        style="padding-left:34px; height:36px; font-size:13px; border-radius:8px"
-                        oninput="ocFilterGlobalList('searchClientes', 'clientesListBody', 'tr')">
-                </div>
-                <button class="btn btn-primary" onclick="openModalNovaLoja()" style="height:36px; padding:0 16px; font-size:13px">
-                    <i class="fas fa-plus"></i> Novo
+                <button class="btn btn-primary" onclick="openModalNovaLoja()">
+                    <i class="fas fa-plus"></i> Novo Cliente
                 </button>
             </div>
         </div>
         <div class="page-body">
-            <div class="card" style="padding:0">
-                <div id="clientesList"><div class="spinner"></div></div>
-            </div>
+            <div id="clientesList"><div class="spinner"></div></div>
         </div>
     </div>`;
     loadClientes();
@@ -1301,64 +1359,52 @@ async function loadClientes() {
         const lojas = await api.get('/admin/lojas');
         state.lojas = lojas;
         if (!lojas.length) {
-            el.innerHTML = `<div style="text-align:center; padding:32px; font-size:13px; color:var(--muted-foreground)">
-                Nenhum cliente cadastrado ainda.<br>
-                <button class="btn btn-primary" style="margin-top:16px" onclick="openModalNovaLoja()">+ Criar primeiro cliente</button>
+            el.innerHTML = `<div style="text-align:center; padding:64px 20px">
+                <div style="font-size:64px; opacity:0.1; margin-bottom:24px"><i class="fas fa-users-slash"></i></div>
+                <h3 style="font-size:18px; font-weight:600; margin-bottom:12px">Nenhum cliente por aqui</h3>
+                <p class="text-muted" style="margin-bottom:24px">Comece cadastrando sua primeira empresa ou parceiro.</p>
+                <button class="btn btn-primary" onclick="openModalNovaLoja()">+ Adicionar Primeiro Cliente</button>
             </div>`;
             return;
         }
         el.innerHTML = `
-        <div class="table-responsive">
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Empresa</th>
-                        <th>WhatsApp ID</th>
-                        <th>Status</th>
-                        <th style="text-align:right">Ações</th>
-                    </tr>
-                </thead>
-                <tbody id="clientesListBody">
-                    ${lojas.map(l => `
-                    <tr>
-                        <td>
-                            <div style="display:flex;align-items:center;gap:12px">
-                                <div style="background:var(--primary-subtle);border:1px solid rgba(197,160,89,0.2);border-radius:8px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--primary);flex-shrink:0">
-                                    ${l.nome.substring(0, 2).toUpperCase()}
-                                </div>
-                                <div>
-                                    <div style="font-weight:700;font-size:14px">${esc(l.nome)}</div>
-                                    <div style="font-size:11px;color:var(--muted-foreground)">Desde ${new Date(l.criado_em || Date.now()).toLocaleDateString('pt-BR')}</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <code style="background:var(--muted);padding:4px 8px;border-radius:4px;font-size:12px;font-family:'JetBrains Mono',monospace">${esc(l.wa_id)}</code>
-                        </td>
-                        <td>
-                            <div style="display:flex;align-items:center;gap:6px">
-                                <div class="status-dot ${l.ativa ? 'online' : 'offline'}"></div>
-                                <span style="font-size:12px;font-weight:600;color:${l.ativa ? 'var(--success)' : 'var(--muted-foreground)'}">
-                                    ${l.ativa ? 'Ativo' : 'Inativo'}
-                                </span>
-                            </div>
-                        </td>
-                        <td style="text-align:right">
-                            <div style="display:flex;gap:8px;justify-content:flex-end">
-                                <button class="btn btn-primary" style="padding:6px 12px;font-size:12px" onclick="selecionarCliente('${esc(l.id)}')" title="Selecionar">
-                                    <i class="fas fa-external-link-alt"></i>
-                                </button>
-                                <button class="btn btn-ghost" style="padding:6px 12px;font-size:12px" onclick="editarCliente('${esc(l.id)}')" title="Editar">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button class="btn btn-danger" style="padding:6px 12px;font-size:12px" onclick="excluirCliente('${esc(l.id)}')" title="Excluir">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>`).join('')}
-                </tbody>
-            </table>
+        <div class="stats-grid">
+            ${lojas.map(l => `
+            <div class="card" style="display:flex; flex-direction:column; gap:20px">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start">
+                    <div style="display:flex; align-items:center; gap:16px">
+                        <div style="width:48px; height:48px; border-radius:12px; background:rgba(255, 215, 0, 0.1); border:1px solid rgba(255,215,0,0.2); color:var(--accent); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:18px">
+                            ${l.nome.substring(0, 1).toUpperCase()}
+                        </div>
+                        <div>
+                            <div style="font-weight:600; font-size:16px">${esc(l.nome)}</div>
+                            <div class="text-muted">Desde ${new Date(l.criado_em).toLocaleDateString('pt-BR')}</div>
+                        </div>
+                    </div>
+                    <div class="status-badge" style="background:${l.ativa ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)'}; color:${l.ativa ? 'var(--success)' : 'var(--danger)'}; border-color:${l.ativa ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)'}">
+                        ${l.ativa ? 'ATIVO' : 'INATIVO'}
+                    </div>
+                </div>
+                
+                <div style="background:var(--bg-primary); padding:12px; border-radius:12px; border:1px solid var(--border-color)">
+                    <div style="font-size:11px; color:var(--text-secondary); margin-bottom:4px; text-transform:uppercase; letter-spacing:0.5px">ID da Instância</div>
+                    <code style="font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--accent)">${esc(l.wa_id)}</code>
+                </div>
+
+                <div style="display:grid; grid-template-columns:1fr; gap:12px; margin-top:auto">
+                    <button class="btn btn-primary" onclick="selecionarCliente('${esc(l.id)}')" style="justify-content:center">
+                        <i class="fas fa-sign-in-alt"></i> Acessar Painel
+                    </button>
+                    <div style="display:flex; gap:8px">
+                        <button class="btn btn-secondary" onclick="editarCliente('${esc(l.id)}')" style="flex:1; justify-content:center">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-ghost" onclick="excluirCliente('${esc(l.id)}')" style="flex:1; justify-content:center; color:var(--danger)">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>`).join('')}
         </div>`;
     } catch (e) { el.innerHTML = errMsg(e); }
 }
@@ -1395,7 +1441,7 @@ function editarCliente(id) {
     openModal(`
     <div style="margin-bottom:24px">
         <div style="font-size:18px;font-weight:700;letter-spacing:-0.02em;margin-bottom:4px">✏️ Editar Cliente</div>
-        <div style="font-size:13px;color:var(--muted-foreground)">Atualize os dados básicos da empresa.</div>
+        <div style="font-size:13px;color:var(--text-secondary)">Atualize os dados básicos da empresa.</div>
     </div>
 
     <div class="form-group">
@@ -1405,12 +1451,12 @@ function editarCliente(id) {
     <div class="form-group">
         <label class="form-label">Número WhatsApp (ID)</label>
         <div style="display:flex;gap:8px">
-            <input class="form-input" value="${esc(loja.wa_id)}" disabled style="background:var(--muted);font-family:'JetBrains Mono',monospace;flex:1">
-            <div style="padding:10px;background:var(--muted);border-radius:6px;color:var(--muted-foreground);font-size:14px;display:flex;align-items:center">
+            <input class="form-input" value="${esc(loja.wa_id)}" disabled style="background:var(--bg-secondary);font-family:'JetBrains Mono',monospace;flex:1">
+            <div style="padding:10px;background:var(--bg-secondary);border-radius:6px;color:var(--text-secondary);font-size:14px;display:flex;align-items:center">
                 <i class="fas fa-lock"></i>
             </div>
         </div>
-        <small style="color:var(--muted-foreground);margin-top:6px;display:block">O ID do WhatsApp não pode ser alterado após o cadastro.</small>
+        <small style="color:var(--text-secondary);margin-top:6px;display:block">O ID do WhatsApp não pode ser alterado após o cadastro.</small>
     </div>
 
     <div style="display:flex;justify-content:flex-end;gap:12px;margin-top:32px">
@@ -1437,7 +1483,7 @@ function openModalNovaLoja() {
     openModal(`
     <div style="margin-bottom:24px">
         <div style="font-size:18px;font-weight:700;letter-spacing:-0.02em;margin-bottom:4px">🏢 Novo Cliente</div>
-        <div style="font-size:13px;color:var(--muted-foreground)">Cadastre uma nova empresa e configure o bot inicial.</div>
+        <div style="font-size:13px;color:var(--text-secondary)">Cadastre uma nova empresa e configure o bot inicial.</div>
     </div>
 
     <div class="form-group">
@@ -1447,7 +1493,7 @@ function openModalNovaLoja() {
     <div class="form-group">
         <label class="form-label">Número do WhatsApp (ID)</label>
         <input class="form-input" id="mWaId" placeholder="5511999999999" style="font-family:'JetBrains Mono',monospace">
-        <small style="color:var(--muted-foreground);margin-top:6px;display:block">Use apenas números com DDD (ex: 5511...)</small>
+        <small style="color:var(--text-secondary);margin-top:6px;display:block">Use apenas números com DDD (ex: 5511...)</small>
     </div>
     <div class="form-group">
         <label class="form-label">Prompt inicial da IA</label>
@@ -1529,10 +1575,10 @@ async function renderEquipe() {
     c.innerHTML = `
     <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px;margin-bottom:24px">
         <div>
-            <h2 style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;letter-spacing:-0.03em;color:var(--foreground)">
+            <h2 style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;letter-spacing:-0.03em;color:var(--text-primary)">
                 Configurações da Equipe
             </h2>
-            <p style="font-size:13px;color:var(--muted-foreground);margin-top:4px">
+            <p style="font-size:13px;color:var(--text-secondary);margin-top:4px">
                 Gerencie os membros, permissões e acessos ao painel.
             </p>
         </div>
@@ -1543,32 +1589,32 @@ async function renderEquipe() {
 
     <div class="stats-grid" style="margin-bottom:24px">
         <div class="stat-card">
-            <div class="stat-label"><i class="fas fa-users" style="color:var(--primary)"></i> Total de Membros</div>
+            <div class="stat-label"><i class="fas fa-users" style="color:var(--accent)"></i> Total de Membros</div>
             <div class="stat-value">${users.length}</div>
             <div class="stat-trend">Equipe ativa</div>
         </div>
         <div class="stat-card">
-            <div class="stat-label"><i class="fas fa-shield-alt" style="color:var(--primary)"></i> Administradores</div>
+            <div class="stat-label"><i class="fas fa-shield-alt" style="color:var(--accent)"></i> Administradores</div>
             <div class="stat-value">${admins}</div>
             <div class="stat-trend">Acesso total</div>
         </div>
         <div class="stat-card">
-            <div class="stat-label"><i class="fas fa-headset" style="color:var(--primary)"></i> Operadores</div>
+            <div class="stat-label"><i class="fas fa-headset" style="color:var(--accent)"></i> Operadores</div>
             <div class="stat-value">${operators}</div>
             <div class="stat-trend">Vendedores + Suporte</div>
         </div>
     </div>
 
     <div class="card" style="padding:0;overflow:hidden">
-        <div style="padding:18px 22px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px">
+        <div style="padding:18px 22px;border-bottom:1px solid var(--border-color);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px">
             <div class="card-title">Membros da Equipe</div>
             
             <!-- SEARCH ENGINE: EQUIPE -->
             <div style="position:relative; width:100%; max-width:300px">
-                <i class="fas fa-search" style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--muted-foreground); font-size:12px"></i>
+                <i class="fas fa-search" style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--text-secondary); font-size:12px"></i>
                 <input type="text" class="form-input" id="searchEquipe" 
                     placeholder="Buscar por nome ou e-mail..." 
-                    style="padding-left:34px; border-radius:100px; background:var(--muted); height:36px; font-size:12px"
+                    style="padding-left:34px; border-radius:100px; background:var(--bg-secondary); height:36px; font-size:12px"
                     oninput="ocFilterGlobalList('searchEquipe', 'equipeListBody', 'tr')">
             </div>
         </div>
@@ -1588,22 +1634,22 @@ async function renderEquipe() {
                     <tr>
                         <td>
                             <div style="display:flex;align-items:center;gap:10px">
-                                <div style="width:36px;height:36px;border-radius:50%;background:var(--primary-subtle);border:1px solid rgba(197,160,89,0.2);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--primary);flex-shrink:0">
+                                <div style="width:36px;height:36px;border-radius:50%;background:rgba(255, 215, 0, 0.1);border:1px solid rgba(197,160,89,0.2);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--accent);flex-shrink:0">
                                     ${(u.nome || 'U').substring(0, 2).toUpperCase()}
                                 </div>
                                 <div>
                                     <div style="font-weight:700;font-size:14px">${esc(u.nome)}</div>
-                                    <div style="font-size:11px;color:var(--muted-foreground);margin-top:1px">${cargoIcon(u.cargo)}</div>
+                                    <div style="font-size:11px;color:var(--text-secondary);margin-top:1px">${cargoIcon(u.cargo)}</div>
                                 </div>
                             </div>
                         </td>
                         <td>
-                            <span style="font-size:13px;color:var(--muted-foreground)">${esc(u.email)}</span>
+                            <span style="font-size:13px;color:var(--text-secondary)">${esc(u.email)}</span>
                         </td>
                         <td>
                             <span class="badge ${cargoBadge(u.cargo)}">${esc(u.cargo)}</span>
                         </td>
-                        <td style="font-size:12px;color:var(--muted-foreground)">
+                        <td style="font-size:12px;color:var(--text-secondary)">
                             ${new Date(u.criado_em || Date.now()).toLocaleDateString('pt-BR')}
                         </td>
                         <td style="text-align:right">
@@ -1626,20 +1672,20 @@ async function renderEquipe() {
         </div>
     </div>
 
-    <div class="card" style="background:var(--primary-subtle);border-color:rgba(197,160,89,0.2);margin-top:0">
+    <div class="card" style="background:rgba(255, 215, 0, 0.1);border-color:rgba(197,160,89,0.2);margin-top:0">
         <div class="card-title" style="font-size:14px;margin-bottom:10px">🔐 Níveis de Permissão</div>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px">
-            <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px">
+            <div style="background:var(--card-bg);border:1px solid var(--border-color);border-radius:var(--radius-sm);padding:14px">
                 <div style="font-weight:700;font-size:13px;margin-bottom:6px">👑 Admin</div>
-                <div style="font-size:12px;color:var(--muted-foreground);line-height:1.7">Acesso total: configurações, equipe, clientes e relatórios.</div>
+                <div style="font-size:12px;color:var(--text-secondary);line-height:1.7">Acesso total: configurações, equipe, clientes e relatórios.</div>
             </div>
-            <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px">
+            <div style="background:var(--card-bg);border:1px solid var(--border-color);border-radius:var(--radius-sm);padding:14px">
                 <div style="font-weight:700;font-size:13px;margin-bottom:6px">💼 Vendedor</div>
-                <div style="font-size:12px;color:var(--muted-foreground);line-height:1.7">Caixa de entrada, Base de Conhecimento e Dashboard.</div>
+                <div style="font-size:12px;color:var(--text-secondary);line-height:1.7">Caixa de entrada, Base de Conhecimento e Dashboard.</div>
             </div>
-            <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px">
+            <div style="background:var(--card-bg);border:1px solid var(--border-color);border-radius:var(--radius-sm);padding:14px">
                 <div style="font-weight:700;font-size:13px;margin-bottom:6px">🎧 Suporte</div>
-                <div style="font-size:12px;color:var(--muted-foreground);line-height:1.7">Somente Caixa de Entrada — visualiza e responde conversas.</div>
+                <div style="font-size:12px;color:var(--text-secondary);line-height:1.7">Somente Caixa de Entrada — visualiza e responde conversas.</div>
             </div>
         </div>
     </div>`;
@@ -1649,7 +1695,7 @@ function openModalConvidarUsuario() {
     openModal(`
     <div style="margin-bottom:24px">
         <div style="font-size:20px;font-weight:700;letter-spacing:-0.02em;margin-bottom:4px">Convidar Usuário</div>
-        <div style="font-size:13px;color:var(--muted-foreground)">Adicione um novo membro à equipe de atendimento.</div>
+        <div style="font-size:13px;color:var(--text-secondary)">Adicione um novo membro à equipe de atendimento.</div>
     </div>
 
     <div class="form-group">
@@ -1678,8 +1724,8 @@ function openModalConvidarUsuario() {
         </select>
     </div>
 
-    <div style="background:var(--primary-subtle);border:1px solid rgba(197,160,89,0.2);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:24px;font-size:12px;color:var(--muted-foreground);line-height:1.7">
-        <strong style="color:var(--foreground)">ℹ️ Sobre as permissões:</strong><br>
+    <div style="background:rgba(255, 215, 0, 0.1);border:1px solid rgba(197,160,89,0.2);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:24px;font-size:12px;color:var(--text-secondary);line-height:1.7">
+        <strong style="color:var(--text-primary)">ℹ️ Sobre as permissões:</strong><br>
         A senha inicial deve ser alterada pelo usuário no primeiro acesso.<br>
         Admins têm acesso irrestrito — conceda com critério.
     </div>
@@ -1720,7 +1766,7 @@ function editarUsuarioEquipe(id, nome, email, cargo) {
     openModal(`
     <div style="margin-bottom:24px">
         <div style="font-size:20px;font-weight:700;letter-spacing:-0.02em;margin-bottom:4px">Editar Membro</div>
-        <div style="font-size:13px;color:var(--muted-foreground)">Atualize as informações e permissões de <strong>${esc(nome)}</strong>.</div>
+        <div style="font-size:13px;color:var(--text-secondary)">Atualize as informações e permissões de <strong>${esc(nome)}</strong>.</div>
     </div>
 
     <div class="form-group">
@@ -1729,8 +1775,8 @@ function editarUsuarioEquipe(id, nome, email, cargo) {
     </div>
     <div class="form-group">
         <label class="form-label">E-mail</label>
-        <input class="form-input" id="emEmail" value="${esc(email)}" disabled style="background:var(--muted);opacity:0.7">
-        <small style="color:var(--muted-foreground);margin-top:4px;display:block">O e-mail não pode ser alterado.</small>
+        <input class="form-input" id="emEmail" value="${esc(email)}" disabled style="background:var(--bg-secondary);opacity:0.7">
+        <small style="color:var(--text-secondary);margin-top:4px;display:block">O e-mail não pode ser alterado.</small>
     </div>
     <div class="form-group">
         <label class="form-label">Cargo / Permissão</label>
@@ -1792,7 +1838,7 @@ async function renderDiagnostics() {
         </div>
         <div class="page-body">
             <div class="card">
-                <p style="font-size:13px;color:var(--muted-foreground);margin-bottom:20px">
+                <p style="font-size:13px;color:var(--text-secondary);margin-bottom:20px">
                     Verifica conectividade com os LLMs (Groq, Gemini), Supabase e a base RAG do cliente selecionado.
                 </p>
                 <button class="btn btn-primary" onclick="executarDiagnostico()" id="btnDiag">
@@ -1804,7 +1850,7 @@ async function renderDiagnostics() {
             <div class="card">
                 <div class="card-title" style="margin-bottom:12px">ℹ️ Informações da Sessão</div>
                 <div style="font-size:13px;line-height:2.2;font-family:'JetBrains Mono',monospace">
-                    <div>Cliente ativo: <strong style="color:var(--primary)">${esc(state.lojaId || 'nenhum')}</strong></div>
+                    <div>Cliente ativo: <strong style="color:var(--accent)">${esc(state.lojaId || 'nenhum')}</strong></div>
                     <div>Servidor: <strong>${API}</strong></div>
                     <div>Versão: <strong>4.0</strong></div>
                     <div>Tema: <strong id="diagTheme">${document.documentElement.getAttribute('data-theme') || 'light'}</strong></div>
@@ -1829,20 +1875,20 @@ async function executarDiagnostico() {
         };
         el.innerHTML = `
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-            <div style="padding:16px;background:var(--muted);border-radius:var(--radius);font-size:13px;line-height:2.2;border:1px solid var(--border)">
-                <div style="font-weight:700;margin-bottom:8px;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--primary)">LLMs</div>
-                <div>${icon(d.llm?.groq)} Groq: <code style="background:var(--card);padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono',monospace">${d.llm?.groq}</code></div>
-                <div>${icon(d.llm?.gemini)} Gemini: <code style="background:var(--card);padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono',monospace">${d.llm?.gemini}</code></div>
-                <div>${icon(d.llm?.openrouter)} OpenRouter: <code style="background:var(--card);padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono',monospace">${d.llm?.openrouter || '—'}</code></div>
+            <div style="padding:16px;background:var(--bg-secondary);border-radius:var(--radius);font-size:13px;line-height:2.2;border:1px solid var(--border-color)">
+                <div style="font-weight:700;margin-bottom:8px;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--accent)">LLMs</div>
+                <div>${icon(d.llm?.groq)} Groq: <code style="background:var(--card-bg);padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono',monospace">${d.llm?.groq}</code></div>
+                <div>${icon(d.llm?.gemini)} Gemini: <code style="background:var(--card-bg);padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono',monospace">${d.llm?.gemini}</code></div>
+                <div>${icon(d.llm?.openrouter)} OpenRouter: <code style="background:var(--card-bg);padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono',monospace">${d.llm?.openrouter || '—'}</code></div>
             </div>
-            <div style="padding:16px;background:var(--muted);border-radius:var(--radius);font-size:13px;line-height:2.2;border:1px solid var(--border)">
-                <div style="font-weight:700;margin-bottom:8px;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--primary)">Supabase & RAG</div>
-                <div>${icon(d.supabase?.agentes_config)} agentes_config: <code style="background:var(--card);padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono',monospace">${d.supabase?.agentes_config}</code></div>
-                <div>${icon(d.rag?.documentos)} Documentos: <code style="background:var(--card);padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono',monospace">${d.rag?.documentos}</code></div>
-                <div>${icon(d.rag?.rpc_buscar_conhecimento)} Função RPC: <code style="background:var(--card);padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono',monospace">${d.rag?.rpc_buscar_conhecimento}</code></div>
+            <div style="padding:16px;background:var(--bg-secondary);border-radius:var(--radius);font-size:13px;line-height:2.2;border:1px solid var(--border-color)">
+                <div style="font-weight:700;margin-bottom:8px;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--accent)">Supabase & RAG</div>
+                <div>${icon(d.supabase?.agentes_config)} agentes_config: <code style="background:var(--card-bg);padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono',monospace">${d.supabase?.agentes_config}</code></div>
+                <div>${icon(d.rag?.documentos)} Documentos: <code style="background:var(--card-bg);padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono',monospace">${d.rag?.documentos}</code></div>
+                <div>${icon(d.rag?.rpc_buscar_conhecimento)} Função RPC: <code style="background:var(--card-bg);padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono',monospace">${d.rag?.rpc_buscar_conhecimento}</code></div>
             </div>
         </div>
-        <div style="font-size:11px;color:var(--muted-foreground);margin-top:12px">Verificado em: ${d.timestamp}</div>`;
+        <div style="font-size:11px;color:var(--text-secondary);margin-top:12px">Verificado em: ${d.timestamp}</div>`;
     } catch (e) {
         el.innerHTML = `<div style="padding:14px;background:var(--destructive-subtle);border:1px solid rgba(220,38,38,0.2);border-radius:var(--radius);font-size:13px;color:var(--destructive)">${e.message}</div>`;
     } finally { btn.innerHTML = '<i class="fas fa-play"></i> Executar Diagnóstico'; btn.disabled = false; }
@@ -1900,11 +1946,11 @@ async function renderMore() {
         </div>
         <div class="page-body">
             <div class="card" style="padding:0;overflow:hidden;margin-bottom:24px">
-                <div style="padding:20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px;background:var(--secondary)">
+                <div style="padding:20px;border-bottom:1px solid var(--border-color);display:flex;align-items:center;gap:14px;background:var(--bg-secondary)">
                     <div class="sidebar-user-avatar" style="width:50px;height:50px;font-size:18px">${(state.user?.email || 'AD').substring(0, 2).toUpperCase()}</div>
                     <div>
                         <div style="font-weight:700;font-size:16px">${esc(state.user?.email || '')}</div>
-                        <div style="font-size:12px;color:var(--muted-foreground)">${roleLabel}</div>
+                        <div style="font-size:12px;color:var(--text-secondary)">${roleLabel}</div>
                     </div>
                 </div>
 
@@ -1934,14 +1980,14 @@ async function renderMore() {
             <div class="card">
                 <div class="card-title" style="margin-bottom:16px">Status do Sistema</div>
                 <div style="display:flex;flex-direction:column;gap:12px">
-                    <div style="display:flex;justify-content:space-between;align-items:center;padding:12px;background:var(--muted);border-radius:8px;border:1px solid var(--border)">
+                    <div style="display:flex;justify-content:space-between;align-items:center;padding:12px;background:var(--bg-secondary);border-radius:8px;border:1px solid var(--border-color)">
                         <div style="font-size:13px;font-weight:600">Servidor Backend</div>
                         <div style="display:flex;align-items:center;gap:8px">
                             <div id="serverDotMore" class="status-dot online"></div>
-                            <span id="serverStatusTextMore" style="font-size:12px;color:var(--muted-foreground)">Conectado</span>
+                            <span id="serverStatusTextMore" style="font-size:12px;color:var(--text-secondary)">Conectado</span>
                         </div>
                     </div>
-                    <div style="font-size:11px;color:var(--muted-foreground);text-align:center">
+                    <div style="font-size:11px;color:var(--text-secondary);text-align:center">
                         Versão 4.0.5 — RoboTI BR by WavePod
                     </div>
                 </div>
@@ -2002,9 +2048,9 @@ async function initLojas() {
             <div class="card">
                 <div class="card-title">Leads capturados e qualificados pela IA.</div>
                 <div class="empty-state" style="padding:48px; text-align:center">
-                    <div class="empty-icon" style="color:var(--primary); font-size: 48px; margin-bottom:16px"><i class="fas fa-users"></i></div>
+                    <div class="empty-icon" style="color:var(--accent); font-size: 48px; margin-bottom:16px"><i class="fas fa-users"></i></div>
                     <h3>Módulo em Integração</h3>
-                    <p style="color:var(--muted-foreground)">Estamos sincronizando os dados da tabela <code>contatos_crm</code> com o painel.</p>
+                    <p style="color:var(--text-secondary)">Estamos sincronizando os dados da tabela <code>contatos_crm</code> com o painel.</p>
                 </div>
             </div>
         </div>
@@ -2032,7 +2078,7 @@ async function renderCatalogo() {
                     <div style="overflow-x:auto">
                         <table style="width:100%; border-collapse:collapse; font-size:14px">
                             <thead>
-                                <tr style="border-bottom:1px solid var(--border); text-align:left; background:var(--secondary)">
+                                <tr style="border-bottom:1px solid var(--border-color); text-align:left; background:var(--bg-secondary)">
                                     <th style="padding:16px; color:var(--sidebar-muted); font-size:11px; text-transform:uppercase">Produto / SKU</th>
                                     <th style="padding:16px; color:var(--sidebar-muted); font-size:11px; text-transform:uppercase">Preço</th>
                                     <th style="padding:16px; color:var(--sidebar-muted); font-size:11px; text-transform:uppercase; text-align:right">Ações</th>
@@ -2040,19 +2086,19 @@ async function renderCatalogo() {
                             </thead>
                             <tbody>
                                 ${produtos.map(p => `
-                                    <tr style="border-bottom:1px solid var(--border)">
+                                    <tr style="border-bottom:1px solid var(--border-color)">
                                         <td style="padding:16px">
                                             <div style="font-weight:600">${esc(p.nome_produto)}</div>
-                                            <div style="font-size:12px; color:var(--muted-foreground)">${esc(p.sku || 'Sem SKU')}</div>
+                                            <div style="font-size:12px; color:var(--text-secondary)">${esc(p.sku || 'Sem SKU')}</div>
                                         </td>
-                                        <td style="padding:16px; font-weight:700; color:var(--primary)">R$ ${Number(p.preco).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
+                                        <td style="padding:16px; font-weight:700; color:var(--accent)">R$ ${Number(p.preco).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
                                         <td style="padding:16px; text-align:right">
                                             <button class="btn btn-ghost" onclick="openModalProduto('${p.id}')" title="Editar" style="width:32px; height:32px; padding:0"><i class="fas fa-edit"></i></button>
                                             <button class="btn btn-ghost" style="color:var(--destructive); width:32px; height:32px; padding:0" onclick="deleteProduto('${p.id}')" title="Excluir"><i class="fas fa-trash"></i></button>
                                         </td>
                                     </tr>
                                 `).join('')}
-                                ${!produtos.length ? '<tr><td colspan="3" style="padding:48px; text-align:center; color:var(--muted-foreground)">Nenhum produto cadastrado.</td></tr>' : ''}
+                                ${!produtos.length ? '<tr><td colspan="3" style="padding:48px; text-align:center; color:var(--text-secondary)">Nenhum produto cadastrado.</td></tr>' : ''}
                             </tbody>
                         </table>
                     </div>
@@ -2090,7 +2136,7 @@ async function openModalProduto(id = null) {
         <textarea class="form-textarea" id="p_desc" placeholder="Detalhes técnicos, cores, garantias...">${esc(p.descricao)}</textarea>
     </div>
     <div class="form-group" style="display:flex; align-items:center; gap:10px">
-        <input type="checkbox" id="p_ia" ${p.disponivel_para_ia ? 'checked' : ''} style="width:20px; height:20px; accent-color:var(--primary)">
+        <input type="checkbox" id="p_ia" ${p.disponivel_para_ia ? 'checked' : ''} style="width:20px; height:20px; accent-color:var(--accent)">
         <label style="margin:0">Disponível para consulta da IA</label>
     </div>
     <div style="display:flex; gap:12px; margin-top:32px">
