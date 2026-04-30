@@ -1512,78 +1512,10 @@ h4,
     display: none;
 }
 
-/* ══ MOBILE RESPONSIVENESS (OFF-CANVAS & CLEANUP) ═══════════════════════════ */
-@media (max-width: 768px) {
-    .topbar {
-        background: rgba(17, 24, 39, 0.8);
-        backdrop-filter: blur(12px);
-    }
+/* ════════════════════════════════════════════════
+   MOBILE MASTER (UNIFICADO & AUDITADO)
+════════════════════════════════════════════════ */
 
-    .topbar h1 {
-        font-family: 'Space Grotesk', sans-serif;
-        font-weight: 700;
-        font-size: 18px;
-        letter-spacing: -0.02em;
-    }
-
-    .mobile-sidebar {
-        background: #2a2a2a;
-        padding: 30px 24px;
-        border-left: 1px solid rgba(255, 255, 255, 0.05);
-    }
-
-    .mobile-sidebar-overlay {
-        background: rgba(0, 0, 0, 0.85);
-        backdrop-filter: blur(8px);
-        animation: fadeIn 0.2s ease;
-    }
-
-    .mobile-nav-header {
-        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        padding-bottom: 20px;
-        margin-bottom: 40px;
-    }
-
-    .mobile-nav-title {
-        color: #ffffff;
-        font-family: 'Space Grotesk', sans-serif;
-        font-weight: 700;
-        font-size: 20px;
-        letter-spacing: -0.02em;
-    }
-
-    .mobile-nav-close {
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        color: #ffffff;
-    }
-
-    .mobile-nav-item {
-        color: #e2e8f0;
-        text-decoration: none;
-        font-weight: 500;
-        transition: 0.2s;
-        background: rgba(255, 255, 255, 0.02);
-    }
-
-    .mobile-nav-item i {
-        font-size: 18px;
-        color: var(--primary);
-    }
-
-    .mobile-nav-item.active {
-        background: rgba(255, 215, 0, 0.08);
-        color: var(--primary);
-        border: 1px solid rgba(255, 215, 0, 0.15);
-    }
-
-    .card {
-        border-radius: 16px !important;
-    }
-
-    .btn {
-        font-weight: 700;
-    }
 @media (max-width: 768px) {
     :root {
         --sidebar-width: 0px;
@@ -1615,13 +1547,30 @@ h4,
         overflow-x: hidden;
     }
 
-    /* Fullscreen (Omnichat / WhatsApp) */
+    /* Topbar */
+    .topbar {
+        height: 64px;
+        padding: 0 16px;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        background: rgba(17, 24, 39, 0.8);
+        backdrop-filter: blur(12px);
+    }
+
+    .topbar h1 {
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 700;
+        font-size: 18px;
+        letter-spacing: -0.02em;
+    }
+
+    /* Fullscreen Components (Omnichat / WhatsApp) */
     .page-content:has(.omnichat-layout),
     .page-content:has(.whatsapp-layout) {
-        height: auto;
-        min-height: calc(100dvh - 64px);
-        padding-bottom: 80px;
-        overflow: visible;
+        padding: 0 !important;
+        height: calc(100dvh - 64px);
+        overflow: hidden;
     }
 
     /* Omnichat - Navegação Simples (Um painel por vez) */
@@ -1642,7 +1591,7 @@ h4,
 
     .oc-chat-panel,
     .oc-crm-panel {
-        display: none !important; /* Escondidos por padrão no mobile */
+        display: none !important;
         width: 100% !important;
         height: 100% !important;
         min-height: calc(100dvh - 64px) !important;
@@ -1687,17 +1636,7 @@ h4,
     }
 
     .oc-composer textarea {
-        font-size: 16px !important; /* Evita zoom automático no iOS ao focar */
-    }
-
-    /* Topbar */
-    .topbar {
-        height: 64px;
-        padding: 0 16px;
-        position: sticky;
-        top: 0;
-        z-index: 1000;
-        background: var(--background);
+        font-size: 16px !important;
     }
 
     /* Sidebar mobile (Off-canvas) */
@@ -1711,6 +1650,9 @@ h4,
         z-index: 2001;
         transition: right 0.3s ease;
         flex-direction: column;
+        background: #2a2a2a;
+        padding: 30px 24px;
+        border-left: 1px solid rgba(255, 255, 255, 0.05);
     }
 
     .mobile-sidebar.active {
@@ -1722,6 +1664,9 @@ h4,
         inset: 0;
         z-index: 2000;
         display: none;
+        background: rgba(0, 0, 0, 0.85);
+        backdrop-filter: blur(8px);
+        animation: fadeIn 0.2s ease;
     }
 
     .mobile-sidebar-overlay.active {
@@ -1732,6 +1677,17 @@ h4,
         display: flex;
         justify-content: space-between;
         align-items: center;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        padding-bottom: 20px;
+        margin-bottom: 40px;
+    }
+
+    .mobile-nav-title {
+        color: #ffffff;
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 700;
+        font-size: 20px;
+        letter-spacing: -0.02em;
     }
 
     .mobile-nav-close {
@@ -1742,6 +1698,9 @@ h4,
         align-items: center;
         justify-content: center;
         cursor: pointer;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: #ffffff;
     }
 
     .mobile-nav-item {
@@ -1751,14 +1710,27 @@ h4,
         padding: 16px;
         border-radius: 12px;
         margin-bottom: 10px;
+        color: #e2e8f0;
+        text-decoration: none;
+        font-weight: 500;
+        transition: 0.2s;
+        background: rgba(255, 255, 255, 0.02);
     }
 
     .mobile-nav-item i {
         width: 20px;
         text-align: center;
+        font-size: 18px;
+        color: var(--primary);
     }
 
-    /* Layout Cleaning Mobile */
+    .mobile-nav-item.active {
+        background: rgba(255, 215, 0, 0.08);
+        color: var(--primary);
+        border: 1px solid rgba(255, 215, 0, 0.15);
+    }
+
+    /* Componentes */
     .stats-grid {
         grid-template-columns: 1fr !important;
         gap: 16px;
@@ -1767,11 +1739,13 @@ h4,
     .card {
         padding: 20px !important;
         margin-bottom: 16px;
+        border-radius: 16px !important;
     }
 
     .btn {
         width: 100% !important;
         height: 48px !important;
         justify-content: center;
+        font-weight: 700;
     }
 }
