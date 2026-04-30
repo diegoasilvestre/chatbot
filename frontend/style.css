@@ -818,5 +818,47 @@ h1, h2, h3, h4, .brand-name, .card-title, .stat-value {
     line-height: 1.6;
 }
 
+.oc-ia-toggle-btn {
+    background: rgba(255, 255, 255, 0.03);
+    transition: var(--transition);
+}
+
+.oc-ia-toggle-btn.off {
+    background: rgba(239, 68, 68, 0.05);
+    border-color: rgba(239, 68, 68, 0.2) !important;
+}
+
+.oc-ia-toggle-btn.off span {
+    color: var(--danger);
+}
+
+.oc-switch {
+    width: 28px;
+    height: 14px;
+    border-radius: 10px;
+    background: var(--success);
+    position: relative;
+    transition: var(--transition);
+}
+
+.oc-switch.off {
+    background: #3f3f46; /* Zinc 700 */
+}
+
+.oc-switch-dot {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: #fff;
+    border-radius: 50%;
+    top: 2px;
+    left: 16px;
+    transition: var(--transition);
+}
+
+.oc-switch.off .oc-switch-dot {
+    left: 2px;
+}
+
 /* ════════════════════════════════════════════════════════════════════════════ */
 /* FIM DA RESTAURAÇÃO BASE - PRONTO PARA EVOLUÇÃO CIRÚRGICA */

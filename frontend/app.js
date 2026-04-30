@@ -935,9 +935,9 @@ async function ocSelectContact(id) {
             <div style="font-size:15px; font-weight:600; color:var(--text-primary)">${esc(contact.nome || contact.numero_cliente)}</div>
             <div style="font-size:11px; color:var(--text-secondary)">${esc(contact.numero_cliente)}</div>
         </div>
-        <div class="oc-ia-toggle-btn${!ia ? ' off' : ''}" id="ocIaBtn_${esc(id)}" onclick="ocToggleIA('${esc(id)}')" style="cursor:pointer; display:flex; align-items:center; gap:8px; padding:6px 12px; border-radius:30px; background:var(--bg-primary); border:1px solid var(--border-color)">
-            <div class="oc-switch${!ia ? ' off' : ''}" style="width:24px; height:12px; border-radius:10px; background:var(--success); position:relative">
-                <div style="position:absolute; width:8px; height:8px; background:#fff; border-radius:50%; top:2px; left:${ia ? '14px' : '2px'}; transition:0.2s"></div>
+        <div class="oc-ia-toggle-btn${!ia ? ' off' : ''}" id="ocIaBtn_${esc(id)}" onclick="ocToggleIA('${esc(id)}')" style="cursor:pointer; display:flex; align-items:center; gap:8px; padding:6px 12px; border-radius:30px; border:1px solid var(--border-color)">
+            <div class="oc-switch${!ia ? ' off' : ''}">
+                <div class="oc-switch-dot"></div>
             </div>
             <span style="font-size:11px; font-weight:600" id="ocIaLabel_${esc(id)}">${ia ? 'IA ATIVA' : 'IA PAUSADA'}</span>
         </div>
