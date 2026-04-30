@@ -1624,7 +1624,7 @@ h4,
         overflow: visible;
     }
 
-    /* Omnichat - Layout Vertical Simples */
+    /* Omnichat - Navegação Simples (Um painel por vez) */
     .omnichat-layout {
         display: flex;
         flex-direction: column;
@@ -1633,16 +1633,37 @@ h4,
         transform: none !important;
     }
 
-    .oc-sidebar-panel,
+    /* Controlamos a visibilidade via classes */
+    .oc-sidebar-panel {
+        display: flex !important;
+        width: 100% !important;
+        height: 100% !important;
+    }
+
     .oc-chat-panel,
     .oc-crm-panel {
+        display: none !important; /* Escondidos por padrão no mobile */
         width: 100% !important;
         height: 100% !important;
         min-height: calc(100dvh - 64px) !important;
-        flex-shrink: 0;
-        display: flex;
         flex-direction: column;
-        overflow: hidden;
+    }
+
+    /* Quando o chat está aberto */
+    .omnichat-layout.chat-open .oc-sidebar-panel {
+        display: none !important;
+    }
+    .omnichat-layout.chat-open .oc-chat-panel {
+        display: flex !important;
+    }
+
+    /* Quando o CRM está aberto */
+    .omnichat-layout.crm-open .oc-chat-panel,
+    .omnichat-layout.crm-open .oc-sidebar-panel {
+        display: none !important;
+    }
+    .omnichat-layout.crm-open .oc-crm-panel {
+        display: flex !important;
     }
 
     .oc-messages-area {
