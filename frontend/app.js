@@ -798,7 +798,7 @@ async function renderConversas() {
 
     c.innerHTML = `
     <div class="page-wrapper">
-        <div class="omnichat-layout" id="omnichatLayout" style="height: calc(100vh - 72px)">
+        <div class="omnichat-layout view-contacts" id="omnichatLayout" style="height: calc(100vh - 72px)">
             <!-- Coluna 1: Contatos -->
             <div class="oc-sidebar-panel">
                 <div class="oc-panel-header">
@@ -919,7 +919,10 @@ async function ocSelectContact(id) {
     ocRenderContactList(_ocContacts);
 
     const layout = document.getElementById('omnichatLayout');
-    if (layout) layout.classList.add('chat-open');
+    if (layout) {
+        layout.classList.remove('view-contacts', 'view-crm');
+        layout.classList.add('view-chat');
+    }
 
     const panel = document.getElementById('ocChatPanel');
     if (!panel) return;
@@ -929,10 +932,10 @@ async function ocSelectContact(id) {
 
     panel.innerHTML = `
     <div class="oc-chat-header" style="background:var(--card-bg); border-bottom:1px solid var(--border-color); padding:12px 20px; display:flex; align-items:center; gap:12px">
-        <button class="oc-back-btn" onclick="backToContacts()" style="background:transparent; border:none; color:var(--text-primary); cursor:pointer"><i class="fas fa-arrow-left"></i></button>
+        <button class="oc-back-btn" onclick="backToContacts()" style="background:transparent; border:none; color:var(--text-primary); cursor:pointer; display:none"><i class="fas fa-arrow-left"></i></button>
         <div class="sidebar-user-avatar" style="width:40px; height:40px; font-size:14px">${ocInitials(contact.nome)}</div>
         <div style="flex:1">
-            <div style="font-size:15px; font-weight:600; color:var(--text-primary)">${esc(contact.nome || contact.numero_cliente)}</div>
+            <div style="font-size:15px; font-weight:600; color:var(--text-primary); cursor:pointer" onclick="ocToggleCrmView()">${esc(contact.nome || contact.numero_cliente)} <i class="fas fa-chevron-right" style="font-size:10px; opacity:0.5; margin-left:4px"></i></div>
             <div style="font-size:11px; color:var(--text-secondary)">${esc(contact.numero_cliente)}</div>
         </div>
         <div class="oc-ia-toggle-btn${!ia ? ' off' : ''}" id="ocIaBtn_${esc(id)}" onclick="ocToggleIA('${esc(id)}')" style="cursor:pointer; display:flex; align-items:center; gap:8px; padding:6px 12px; border-radius:30px; border:1px solid var(--border-color)">
@@ -972,8 +975,16 @@ async function ocSelectContact(id) {
 
 function backToContacts() {
     const layout = document.getElementById('omnichatLayout');
-    if (layout) layout.classList.remove('chat-open');
+    if (layout) {
+        layout.classList.remove('view-chat', 'view-crm');
+        layout.classList.add('view-contacts');
+    }
     _ocActiveId = null;
+}
+
+function ocToggleCrmView() {
+    const layout = document.getElementById('omnichatLayout');
+    if (layout) layout.classList.toggle('view-crm');
 }
 
 async function ocRenderCrmProfile(telefone) {
@@ -985,6 +996,11 @@ async function ocRenderCrmProfile(telefone) {
         const crm = await api.get(`/chat/contato/${state.lojaId}/${telefone}`);
 
         el.innerHTML = `
+        <div class="oc-crm-header" style="display:flex; align-items:center; gap:12px; margin-bottom:24px">
+            <button class="btn-ghost" onclick="ocToggleCrmView()" style="display:none" id="crmBackBtn"><i class="fas fa-arrow-left"></i></button>
+            <span style="font-weight:700; font-size:14px">Perfil do Cliente</span>
+        </div>
+        <style>@media(max-width:768px){ #crmBackBtn{display:block !important;} }</style>
         <div class="crm-section" style="text-align:center; margin-bottom:32px">
             <div class="sidebar-user-avatar" style="width:80px; height:80px; font-size:24px; margin:0 auto 16px">${ocInitials(crm.nome || telefone)}</div>
             <div style="font-size:18px; font-weight:700; color:var(--text-primary)">${esc(crm.nome || 'Lead s/ Nome')}</div>
@@ -2294,5 +2310,126 @@ async function init() {
         navigate(isAdmin ? 'clientes' : 'dashboard');
     }
 }
+
+function toggleSidebar() {
+    const sb = document.querySelector('.sidebar');
+    if (sb) sb.classList.toggle('active');
+}
+
+// Fecha o sidebar ao clicar fora no mobile
+document.addEventListener('click', (e) => {
+    if (window.innerWidth <= 768) {
+        const sb = document.querySelector('.sidebar');
+        const btn = document.getElementById('mobileMenuBtn');
+        if (sb && sb.classList.contains('active') && !sb.contains(e.target) && !btn.contains(e.target)) {
+            sb.classList.remove('active');
+        }
+    }
+});
+
+// ─── BUSCA GLOBAL ────────────────────────────────────────────────────────────
+function openGlobalSearch() {
+    const overlay = document.getElementById('searchOverlay');
+    const input = document.getElementById('globalSearchInput');
+    if (overlay) overlay.classList.add('active');
+    if (input) {
+        input.value = '';
+        setTimeout(() => input.focus(), 50);
+    }
+    renderSearchResults([]);
+}
+
+function closeGlobalSearch() {
+    const overlay = document.getElementById('searchOverlay');
+    if (overlay) overlay.classList.remove('active');
+}
+
+function handleGlobalSearch(q) {
+    if (!q || q.length < 2) return renderSearchResults([]);
+    
+    const results = [];
+    const query = q.toLowerCase();
+
+    // 1. Páginas
+    const PAGES = [
+        { id: 'dashboard', title: 'Dashboard', icon: 'fa-th-large' },
+        { id: 'conversas', title: 'Conversas / Omnichat', icon: 'fa-comments' },
+        { id: 'whatsapp', title: 'Conexão WhatsApp', icon: 'fa-whatsapp' },
+        { id: 'clientes', title: 'Gestão de Clientes', icon: 'fa-building' },
+        { id: 'agente', title: 'Configurar Agente IA', icon: 'fa-robot' },
+        { id: 'rag', title: 'Base de Conhecimento', icon: 'fa-brain' },
+        { id: 'diagnostics', title: 'Diagnóstico do Sistema', icon: 'fa-tools' }
+    ];
+
+    PAGES.forEach(p => {
+        if (p.title.toLowerCase().includes(query) || p.id.includes(query)) {
+            results.push({ ...p, type: 'Página' });
+        }
+    });
+
+    // 2. Contatos (se carregados)
+    if (typeof _ocContacts !== 'undefined') {
+        _ocContacts.forEach(c => {
+            if ((c.nome || '').toLowerCase().includes(query) || (c.numero_cliente || '').includes(query)) {
+                results.push({ 
+                    id: c.id, 
+                    title: c.nome || c.numero_cliente, 
+                    meta: c.numero_cliente,
+                    type: 'Contato',
+                    icon: 'fa-user',
+                    action: () => { navigate('conversas'); setTimeout(() => ocSelectContact(c.id), 100); }
+                });
+            }
+        });
+    }
+
+    renderSearchResults(results);
+}
+
+function renderSearchResults(results) {
+    const el = document.getElementById('globalSearchResults');
+    if (!el) return;
+
+    if (!results.length) {
+        el.innerHTML = `<div style="padding:40px; text-align:center; color:var(--text-secondary); font-size:13px">
+            Busque por páginas (ex: "ia", "chat") ou contatos...
+        </div>`;
+        return;
+    }
+
+    el.innerHTML = results.map(r => `
+        <div class="search-item" onclick="handleSearchResultClick('${esc(r.id)}', '${r.type}')">
+            <div class="search-item-icon"><i class="fas ${r.icon}"></i></div>
+            <div class="search-item-info">
+                <div class="search-item-title">${esc(r.title)}</div>
+                <div class="search-item-meta">${esc(r.type)}${r.meta ? ' • ' + esc(r.meta) : ''}</div>
+            </div>
+            <i class="fas fa-chevron-right" style="font-size:10px; opacity:0.3"></i>
+        </div>
+    `).join('');
+
+    // Armazena ações temporariamente para o clique
+    window._lastSearchResults = results;
+}
+
+function handleSearchResultClick(id, type) {
+    const res = window._lastSearchResults.find(r => r.id === id && r.type === type);
+    closeGlobalSearch();
+    if (res) {
+        if (res.action) res.action();
+        else navigate(res.id);
+    }
+}
+
+// Atalhos de Teclado
+document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        openGlobalSearch();
+    }
+    if (e.key === 'Escape') {
+        closeGlobalSearch();
+    }
+});
 
 document.addEventListener('DOMContentLoaded', init);
