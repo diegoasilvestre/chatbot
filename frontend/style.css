@@ -337,6 +337,50 @@ h4,
     text-overflow: ellipsis;
 }
 
+/* ══ PAGE STANDARDIZATION (GLOBAL) ═══════════════════════════════════════════ */
+.page-wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+    width: 100%;
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--border);
+    background: var(--card);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.page-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--foreground);
+    max-width: 60%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin: 0;
+}
+
+.page-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.page-body {
+    flex: 1;
+    padding: 24px;
+    overflow-y: auto;
+}
+
 .topbar-right {
     display: flex;
     align-items: center;
@@ -1531,6 +1575,20 @@ h4,
         --sidebar-width: 0px;
     }
 
+    /* Padronização de Páginas Mobile */
+    .page-header {
+        padding: 12px 16px;
+    }
+
+    .page-title {
+        font-size: 14px !important;
+        max-width: 50% !important;
+    }
+
+    .page-body {
+        padding: 16px;
+    }
+
     /* Blindagem Global Mobile */
     html, body {
         overflow-x: hidden !important;
@@ -1539,9 +1597,21 @@ h4,
         min-height: 100% !important;
     }
 
-    /* Layout geral */
-    .sidebar {
-        display: none !important;
+    .main-content,
+    .page-content {
+        display: flex !important;
+        flex-direction: column !important;
+        min-height: 100dvh !important;
+        height: auto !important;
+    }
+
+    /* Removendo Scroll Duplo */
+    .page-content {
+        overflow: visible !important;
+    }
+
+    .page-wrapper {
+        min-height: 100dvh;
     }
 
     /* Menu Inferior - Fixo & Safe Area */

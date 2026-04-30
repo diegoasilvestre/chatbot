@@ -150,20 +150,28 @@ function togglePasswordVisibility(inputId) {
 }
 
 function noLojaMsg() {
-    return `<div class="empty-state">
-        <div class="empty-icon">🏢</div>
-        <h3>Nenhum cliente selecionado</h3>
-        <p>Crie ou selecione um cliente no menu lateral.</p>
-        <button class="btn btn-primary" style="margin-top:20px" onclick="navigate('clientes')">Ir para Gestão de Clientes</button>
+    return `<div class="page-wrapper">
+        <div class="page-body" style="display:flex; align-items:center; justify-content:center; flex:1">
+            <div class="empty-state">
+                <div class="empty-icon" style="font-size:48px; margin-bottom:16px">🏢</div>
+                <h3 style="margin-bottom:8px">Nenhum cliente selecionado</h3>
+                <p style="color:var(--muted-foreground); margin-bottom:24px">Selecione uma empresa no topo para gerenciar as configurações.</p>
+                <button class="btn btn-primary" onclick="navigate('clientes')">Gestão de Clientes</button>
+            </div>
+        </div>
     </div>`;
 }
 
 function errMsg(e) {
-    return `<div class="empty-state">
-        <div class="empty-icon">⚠️</div>
-        <h3>Erro ao carregar</h3>
-        <p style="font-family:monospace;font-size:12px;background:var(--muted);padding:8px 12px;border-radius:6px;margin-top:8px">${e.message}</p>
-        <button class="btn btn-secondary" style="margin-top:16px" onclick="navigate('diagnostics')">Ver Diagnóstico</button>
+    return `<div class="page-wrapper">
+        <div class="page-body" style="display:flex; align-items:center; justify-content:center; flex:1">
+            <div class="empty-state">
+                <div class="empty-icon" style="font-size:48px; margin-bottom:16px">⚠️</div>
+                <h3 style="margin-bottom:8px">Erro de Carregamento</h3>
+                <p style="font-family:monospace; font-size:12px; background:var(--muted); padding:12px; border-radius:8px; margin-bottom:20px; border:1px solid var(--border)">${e.message}</p>
+                <button class="btn btn-secondary" onclick="window.location.reload()">Recarregar Painel</button>
+            </div>
+        </div>
     </div>`;
 }
 
@@ -353,43 +361,48 @@ async function renderDashboard() {
         ]);
 
         const waStatus = wa.status === 'conectado'
-            ? '<span style="color:var(--primary)">● Conectado</span>'
+            ? '<span style="color:var(--success)">● Conectado</span>'
             : '<span style="color:var(--destructive)">○ Desconectado</span>';
 
         c.innerHTML = `
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-label"><i class="fas fa-comments"></i> Conversas Ativas</div>
-                <div class="stat-value">--</div>
-                <div style="font-size:11px; color:var(--primary); margin-top:8px">↑ 12% este mês</div>
+        <div class="page-wrapper">
+            <div class="page-header">
+                <h1 class="page-title">Painel Geral</h1>
+                <div class="page-actions">
+                    <span class="status-badge" style="font-size:12px; opacity:0.8">Live Feed</span>
+                </div>
             </div>
-            <div class="stat-card">
-                <div class="stat-label"><i class="fas fa-user-plus"></i> Novos Leads</div>
-                <div class="stat-value">--</div>
-                <div style="font-size:11px; color:var(--primary); margin-top:8px">Capturados via WA</div>
+            <div class="page-body">
+                <div class="stats-grid">
+                    <div class="card stat-card">
+                        <div class="stat-label">Conversas Ativas</div>
+                        <div class="stat-value" id="dashAtivas">--</div>
+                    </div>
+                    <div class="card stat-card">
+                        <div class="stat-label">Base de Conhecimento</div>
+                        <div class="stat-value">${docs.length}</div>
+                    </div>
+                    <div class="card stat-card">
+                        <div class="stat-label">Status WhatsApp</div>
+                        <div class="stat-value" style="font-size:14px; margin-top:8px">${waStatus}</div>
+                    </div>
+                    <div class="card stat-card">
+                        <div class="stat-label">Sistema</div>
+                        <div class="stat-value" style="color:var(--success); font-size:14px">Operacional</div>
+                    </div>
+                </div>
+                
+                <div class="card" style="margin-top:24px">
+                    <div class="card-title">🚀 Ações Rápidas</div>
+                    <div class="grid-2" style="margin-top:16px">
+                        <button class="btn btn-primary" onclick="navigate('whatsapp')"><i class="fab fa-whatsapp"></i> Conectar WhatsApp</button>
+                        <button class="btn btn-secondary" onclick="navigate('agente')"><i class="fas fa-robot"></i> Configurar IA</button>
+                        <button class="btn btn-secondary" onclick="navigate('rag')"><i class="fas fa-brain"></i> Treinar Cérebro</button>
+                        <button class="btn btn-ghost" onclick="navigate('conversas')"><i class="fas fa-comment-dots"></i> Abrir Chat</button>
+                    </div>
+                </div>
             </div>
-            <div class="stat-card">
-                <div class="stat-label"><i class="fas fa-brain"></i> Conhecimento</div>
-                <div class="stat-value">${docs.length}</div>
-                <div style="font-size:11px; color:var(--muted-foreground); margin-top:8px">Documentos ativos</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label"><i class="fab fa-whatsapp"></i> Status WA</div>
-                <div class="stat-value" style="font-size:18px; margin-top:10px">${waStatus}</div>
-                <div style="font-size:11px; color:var(--muted-foreground); margin-top:8px">${esc(state.lojaId)}</div>
-            </div>
-        </div>
-
-        <div class="card" style="background: linear-gradient(135deg, var(--card) 0%, #1a1f26 100%)">
-            <div class="card-title">🚀 Ações Rápidas</div>
-            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:12px">
-                <button class="btn btn-primary" onclick="navigate('whatsapp')"><i class="fab fa-whatsapp"></i> Conectar WhatsApp</button>
-                <button class="btn btn-secondary" onclick="navigate('agente')"><i class="fas fa-robot"></i> Configurar IA</button>
-                <button class="btn btn-secondary" onclick="navigate('rag')"><i class="fas fa-brain"></i> Treinar Cérebro</button>
-                <button class="btn btn-ghost" onclick="navigate('conversas')"><i class="fas fa-comment-dots"></i> Abrir Chat</button>
-            </div>
-        </div>
-        `;
+        </div>`;
     } catch (e) { c.innerHTML = errMsg(e); }
 }
 
@@ -406,71 +419,77 @@ async function renderAgente() {
         const cfg = loja.config || {};
 
         c.innerHTML = `
-        <div class="card">
-            <div class="card-title" style="margin-bottom:20px;text-align:center">🤖 Configurar Agente IA</div>
-
-            <div class="agente-grid">
-                <div class="form-group">
-                    <label class="form-label">Nome da Empresa</label>
-                    <input class="form-input" id="agNome" value="${esc(loja.nome || '')}" placeholder="Ex: Clínica Sorriso">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Nicho / Segmento</label>
-                    <input class="form-input" id="agNicho" value="${esc(cfg.nicho || '')}" placeholder="Ex: Clínica Odontológica, Pet Shop...">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Tom de Voz</label>
-                    <select class="form-input form-select" id="agTom">
-                        ${['Profissional e educado', 'Amigável e descontraído', 'Formal e objetivo', 'Entusiasmado e vendedor'].map(t =>
-            `<option value="${t}" ${cfg.tom_voz === t ? 'selected' : ''}>${t}</option>`
-        ).join('')}
-                    </select>
+        <div class="page-wrapper">
+            <div class="page-header">
+                <h1 class="page-title">Personalidade do Agente</h1>
+                <div class="page-actions">
+                    <button class="btn btn-primary" id="btnSalvarAgente" onclick="salvarAgente()" style="height:36px; padding:0 16px; font-size:13px">
+                        <i class="fas fa-save"></i> Salvar Alterações
+                    </button>
                 </div>
             </div>
+            <div class="page-body">
+                <div class="agente-layout">
+                    <div class="card">
+                        <div class="card-title" style="margin-bottom:20px;text-align:center">🤖 Configurar Agente IA</div>
+                        <div class="agente-grid">
+                            <div class="form-group">
+                                <label class="form-label">Nome da Empresa</label>
+                                <input class="form-input" id="agNome" value="${esc(loja.nome || '')}" placeholder="Ex: Clínica Sorriso">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Nicho / Segmento</label>
+                                <input class="form-input" id="agNicho" value="${esc(cfg.nicho || '')}" placeholder="Ex: Clínica Odontológica, Pet Shop...">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Tom de Voz</label>
+                                <select class="form-input form-select" id="agTom">
+                                    ${['Profissional e educado', 'Amigável e descontraído', 'Formal e objetivo', 'Entusiasmado e vendedor'].map(t =>
+                                        `<option value="${t}" ${cfg.tom_voz === t ? 'selected' : ''}>${t}</option>`
+                                    ).join('')}
+                                </select>
+                            </div>
+                        </div>
 
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">
-                <button class="btn btn-secondary" onclick="toggleField('agRegrasContainer')" style="justify-content:center;padding:12px">
-                    <i class="fas fa-list-check" style="margin-right:8px"></i> Regras Estritas
-                </button>
-                <button class="btn btn-secondary" onclick="toggleField('agPromptContainer')" style="justify-content:center;padding:12px">
-                    <i class="fas fa-terminal" style="margin-right:8px"></i> Prompt Principal
-                </button>
-            </div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">
+                            <button class="btn btn-secondary" onclick="toggleField('agRegrasContainer')" style="justify-content:center;padding:12px">
+                                <i class="fas fa-list-check" style="margin-right:8px"></i> Regras Estritas
+                            </button>
+                            <button class="btn btn-secondary" onclick="toggleField('agPromptContainer')" style="justify-content:center;padding:12px">
+                                <i class="fas fa-terminal" style="margin-right:8px"></i> Prompt Principal
+                            </button>
+                        </div>
 
-            <div id="agRegrasContainer" style="display:none;margin-top:20px;animation:fadeIn 0.3s ease">
-                <div class="form-group">
-                    <label class="form-label">Regras Estritas (Instruções Proibitivas)</label>
-                    <textarea class="form-textarea" id="agRegras" style="height:120px"
-                        placeholder="Ex: Nunca revelar preços sem consultar tabela. Nunca falar de concorrentes.">${esc(cfg.regras || '')}</textarea>
+                        <div id="agRegrasContainer" style="display:none;margin-top:20px;animation:fadeIn 0.3s ease">
+                            <div class="form-group">
+                                <label class="form-label">Regras Estritas (Instruções Proibitivas)</label>
+                                <textarea class="form-textarea" id="agRegras" style="height:120px"
+                                    placeholder="Ex: Nunca revelar preços sem consultar tabela. Nunca falar de concorrentes.">${esc(cfg.regras || '')}</textarea>
+                            </div>
+                        </div>
+
+                        <div id="agPromptContainer" style="display:none;margin-top:20px;animation:fadeIn 0.3s ease">
+                            <div class="form-group">
+                                <label class="form-label">Prompt Principal — Comportamento e Personalidade</label>
+                                <textarea class="form-textarea" id="agPrompt" style="height:250px"
+                                    placeholder="Ex: Você é a Mia, assistente virtual...">${esc(loja.prompt_base || '')}</textarea>
+                            </div>
+                        </div>
+                        <div id="agenteStatus" style="font-size:12px;color:var(--muted-foreground);text-align:center;margin-top:12px"></div>
+                    </div>
+
+                    <div class="card" style="background:var(--success-subtle);border-color:rgba(5,150,105,0.2)">
+                        <div class="card-title" style="margin-bottom:8px;font-size:14px;color:var(--success)">💡 Como escrever um bom prompt</div>
+                        <p style="font-size:13px;color:var(--muted-foreground);line-height:1.8">
+                            Pense como se estivesse contratando um funcionário e descrevendo a função dele:<br>
+                            <strong>① Quem é a empresa</strong> — nome, segmento, diferenciais.<br>
+                            <strong>② O que a IA deve fazer</strong> — agendar, tirar dúvidas, qualificar leads.<br>
+                            <strong>③ Como deve falar</strong> — tom, emoji, formalidade.<br>
+                            <strong>④ O que nunca deve fazer</strong> — inventar preços, mencionar concorrentes.
+                        </p>
+                    </div>
                 </div>
             </div>
-
-            <div id="agPromptContainer" style="display:none;margin-top:20px;animation:fadeIn 0.3s ease">
-                <div class="form-group">
-                    <label class="form-label">Prompt Principal — Comportamento e Personalidade</label>
-                    <textarea class="form-textarea" id="agPrompt" style="height:250px"
-                        placeholder="Ex: Você é a Mia, assistente virtual...">${esc(loja.prompt_base || '')}</textarea>
-                </div>
-            </div>
-
-            <div style="margin-top:32px;display:flex;flex-direction:column;gap:12px;align-items:center">
-                <button class="btn btn-primary" id="btnSalvarAgente" onclick="salvarAgente()" style="width:100%;max-width:300px;justify-content:center;padding:14px">
-                    <i class="fas fa-save" style="margin-right:8px"></i> Salvar Configurações
-                </button>
-                <span id="agenteStatus" style="font-size:12px;color:var(--muted-foreground)"></span>
-            </div>
-        </div>
-
-        <div class="card" style="background:var(--success-subtle);border-color:rgba(5,150,105,0.2)">
-            <div class="card-title" style="margin-bottom:8px;font-size:14px;color:var(--success)">💡 Como escrever um bom prompt</div>
-            <p style="font-size:13px;color:var(--muted-foreground);line-height:1.8">
-                Pense como se estivesse contratando um funcionário e descrevendo a função dele:<br>
-                <strong>① Quem é a empresa</strong> — nome, segmento, diferenciais.<br>
-                <strong>② O que a IA deve fazer</strong> — agendar, tirar dúvidas, qualificar leads.<br>
-                <strong>③ Como deve falar</strong> — tom, emoji, formalidade.<br>
-                <strong>④ O que nunca deve fazer</strong> — inventar preços, mencionar concorrentes.<br><br>
-                <em>"Você é a Mia, assistente virtual da PetShop Amigo Fiel. Atenda clientes de forma simpática e agende banho/tosa. Nunca invente preços — diga que vai confirmar com a equipe."</em>
-            </p>
         </div>`;
     } catch (e) { c.innerHTML = errMsg(e); }
 }
@@ -503,30 +522,37 @@ async function renderRAG() {
     const c = document.getElementById('pageContent');
     if (!state.lojaId) { c.innerHTML = noLojaMsg(); return; }
     c.innerHTML = `
-    <div class="rag-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
-        <div class="card">
-            <div class="card-title" style="margin-bottom:16px">✏️ Adicionar Texto Manualmente</div>
-            <div class="form-group">
-                <label class="form-label">Título</label>
-                <input class="form-input" id="ragTitulo" placeholder="Ex: Tabela de Preços, Horários de Atendimento...">
-            </div>
-            <div class="form-group">
-                <label class="form-label">Conteúdo</label>
-                <textarea class="form-textarea" id="ragConteudo" style="height:180px"
-                    placeholder="Cole aqui as informações. A IA usará este texto para responder clientes.&#10;&#10;Exemplos:&#10;- Preços e planos&#10;- Horários de funcionamento&#10;- Endereço e contatos&#10;- FAQ&#10;- Descrição de produtos/serviços"></textarea>
-            </div>
-            <div style="display:flex;gap:10px">
-                <button class="btn btn-primary" id="btnSalvarRAG" onclick="salvarTextoRAG()">
-                    <i class="fas fa-save"></i> Salvar no Banco Vetorial
-                </button>
-                <button class="btn btn-ghost" onclick="navigate('scraping')">
-                    <i class="fas fa-globe"></i> Importar de URL
+    <div class="page-wrapper">
+        <div class="page-header">
+            <h1 class="page-title">Cérebro do Bot (Base de Conhecimento)</h1>
+            <div class="page-actions">
+                <button class="btn btn-ghost" onclick="navigate('scraping')" style="font-size:13px">
+                    <i class="fas fa-globe"></i> Scraping Web
                 </button>
             </div>
         </div>
-        <div class="card">
-            <div class="card-title" style="margin-bottom:16px">📚 Conhecimento Salvo</div>
-            <div id="ragList"><div class="spinner"></div></div>
+        <div class="page-body">
+            <div class="rag-grid">
+                <div class="card">
+                    <div class="card-title" style="margin-bottom:16px">✏️ Adicionar Texto Manualmente</div>
+                    <div class="form-group">
+                        <label class="form-label">Título</label>
+                        <input class="form-input" id="ragTitulo" placeholder="Ex: Tabela de Preços, Horários de Atendimento...">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Conteúdo</label>
+                        <textarea class="form-textarea" id="ragConteudo" style="height:180px"
+                            placeholder="Cole aqui as informações para a IA usar como base..."></textarea>
+                    </div>
+                    <button class="btn btn-primary" id="btnSalvarRAG" onclick="salvarTextoRAG()" style="width:100%;justify-content:center">
+                        <i class="fas fa-save"></i> Salvar no Banco Vetorial
+                    </button>
+                </div>
+                <div class="card">
+                    <div class="card-title" style="margin-bottom:16px">📚 Conhecimento Salvo</div>
+                    <div id="ragList"><div class="spinner"></div></div>
+                </div>
+            </div>
         </div>
     </div>`;
     loadRAGDocs();
@@ -597,60 +623,67 @@ async function renderScraping() {
     const c = document.getElementById('pageContent');
     if (!state.lojaId) { c.innerHTML = noLojaMsg(); return; }
     c.innerHTML = `
-    <div class="scraping-grid">
-    <div class="card">
-        <div class="card-title" style="margin-bottom:6px">🌐 Importar Conhecimento de Sites</div>
-        <p style="font-size:13px;color:var(--muted-foreground);margin-bottom:20px">
-            Cole a URL de qualquer página do site do cliente. O sistema extrai o texto automaticamente e salva no banco vetorial.
-        </p>
-        <div style="display:grid;grid-template-columns:1fr auto;gap:12px;align-items:end;margin-bottom:12px">
-            <div class="form-group" style="margin-bottom:0">
-                <label class="form-label">URL da Página</label>
-                <input class="form-input" id="scrapeUrl" placeholder="https://www.sitedomeucliente.com.br/servicos" type="url">
+    <div class="page-wrapper">
+        <div class="page-header">
+            <h1 class="page-title">Importar Conhecimento (Web Scraping)</h1>
+            <div class="page-actions">
+                <button class="btn btn-ghost" onclick="navigate('rag')" style="font-size:13px">
+                    <i class="fas fa-arrow-left"></i> Voltar ao Cérebro
+                </button>
             </div>
-            <button class="btn btn-primary" onclick="executarScraping()" id="btnScrape">
-                <i class="fas fa-download"></i> Importar
-            </button>
         </div>
-        <div class="form-group">
-            <label class="form-label">Título personalizado (opcional)</label>
-            <input class="form-input" id="scrapeTitulo" placeholder="Ex: Página de Serviços (deixe vazio para usar o domínio)">
-        </div>
-        <div id="scrapeResult"></div>
-    </div>
+        <div class="page-body">
+            <div class="card" style="margin-bottom:24px">
+                <div class="card-title" style="margin-bottom:6px">🌐 Importar de Sites</div>
+                <p style="font-size:13px;color:var(--muted-foreground);margin-bottom:20px">
+                    Cole a URL de qualquer página do site do cliente para extrair informações automaticamente.
+                </p>
+                <div style="display:grid;grid-template-columns:1fr auto;gap:12px;align-items:end;margin-bottom:12px">
+                    <div class="form-group" style="margin-bottom:0">
+                        <label class="form-label">URL da Página</label>
+                        <input class="form-input" id="scrapeUrl" placeholder="https://www.site.com.br/servicos" type="url">
+                    </div>
+                    <button class="btn btn-primary" onclick="executarScraping()" id="btnScrape" style="height:42px">
+                        <i class="fas fa-download"></i> Importar
+                    </button>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Título personalizado (opcional)</label>
+                    <input class="form-input" id="scrapeTitulo" placeholder="Ex: Página de Serviços">
+                </div>
+                <div id="scrapeResult"></div>
+            </div>
 
-    <div class="card">
-        <div class="card-title" style="margin-bottom:12px">📋 Quais páginas importar?</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:13px">
-            <div style="padding:14px;background:var(--success-subtle);border:1px solid rgba(5,150,105,0.15);border-radius:var(--radius)">
-                <div style="font-weight:700;margin-bottom:8px;color:var(--success)">✅ Alto valor</div>
-                <ul style="color:var(--muted-foreground);line-height:2;padding-left:16px">
-                    <li>Serviços / produtos</li>
-                    <li>Tabela de preços</li>
-                    <li>Sobre a empresa</li>
-                    <li>FAQ</li>
-                    <li>Página de contato</li>
-                </ul>
+            <div class="grid-2">
+                <div class="card" style="background:var(--success-subtle);border-color:rgba(5,150,105,0.15)">
+                    <div class="card-title" style="margin-bottom:8px;font-size:14px;color:var(--success)">✅ Alto valor</div>
+                    <ul style="color:var(--muted-foreground);line-height:2;padding-left:16px;font-size:13px">
+                        <li>Serviços / produtos</li>
+                        <li>Tabela de preços</li>
+                        <li>Sobre a empresa</li>
+                        <li>FAQ</li>
+                        <li>Página de contato</li>
+                    </ul>
+                </div>
+                <div class="card" style="background:var(--warning-subtle);border-color:rgba(217,119,6,0.15)">
+                    <div class="card-title" style="margin-bottom:8px;font-size:14px;color:var(--warning)">⚠️ Geralmente desnecessário</div>
+                    <ul style="color:var(--muted-foreground);line-height:2;padding-left:16px;font-size:13px">
+                        <li>Página inicial genérica</li>
+                        <li>Blog / notícias antigas</li>
+                        <li>Páginas de login</li>
+                        <li>Política de privacidade</li>
+                    </ul>
+                </div>
             </div>
-            <div style="padding:14px;background:var(--warning-subtle);border:1px solid rgba(217,119,6,0.15);border-radius:var(--radius)">
-                <div style="font-weight:700;margin-bottom:8px;color:var(--warning)">⚠️ Geralmente desnecessário</div>
-                <ul style="color:var(--muted-foreground);line-height:2;padding-left:16px">
-                    <li>Página inicial genérica</li>
-                    <li>Blog / notícias antigas</li>
-                    <li>Páginas de login</li>
-                    <li>Política de privacidade</li>
-                </ul>
-            </div>
-        </div>
-    </div>
 
-    <div class="card">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-            <div class="card-title">Base de Conhecimento Atual</div>
-            <span style="font-size:13px;color:var(--muted-foreground)" id="scrapeDocCount">carregando...</span>
+            <div class="card" style="margin-top:24px">
+                <div class="card-title" style="margin-bottom:12px">📋 Documentação e Histórico</div>
+                <div id="scrapingHistory">
+                    <p style="font-size:13px;color:var(--muted-foreground)">As páginas importadas aparecerão na Base de Conhecimento.</p>
+                </div>
+            </div>
         </div>
-        <div id="scrapeDocList"><div class="spinner"></div></div>
-    </div></div>`;
+    </div>`;
     loadScrapeDocs();
 }
 
@@ -1115,34 +1148,45 @@ async function renderWhatsApp() {
     if (waPolling) { clearInterval(waPolling); waPolling = null; }
 
     c.innerHTML = `
-    <div class="whatsapp-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start">
-        <div class="card wa-status-card" id="waStatusCard"><div class="spinner"></div></div>
-        <div>
-            <div class="card">
-                <div class="card-title" style="margin-bottom:16px">📱 Conectar Dispositivo</div>
-                <div style="font-size:13px;color:var(--muted-foreground);margin-bottom:20px;line-height:2">
-                    <strong>Passo 1:</strong> Clique em "Gerar Código"<br>
-                    <strong>Passo 2:</strong> Abra o WhatsApp no celular<br>
-                    <strong>Passo 3:</strong> Vá em <strong>Aparelhos Conectados → Conectar com número</strong><br>
-                    <strong>Passo 4:</strong> Digite o código de 8 dígitos
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Número do Cliente (ID)</label>
-                    <input class="form-input" id="waNumero" value="${esc(state.lojaId)}" disabled style="background:var(--muted);font-weight:700;font-family:'JetBrains Mono',monospace">
-                </div>
-                <div id="pairingCodeBox" style="display:none;margin-bottom:20px">
-                    <label class="form-label">Código de Pareamento</label>
-                    <div class="pairing-code" id="pairingCodeValue" title="Clique para copiar"
-                        onclick="navigator.clipboard.writeText(this.textContent.replace(/-/g,''));toast('Código copiado!')">----</div>
-                    <p style="font-size:12px;color:var(--muted-foreground);text-align:center;margin-top:8px">Clique no código para copiar</p>
-                </div>
-                <div style="display:flex;flex-direction:column;gap:8px">
-                    <button class="btn btn-primary" style="justify-content:center" onclick="conectarWA()" id="btnWA">
-                        <i class="fab fa-whatsapp"></i> Gerar Código de Pareamento
-                    </button>
-                    <button class="btn btn-danger" style="justify-content:center;display:none" onclick="desconectarWA()" id="btnDesconectar">
-                        <i class="fas fa-unlink"></i> Desconectar WhatsApp
-                    </button>
+    <div class="page-wrapper">
+        <div class="page-header">
+            <h1 class="page-title">Conexão WhatsApp</h1>
+            <div class="page-actions">
+                <button class="btn btn-ghost" onclick="renderWhatsApp()" style="width:36px; height:36px; padding:0">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+            </div>
+        </div>
+        <div class="page-body">
+            <div class="whatsapp-grid">
+                <div class="card wa-status-card" id="waStatusCard"><div class="spinner"></div></div>
+                <div>
+                    <div class="card">
+                        <div class="card-title" style="margin-bottom:16px">📱 Conectar Dispositivo</div>
+                        <div style="font-size:13px;color:var(--muted-foreground);margin-bottom:20px;line-height:2">
+                            <strong>Passo 1:</strong> Clique em "Gerar Código"<br>
+                            <strong>Passo 2:</strong> Abra o WhatsApp no celular<br>
+                            <strong>Passo 3:</strong> Vá em <strong>Aparelhos Conectados</strong><br>
+                            <strong>Passo 4:</strong> Digite o código de 8 dígitos
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Número do Cliente (ID)</label>
+                            <input class="form-input" id="waNumero" value="${esc(state.lojaId)}" disabled style="background:var(--muted);font-weight:700;font-family:'JetBrains Mono',monospace">
+                        </div>
+                        <div id="pairingCodeBox" style="display:none;margin-bottom:20px">
+                            <label class="form-label">Código de Pareamento</label>
+                            <div class="pairing-code" id="pairingCodeValue" title="Clique para copiar"
+                                onclick="navigator.clipboard.writeText(this.textContent.replace(/-/g,''));toast('Código copiado!')">----</div>
+                        </div>
+                        <div style="display:flex;flex-direction:column;gap:8px">
+                            <button class="btn btn-primary" style="justify-content:center" onclick="conectarWA()" id="btnWA">
+                                <i class="fab fa-whatsapp"></i> Gerar Código de Pareamento
+                            </button>
+                            <button class="btn btn-danger" style="justify-content:center;display:none" onclick="desconectarWA()" id="btnDesconectar">
+                                <i class="fas fa-unlink"></i> Desconectar
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1226,30 +1270,27 @@ async function desconectarWA() {
 async function renderClientes() {
     const c = document.getElementById('pageContent');
     c.innerHTML = `
-    <div class="card" style="margin-bottom:24px">
-        <div style="display:flex; justify-content:space-between; align-items:center; gap:20px; flex-wrap:wrap">
-            <div style="flex:1; min-width:200px">
-                <div class="card-title" style="margin-bottom:4px">Gestão de Clientes</div>
-                <div style="font-size:13px; color:var(--muted-foreground)">Gerencie instâncias e configurações de cada empresa.</div>
+    <div class="page-wrapper">
+        <div class="page-header">
+            <h1 class="page-title">Gestão de Clientes</h1>
+            <div class="page-actions">
+                <div style="position:relative; width:200px" class="desktop-only">
+                    <i class="fas fa-search" style="position:absolute; left:12px; top:50%; transform:translateY(-50%); font-size:12px; color:var(--muted-foreground)"></i>
+                    <input type="text" class="form-input" id="searchClientes" 
+                        placeholder="Buscar..." 
+                        style="padding-left:34px; height:36px; font-size:13px; border-radius:8px"
+                        oninput="ocFilterGlobalList('searchClientes', 'clientesListBody', 'tr')">
+                </div>
+                <button class="btn btn-primary" onclick="openModalNovaLoja()" style="height:36px; padding:0 16px; font-size:13px">
+                    <i class="fas fa-plus"></i> Novo
+                </button>
             </div>
-            
-            <!-- SEARCH ENGINE: CLIENTES -->
-            <div style="position:relative; width:100%; max-width:340px">
-                <i class="fas fa-search" style="position:absolute; left:14px; top:50%; transform:translateY(-50%); color:var(--muted-foreground); font-size:13px"></i>
-                <input type="text" class="form-input" id="searchClientes" 
-                    placeholder="Buscar empresa ou ID..." 
-                    style="padding-left:40px; border-radius:100px; background:var(--muted); height:42px"
-                    oninput="ocFilterGlobalList('searchClientes', 'clientesListBody', 'tr')">
-            </div>
-
-            <button class="btn btn-primary" onclick="openModalNovaLoja()" style="height:42px; border-radius:100px; padding:0 24px">
-                <i class="fas fa-plus"></i> Novo Cliente
-            </button>
         </div>
-    </div>
-
-    <div class="card" style="padding:0; overflow:visible">
-        <div id="clientesList"><div class="spinner"></div></div>
+        <div class="page-body">
+            <div class="card" style="padding:0">
+                <div id="clientesList"><div class="spinner"></div></div>
+            </div>
+        </div>
     </div>`;
     loadClientes();
 }
@@ -1740,24 +1781,35 @@ async function removerUsuarioEquipe(id, nome) {
 async function renderDiagnostics() {
     const c = document.getElementById('pageContent');
     c.innerHTML = `
-    <div class="card">
-        <div class="card-title" style="margin-bottom:8px">🔧 Diagnóstico do Sistema</div>
-        <p style="font-size:13px;color:var(--muted-foreground);margin-bottom:20px">
-            Verifica conectividade com os LLMs (Groq, Gemini), Supabase e a base RAG do cliente selecionado.
-        </p>
-        <button class="btn btn-primary" onclick="executarDiagnostico()" id="btnDiag">
-            <i class="fas fa-play"></i> Executar Diagnóstico
-        </button>
-        <div id="diagResult" style="margin-top:24px"></div>
-    </div>
+    <div class="page-wrapper">
+        <div class="page-header">
+            <h1 class="page-title">Saúde do Sistema</h1>
+            <div class="page-actions">
+                <button class="btn btn-ghost" onclick="renderDiagnostics()" style="width:36px; height:36px; padding:0">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+            </div>
+        </div>
+        <div class="page-body">
+            <div class="card">
+                <p style="font-size:13px;color:var(--muted-foreground);margin-bottom:20px">
+                    Verifica conectividade com os LLMs (Groq, Gemini), Supabase e a base RAG do cliente selecionado.
+                </p>
+                <button class="btn btn-primary" onclick="executarDiagnostico()" id="btnDiag">
+                    <i class="fas fa-play"></i> Executar Diagnóstico
+                </button>
+                <div id="diagResult" style="margin-top:24px"></div>
+            </div>
 
-    <div class="card">
-        <div class="card-title" style="margin-bottom:12px">ℹ️ Informações da Sessão</div>
-        <div style="font-size:13px;line-height:2.2;font-family:'JetBrains Mono',monospace">
-            <div>Cliente ativo: <strong style="color:var(--primary)">${esc(state.lojaId || 'nenhum')}</strong></div>
-            <div>Servidor: <strong>${API}</strong></div>
-            <div>Versão: <strong>4.0</strong></div>
-            <div>Tema: <strong id="diagTheme">${document.documentElement.getAttribute('data-theme') || 'light'}</strong></div>
+            <div class="card">
+                <div class="card-title" style="margin-bottom:12px">ℹ️ Informações da Sessão</div>
+                <div style="font-size:13px;line-height:2.2;font-family:'JetBrains Mono',monospace">
+                    <div>Cliente ativo: <strong style="color:var(--primary)">${esc(state.lojaId || 'nenhum')}</strong></div>
+                    <div>Servidor: <strong>${API}</strong></div>
+                    <div>Versão: <strong>4.0</strong></div>
+                    <div>Tema: <strong id="diagTheme">${document.documentElement.getAttribute('data-theme') || 'light'}</strong></div>
+                </div>
+            </div>
         </div>
     </div>`;
 }
@@ -1842,59 +1894,57 @@ async function renderMore() {
     });
 
     c.innerHTML = `
-    <div class="card" style="padding:0;overflow:hidden">
-        <div style="padding:20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px;background:var(--secondary)">
-            <div class="sidebar-user-avatar" style="width:50px;height:50px;font-size:18px">${(state.user?.email || 'AD').substring(0, 2).toUpperCase()}</div>
-            <div>
-                <div style="font-weight:700;font-size:16px">${esc(state.user?.email || '')}</div>
-                <div style="font-size:12px;color:var(--muted-foreground)">${roleLabel}</div>
-            </div>
+    <div class="page-wrapper">
+        <div class="page-header">
+            <h1 class="page-title">Mais Opções</h1>
         </div>
+        <div class="page-body">
+            <div class="card" style="padding:0;overflow:hidden;margin-bottom:24px">
+                <div style="padding:20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px;background:var(--secondary)">
+                    <div class="sidebar-user-avatar" style="width:50px;height:50px;font-size:18px">${(state.user?.email || 'AD').substring(0, 2).toUpperCase()}</div>
+                    <div>
+                        <div style="font-weight:700;font-size:16px">${esc(state.user?.email || '')}</div>
+                        <div style="font-size:12px;color:var(--muted-foreground)">${roleLabel}</div>
+                    </div>
+                </div>
 
-        <div class="more-menu">
-            ${menuHtml}
-            
-            <div class="more-item" onclick="toggleTheme()">
-                <i class="fas fa-adjust"></i>
-                <div class="more-item-content">
-                    <div class="more-item-title">Alternar Tema</div>
-                    <div class="more-item-sub">Modo claro / escuro</div>
+                <div class="more-menu">
+                    ${menuHtml}
+                    
+                    <div class="more-item" onclick="toggleTheme()">
+                        <i class="fas fa-adjust"></i>
+                        <div class="more-item-content">
+                            <div class="more-item-title">Alternar Tema</div>
+                            <div class="more-item-sub">Modo claro / escuro</div>
+                        </div>
+                        <i class="fas fa-chevron-right more-arrow"></i>
+                    </div>
+
+                    <div class="more-item" onclick="doLogout()" style="color:var(--destructive)">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <div class="more-item-content">
+                            <div class="more-item-title">Sair</div>
+                            <div class="more-item-sub">Encerrar sessão</div>
+                        </div>
+                        <i class="fas fa-chevron-right more-arrow"></i>
+                    </div>
                 </div>
-                <i class="fas fa-chevron-right more-arrow"></i>
             </div>
 
-            <div class="more-item" onclick="window.location.reload()">
-                <i class="fas fa-sync"></i>
-                <div class="more-item-content">
-                    <div class="more-item-title">Recarregar Painel</div>
-                    <div class="more-item-sub">Atualizar dados</div>
+            <div class="card">
+                <div class="card-title" style="margin-bottom:16px">Status do Sistema</div>
+                <div style="display:flex;flex-direction:column;gap:12px">
+                    <div style="display:flex;justify-content:space-between;align-items:center;padding:12px;background:var(--muted);border-radius:8px;border:1px solid var(--border)">
+                        <div style="font-size:13px;font-weight:600">Servidor Backend</div>
+                        <div style="display:flex;align-items:center;gap:8px">
+                            <div id="serverDotMore" class="status-dot online"></div>
+                            <span id="serverStatusTextMore" style="font-size:12px;color:var(--muted-foreground)">Conectado</span>
+                        </div>
+                    </div>
+                    <div style="font-size:11px;color:var(--muted-foreground);text-align:center">
+                        Versão 4.0.5 — RoboTI BR by WavePod
+                    </div>
                 </div>
-                <i class="fas fa-chevron-right more-arrow"></i>
-            </div>
-            
-            <div class="more-item" onclick="doLogout()" style="color:var(--destructive)">
-                <i class="fas fa-sign-out-alt"></i>
-                <div class="more-item-content">
-                    <div class="more-item-title">Sair</div>
-                    <div class="more-item-sub">Encerrar sessão</div>
-                </div>
-                <i class="fas fa-chevron-right more-arrow"></i>
-            </div>
-        </div>
-    </div>
-
-    <div class="card" style="margin-top:16px">
-        <div class="card-title" style="margin-bottom:16px">Status do Sistema</div>
-        <div style="display:flex;flex-direction:column;gap:12px">
-            <div style="display:flex;justify-content:space-between;align-items:center;padding:12px;background:var(--muted);border-radius:8px;border:1px solid var(--border)">
-                <div style="font-size:13px;font-weight:600">Servidor Backend</div>
-                <div style="display:flex;align-items:center;gap:8px">
-                    <div id="serverDotMore" class="status-dot online"></div>
-                    <span id="serverStatusTextMore" style="font-size:12px;color:var(--muted-foreground)">Conectado</span>
-                </div>
-            </div>
-            <div style="font-size:11px;color:var(--muted-foreground);text-align:center">
-                Versão 4.0.5 — RoboTI BR by WavePod
             </div>
         </div>
     </div>`;
@@ -1943,13 +1993,20 @@ async function initLojas() {
 } async function renderContatos() {
     const c = document.getElementById('pageContent');
     if (!state.lojaId) { c.innerHTML = noLojaMsg(); return; }
-    c.innerHTML = `<div class="card">
-        <div class="card-title">Gestão de Leads (CRM)</div>
-        <p style="color:var(--muted-foreground); margin-bottom: 24px">Leads capturados e qualificados pela IA.</p>
-        <div class="empty-state">
-            <div class="empty-icon" style="color:var(--primary); font-size: 48px"><i class="fas fa-users"></i></div>
-            <h3>Módulo em Integração</h3>
-            <p>Estamos sincronizando os dados da tabela <code>contatos_crm</code> com o painel.</p>
+    c.innerHTML = `
+    <div class="page-wrapper">
+        <div class="page-header">
+            <h1 class="page-title">Gestão de Leads (CRM)</h1>
+        </div>
+        <div class="page-body">
+            <div class="card">
+                <div class="card-title">Leads capturados e qualificados pela IA.</div>
+                <div class="empty-state" style="padding:48px; text-align:center">
+                    <div class="empty-icon" style="color:var(--primary); font-size: 48px; margin-bottom:16px"><i class="fas fa-users"></i></div>
+                    <h3>Módulo em Integração</h3>
+                    <p style="color:var(--muted-foreground)">Estamos sincronizando os dados da tabela <code>contatos_crm</code> com o painel.</p>
+                </div>
+            </div>
         </div>
     </div>`;
 }
@@ -1962,53 +2019,44 @@ async function renderCatalogo() {
         const produtos = await api.get('/cliente/catalogo/' + state.lojaId);
 
         c.innerHTML = `
-        <div class="card" style="margin-bottom:24px">
-            <div style="display:flex; justify-content:space-between; align-items:center">
-                <div>
-                    <h2 class="card-title" style="margin-bottom:4px">Catálogo de Produtos</h2>
-                    <p style="font-size:13px; color:var(--muted-foreground)">Gerencie os produtos que a IA está autorizada a consultar e oferecer.</p>
+        <div class="page-wrapper">
+            <div class="page-header">
+                <h1 class="page-title">Catálogo de Produtos</h1>
+                <div class="page-actions">
+                    <button class="btn btn-primary" onclick="openModalProduto()" style="height:36px; padding:0 16px; font-size:13px">
+                        <i class="fas fa-plus"></i> Novo Produto
+                    </button>
                 </div>
-                <button class="btn btn-primary" onclick="openModalProduto()">
-                    <i class="fas fa-plus"></i> Novo Produto
-                </button>
             </div>
-        </div>
-
-        <div class="card">
-            <div style="overflow-x:auto">
-                <table style="width:100%; border-collapse:collapse; font-size:14px">
-                    <thead>
-                        <tr style="border-bottom:1px solid var(--border); text-align:left">
-                            <th style="padding:16px; color:var(--sidebar-muted); font-size:11px; text-transform:uppercase">Produto</th>
-                            <th style="padding:16px; color:var(--sidebar-muted); font-size:11px; text-transform:uppercase">SKU</th>
-                            <th style="padding:16px; color:var(--sidebar-muted); font-size:11px; text-transform:uppercase">Preço</th>
-                            <th style="padding:16px; color:var(--sidebar-muted); font-size:11px; text-transform:uppercase">IA</th>
-                            <th style="padding:16px; color:var(--sidebar-muted); font-size:11px; text-transform:uppercase; text-align:right">Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody id="catalogoList">
-                        ${produtos.map(p => `
-                            <tr style="border-bottom:1px solid var(--border)">
-                                <td style="padding:16px">
-                                    <div style="font-weight:600">${esc(p.nome_produto)}</div>
-                                    <div style="font-size:12px; color:var(--muted-foreground)">${esc(p.descricao || '')}</div>
-                                </td>
-                                <td style="padding:16px; font-family:'JetBrains Mono'">${esc(p.sku || '--')}</td>
-                                <td style="padding:16px; font-weight:700; color:var(--primary)">R$ ${Number(p.preco).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
-                                <td style="padding:16px">
-                                    <span class="crm-score-badge" style="background:${p.disponivel_para_ia ? 'var(--primary-glow)' : 'var(--muted)'}; color:${p.disponivel_para_ia ? 'var(--primary)' : 'var(--sidebar-muted)'}">
-                                        ${p.disponivel_para_ia ? 'AUTORIZADO' : 'OCULTO'}
-                                    </span>
-                                </td>
-                                <td style="padding:16px; text-align:right">
-                                    <button class="btn-logout" onclick="openModalProduto('${p.id}')" title="Editar"><i class="fas fa-edit"></i></button>
-                                    <button class="btn-logout" style="color:var(--destructive)" onclick="deleteProduto('${p.id}')" title="Excluir"><i class="fas fa-trash"></i></button>
-                                </td>
-                            </tr>
-                        `).join('')}
-                        ${!produtos.length ? '<tr><td colspan="5" style="padding:40px; text-align:center; color:var(--sidebar-muted)">Nenhum produto cadastrado.</td></tr>' : ''}
-                    </tbody>
-                </table>
+                <div class="card" style="padding:0; overflow:hidden">
+                    <div style="overflow-x:auto">
+                        <table style="width:100%; border-collapse:collapse; font-size:14px">
+                            <thead>
+                                <tr style="border-bottom:1px solid var(--border); text-align:left; background:var(--secondary)">
+                                    <th style="padding:16px; color:var(--sidebar-muted); font-size:11px; text-transform:uppercase">Produto / SKU</th>
+                                    <th style="padding:16px; color:var(--sidebar-muted); font-size:11px; text-transform:uppercase">Preço</th>
+                                    <th style="padding:16px; color:var(--sidebar-muted); font-size:11px; text-transform:uppercase; text-align:right">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${produtos.map(p => `
+                                    <tr style="border-bottom:1px solid var(--border)">
+                                        <td style="padding:16px">
+                                            <div style="font-weight:600">${esc(p.nome_produto)}</div>
+                                            <div style="font-size:12px; color:var(--muted-foreground)">${esc(p.sku || 'Sem SKU')}</div>
+                                        </td>
+                                        <td style="padding:16px; font-weight:700; color:var(--primary)">R$ ${Number(p.preco).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
+                                        <td style="padding:16px; text-align:right">
+                                            <button class="btn btn-ghost" onclick="openModalProduto('${p.id}')" title="Editar" style="width:32px; height:32px; padding:0"><i class="fas fa-edit"></i></button>
+                                            <button class="btn btn-ghost" style="color:var(--destructive); width:32px; height:32px; padding:0" onclick="deleteProduto('${p.id}')" title="Excluir"><i class="fas fa-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                                ${!produtos.length ? '<tr><td colspan="3" style="padding:48px; text-align:center; color:var(--muted-foreground)">Nenhum produto cadastrado.</td></tr>' : ''}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>`;
     } catch (e) { c.innerHTML = errMsg(e); }
