@@ -1248,7 +1248,7 @@ async function renderClientes() {
         </div>
     </div>
 
-    <div class="card" style="padding:0; overflow:hidden">
+    <div class="card" style="padding:0; overflow:visible">
         <div id="clientesList"><div class="spinner"></div></div>
     </div>`;
     loadClientes();

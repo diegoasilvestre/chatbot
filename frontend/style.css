@@ -1596,17 +1596,30 @@ h4,
         -webkit-overflow-scrolling: touch;
     }
 
-    /* Containers de Página (WhatsApp, Agent, Clientes) */
+    /* Containers de Página (WhatsApp, Agent, Clientes, RAG) */
     .whatsapp-layout,
+    .whatsapp-grid,
     .agente-layout,
     .clientes-container,
-    .clientes-grid {
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
+    .clientes-grid,
+    .rag-container,
+    .form-container {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 16px !important;
         height: auto !important;
         min-height: 100% !important;
         overflow: visible !important;
+    }
+
+    /* Forçar cards nessas telas a serem scrolláveis */
+    .whatsapp-layout .card,
+    .whatsapp-grid .card,
+    .rag-container .card,
+    .clientes-container .card {
+        height: auto !important;
+        overflow: visible !important;
+        max-width: 100% !important;
     }
 
     /* Topbar Layout */
@@ -1726,14 +1739,17 @@ h4,
         font-size: 18px;
     }
 
-    /* Grids & Cards */
+    /* Grids & Cards - Normalização Mobile */
     .stats-grid,
     .clientes-grid,
-    .cards-container {
+    .cards-container,
+    .whatsapp-grid,
+    .rag-grid {
         display: grid !important;
         grid-template-columns: 1fr !important;
         gap: 16px !important;
         width: 100% !important;
+        height: auto !important;
     }
 
     .card,
