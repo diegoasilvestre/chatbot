@@ -523,7 +523,7 @@ async function salvarAgente() {
     const prompt_base = document.getElementById('agPrompt').value.trim();
     const nicho = document.getElementById('agNicho').value.trim();
     const tom_voz = document.getElementById('agTom').value;
-    const regras = document.getElementById('agRegras').value.trim();
+    const regras = document.getElementById('agRules').value.trim();
     const btn = document.getElementById('btnSalvarAgente');
     const status = document.getElementById('agenteStatus');
 
@@ -1068,40 +1068,26 @@ async function ocSilentRefreshMessages(id) {
 }
 
 function renderBubble(m) {
-    let bubbleClass = '';
-    let label = '';
-    let bgColor = '';
-    let align = '';
-
-    if (m.remetente_tipo === 'user') {
-        bubbleClass = 'user';
-        bgColor = 'var(--bg-secondary)';
-        align = 'flex-start';
-        label = 'Cliente';
-    } else if (m.remetente_tipo === 'assistant' || m.remetente_tipo === 'bot') {
-        bubbleClass = 'assistant';
-        bgColor = 'rgba(255, 215, 0, 0.15)';
-        align = 'flex-end';
-        label = 'IA Assistente';
-    } else {
-        bubbleClass = 'human';
-        bgColor = 'var(--accent)';
-        align = 'flex-end';
-        label = 'Você';
-    }
-
     const isUser = m.remetente_tipo === 'user';
+    const isAI = m.remetente_tipo === 'assistant' || m.remetente_tipo === 'bot';
+    
+    let bgColor = isUser ? 'var(--bg-secondary)' : (isAI ? 'rgba(255, 215, 0, 0.15)' : 'var(--accent)');
+    let textColor = (isUser || isAI) ? 'var(--text-primary)' : 'var(--bg-primary)';
+    let align = isUser ? 'flex-start' : 'flex-end';
+    let label = isUser ? 'Cliente' : (isAI ? 'IA Assistente' : 'Você');
+    let radius = isUser ? '4px 16px 16px 16px' : '16px 4px 16px 16px';
+    let borderColor = isAI ? 'rgba(255,215,0,0.3)' : 'var(--border-color)';
 
     return `
-    <div style="display:flex; flex-direction:column; align-items:${align}; margin-bottom:16px; width:100%">
-        <div style="max-width:85%; padding:12px 16px; border-radius:${isUser ? '4px 16px 16px 16px' : '16px 4px 16px 16px'}; background:${bgColor}; border:1px solid ${isUser ? 'var(--border-color)' : 'rgba(255,215,0,0.2)'}; position:relative; box-shadow:var(--shadow-sm)">
-            <div style="font-size:10px; font-weight:700; margin-bottom:4px; opacity:0.6; color:${isUser ? 'var(--text-secondary)' : 'var(--accent-foreground)'}">
+    <div style="display:flex; flex-direction:column; align-items:${align}; margin-bottom:16px; width:100%; animation: fadeIn 0.2s ease">
+        <div style="max-width:85%; padding:12px 16px; border-radius:${radius}; background:${bgColor}; border:1px solid ${borderColor}; position:relative; box-shadow:var(--shadow-sm)">
+            <div style="font-size:10px; font-weight:800; margin-bottom:4px; opacity:0.6; color:${isUser ? 'var(--text-secondary)' : (isAI ? 'var(--accent)' : 'rgba(0,0,0,0.6)')}; text-transform:uppercase; letter-spacing:0.05em">
                 ${label}
             </div>
-            <div style="font-size:14px; color:${isUser ? 'var(--text-primary)' : 'var(--bg-primary)'}; line-height:1.5; word-break:break-word">
+            <div style="font-size:14px; color:${textColor}; line-height:1.5; word-break:break-word">
                 ${esc(m.conteudo).replace(/\n/g, '<br>')}
             </div>
-            <div style="font-size:10px; opacity:0.5; margin-top:4px; text-align:right; color:${isUser ? 'var(--text-secondary)' : 'var(--bg-primary)'}">
+            <div style="font-size:9px; opacity:0.5; margin-top:6px; text-align:right; color:${textColor}">
                 ${new Date(m.criado_em).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
             </div>
         </div>
@@ -1630,58 +1616,40 @@ async function renderEquipe() {
                     oninput="ocFilterGlobalList('searchEquipe', 'equipeListBody', 'tr')">
             </div>
         </div>
-        <div class="table-responsive">
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Usuário</th>
-                        <th>E-mail</th>
-                        <th>Cargo</th>
-                        <th>Membro desde</th>
-                        <th style="text-align:right">Ações</th>
-                    </tr>
-                </thead>
-                <tbody id="equipeListBody">
-                    ${users.map(u => `
-                    <tr>
-                        <td>
-                            <div style="display:flex;align-items:center;gap:10px">
-                                <div style="width:36px;height:36px;border-radius:50%;background:rgba(255, 215, 0, 0.1);border:1px solid rgba(197,160,89,0.2);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--accent);flex-shrink:0">
-                                    ${(u.nome || 'U').substring(0, 2).toUpperCase()}
-                                </div>
-                                <div>
-                                    <div style="font-weight:700;font-size:14px">${esc(u.nome)}</div>
-                                    <div style="font-size:11px;color:var(--text-secondary);margin-top:1px">${cargoIcon(u.cargo)}</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <span style="font-size:13px;color:var(--text-secondary)">${esc(u.email)}</span>
-                        </td>
-                        <td>
-                            <span class="badge ${cargoBadge(u.cargo)}">${esc(u.cargo)}</span>
-                        </td>
-                        <td style="font-size:12px;color:var(--text-secondary)">
-                            ${new Date(u.criado_em || Date.now()).toLocaleDateString('pt-BR')}
-                        </td>
-                        <td style="text-align:right">
-                            <div style="display:flex;gap:6px;justify-content:flex-end">
-                                <button class="btn btn-ghost" style="padding:5px 10px;font-size:12px"
-                                    onclick="editarUsuarioEquipe('${esc(u.id)}','${esc(u.nome)}','${esc(u.email)}','${esc(u.cargo)}')"
-                                    title="Editar">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button class="btn btn-danger" style="padding:5px 10px;font-size:12px"
-                                    onclick="removerUsuarioEquipe('${esc(u.id)}','${esc(u.nome)}')"
-                                    title="Remover">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>`).join('')}
-                </tbody>
-            </table>
-        </div>
+    <div id="equipeListBody" class="stats-grid">
+        ${users.map(u => `
+        <div class="card" style="display:flex; flex-direction:column; gap:16px; border:1px solid rgba(255,255,255,0.03); background:rgba(255,255,255,0.02); transition:transform 0.2s ease" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start">
+                <div style="display:flex; align-items:center; gap:12px">
+                    <div style="width:44px; height:44px; border-radius:12px; background:linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, rgba(212, 175, 55, 0.05) 100%); border:1px solid rgba(255,215,0,0.15); color:var(--accent); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:16px">
+                        ${(u.nome || 'U').substring(0, 2).toUpperCase()}
+                    </div>
+                    <div>
+                        <div style="font-weight:700; font-size:15px">${esc(u.nome)}</div>
+                        <div style="font-size:11px; color:var(--text-secondary)">${cargoIcon(u.cargo)} ${esc(u.cargo)}</div>
+                    </div>
+                </div>
+                <div class="badge ${cargoBadge(u.cargo)}" style="font-size:9px; letter-spacing:0.05em">${u.cargo.toUpperCase()}</div>
+            </div>
+            
+            <div style="background:var(--bg-primary); padding:12px; border-radius:10px; border:1px solid var(--border-color)">
+                <div style="font-size:10px; color:var(--text-secondary); text-transform:uppercase; margin-bottom:4px">E-mail de Acesso</div>
+                <div style="font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis">${esc(u.email)}</div>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:auto; padding-top:12px; border-top:1px solid var(--border-color)">
+                <div style="font-size:11px; color:var(--text-secondary)">Desde ${new Date(u.criado_em || Date.now()).toLocaleDateString('pt-BR')}</div>
+                <div style="display:flex; gap:6px">
+                    <button class="btn btn-ghost" style="width:32px; height:32px; padding:0" onclick="editarUsuarioEquipe('${esc(u.id)}','${esc(u.nome)}','${esc(u.email)}','${esc(u.cargo)}')" title="Editar">
+                        <i class="fas fa-edit" style="font-size:12px"></i>
+                    </button>
+                    <button class="btn btn-ghost" style="width:32px; height:32px; padding:0; color:var(--danger)" onclick="removerUsuarioEquipe('${esc(u.id)}','${esc(u.nome)}')" title="Remover">
+                        <i class="fas fa-trash-alt" style="font-size:12px"></i>
+                    </button>
+                </div>
+            </div>
+        </div>`).join('')}
+    </div>
     </div>
 
     <div class="card" style="background:rgba(255, 215, 0, 0.1);border-color:rgba(197,160,89,0.2);margin-top:0">
@@ -2054,19 +2022,61 @@ async function initLojas() {
     c.innerHTML = `
     <div class="page-wrapper">
         <div class="page-header">
-            <h1 class="page-title">Gestão de Leads (CRM)</h1>
-        </div>
-        <div class="page-body">
-            <div class="card">
-                <div class="card-title">Leads capturados e qualificados pela IA.</div>
-                <div class="empty-state" style="padding:48px; text-align:center">
-                    <div class="empty-icon" style="color:var(--accent); font-size: 48px; margin-bottom:16px"><i class="fas fa-users"></i></div>
-                    <h3>Módulo em Integração</h3>
-                    <p style="color:var(--text-secondary)">Estamos sincronizando os dados da tabela <code>contatos_crm</code> com o painel.</p>
-                </div>
+            <div>
+                <h1 class="page-title">Gestão de Leads (CRM)</h1>
+                <p class="text-muted">Acompanhe a qualificação dos seus leads em tempo real.</p>
+            </div>
+            <div class="page-actions">
+                <button class="btn btn-secondary" onclick="renderContatos()">
+                    <i class="fas fa-sync-alt"></i> Atualizar Leads
+                </button>
             </div>
         </div>
+        <div class="page-body">
+            <div id="crmLeadsList"><div class="spinner"></div></div>
+        </div>
     </div>`;
+    
+    // Chamada para carregar os leads
+    setTimeout(async () => {
+        const el = document.getElementById('crmLeadsList');
+        if (!el) return;
+        try {
+            const leads = await api.get('/cliente/leads/' + state.lojaId).catch(() => []);
+            if (!leads || !leads.length) {
+                el.innerHTML = `<div class="card" style="padding:64px; text-align:center">
+                    <div style="font-size:48px; opacity:0.1; margin-bottom:16px">👤</div>
+                    <h3>Nenhum lead capturado ainda</h3>
+                    <p class="text-muted">Divulgue seu link e a IA começará a qualificar seus contatos.</p>
+                </div>`;
+                return;
+            }
+            el.innerHTML = `<div class="stats-grid">
+                ${leads.map(l => `
+                <div class="card" style="border:1px solid rgba(255,255,255,0.03); background:rgba(255,255,255,0.02)">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px">
+                        <div style="display:flex; align-items:center; gap:12px">
+                            <div style="width:40px; height:40px; border-radius:50%; background:var(--bg-primary); display:flex; align-items:center; justify-content:center; border:1px solid var(--border-color); color:var(--accent)">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div>
+                                <div style="font-weight:700; font-size:14px">${esc(l.nome || l.numero_whatsapp)}</div>
+                                <div style="font-size:11px; color:var(--text-secondary)">ID: ${esc(l.numero_whatsapp)}</div>
+                            </div>
+                        </div>
+                        <div class="badge" style="background:rgba(255,215,0,0.1); color:var(--accent); font-size:9px">LEAD ATIVO</div>
+                    </div>
+                    <div style="background:var(--bg-primary); padding:10px; border-radius:8px; font-size:12px; margin-bottom:12px">
+                        <div style="color:var(--text-secondary); font-size:10px; text-transform:uppercase; margin-bottom:4px">Última Interação</div>
+                        <div>${new Date(l.updated_at || l.created_at).toLocaleString('pt-BR')}</div>
+                    </div>
+                    <button class="btn btn-secondary" style="width:100%; justify-content:center" onclick="state.selectedChat='${l.numero_whatsapp}'; navigate('conversas')">
+                        <i class="fas fa-comments"></i> Abrir Conversa
+                    </button>
+                </div>`).join('')}
+            </div>`;
+        } catch (e) { el.innerHTML = errMsg(e); }
+    }, 100);
 }
 
 async function renderCatalogo() {
@@ -2086,35 +2096,48 @@ async function renderCatalogo() {
                     </button>
                 </div>
             </div>
-                <div class="card" style="padding:0; overflow:hidden">
-                    <div style="overflow-x:auto">
-                        <table style="width:100%; border-collapse:collapse; font-size:14px">
-                            <thead>
-                                <tr style="border-bottom:1px solid var(--border-color); text-align:left; background:var(--bg-secondary)">
-                                    <th style="padding:16px; color:var(--sidebar-muted); font-size:11px; text-transform:uppercase">Produto / SKU</th>
-                                    <th style="padding:16px; color:var(--sidebar-muted); font-size:11px; text-transform:uppercase">Preço</th>
-                                    <th style="padding:16px; color:var(--sidebar-muted); font-size:11px; text-transform:uppercase; text-align:right">Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${produtos.map(p => `
-                                    <tr style="border-bottom:1px solid var(--border-color)">
-                                        <td style="padding:16px">
-                                            <div style="font-weight:600">${esc(p.nome_produto)}</div>
-                                            <div style="font-size:12px; color:var(--text-secondary)">${esc(p.sku || 'Sem SKU')}</div>
-                                        </td>
-                                        <td style="padding:16px; font-weight:700; color:var(--accent)">R$ ${Number(p.preco).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
-                                        <td style="padding:16px; text-align:right">
-                                            <button class="btn btn-ghost" onclick="openModalProduto('${p.id}')" title="Editar" style="width:32px; height:32px; padding:0"><i class="fas fa-edit"></i></button>
-                                            <button class="btn btn-ghost" style="color:var(--destructive); width:32px; height:32px; padding:0" onclick="deleteProduto('${p.id}')" title="Excluir"><i class="fas fa-trash"></i></button>
-                                        </td>
-                                    </tr>
-                                `).join('')}
-                                ${!produtos.length ? '<tr><td colspan="3" style="padding:48px; text-align:center; color:var(--text-secondary)">Nenhum produto cadastrado.</td></tr>' : ''}
-                            </tbody>
-                        </table>
+            <div class="stats-grid">
+                ${produtos.map(p => `
+                <div class="card" style="display:flex; flex-direction:column; gap:16px; border:1px solid rgba(255,255,255,0.03); background:rgba(255,255,255,0.02)">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start">
+                        <div style="display:flex; align-items:center; gap:12px">
+                            <div style="width:48px; height:48px; border-radius:12px; background:var(--bg-primary); border:1px solid var(--border-color); display:flex; align-items:center; justify-content:center; font-size:20px; color:var(--accent)">
+                                <i class="fas fa-box"></i>
+                            </div>
+                            <div style="min-width:0">
+                                <div style="font-weight:700; font-size:15px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis" title="${esc(p.nome_produto)}">${esc(p.nome_produto)}</div>
+                                <div style="font-size:11px; color:var(--text-secondary)">SKU: ${esc(p.sku || 'Sem SKU')}</div>
+                            </div>
+                        </div>
+                        <div style="font-weight:800; font-size:16px; color:var(--accent); font-family:'Space Grotesk',sans-serif">
+                            R$ ${Number(p.preco).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                        </div>
                     </div>
-                </div>
+                    
+                    <div style="flex:1; font-size:13px; color:var(--text-secondary); line-height:1.5; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden">
+                        ${esc(p.descricao || 'Nenhuma descrição fornecida.')}
+                    </div>
+
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding-top:12px; border-top:1px solid var(--border-color)">
+                        <div class="badge" style="background:${p.disponivel_para_ia ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)'}; color:${p.disponivel_para_ia ? 'var(--success)' : 'var(--danger)'}; font-size:9px">
+                            ${p.disponivel_para_ia ? 'IA ATIVA' : 'IA OFF'}
+                        </div>
+                        <div style="display:flex; gap:6px">
+                            <button class="btn btn-secondary" style="width:32px; height:32px; padding:0" onclick="openModalProduto('${p.id}')" title="Editar">
+                                <i class="fas fa-edit" style="font-size:12px"></i>
+                            </button>
+                            <button class="btn btn-ghost" style="width:32px; height:32px; padding:0; color:var(--danger)" onclick="deleteProduto('${p.id}')" title="Excluir">
+                                <i class="fas fa-trash-alt" style="font-size:12px"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>`).join('')}
+                ${!produtos.length ? `<div style="grid-column:1/-1; padding:64px; text-align:center; background:rgba(255,255,255,0.01); border-radius:16px; border:1px dashed var(--border-color)">
+                    <div style="font-size:48px; opacity:0.1; margin-bottom:16px">📦</div>
+                    <h3 style="margin-bottom:8px">Seu catálogo está vazio</h3>
+                    <p class="text-muted">Cadastre produtos para que a IA possa realizar vendas.</p>
+                </div>` : ''}
+            </div>
             </div>
         </div>`;
     } catch (e) { c.innerHTML = errMsg(e); }
@@ -2267,7 +2290,7 @@ async function init() {
 
     // 6. Rota inicial
     if (state.admin.logado || saved) {
-        const isAdmin = state.admin?.email === 'diegoasilvestre@live.com';
+        const isAdmin = state.admin?.isSuperAdmin === true;
         navigate(isAdmin ? 'clientes' : 'dashboard');
     }
 }
