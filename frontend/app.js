@@ -301,6 +301,9 @@ function navigate(page) {
     const titleEl = document.getElementById('pageTitle');
     if (titleEl) titleEl.textContent = TITLES[page] || page;
 
+    const topbarPage = document.getElementById('topbarCurrentPage');
+    if (topbarPage) topbarPage.textContent = TITLES[page] || page;
+
     const content = document.getElementById('pageContent');
     if (content) content.innerHTML = '<div class="spinner"></div>';
 
