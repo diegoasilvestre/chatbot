@@ -325,12 +325,16 @@ h4,
     background: rgba(239, 68, 68, 0.1);
 }
 
-.topbar h1 {
+#pageTitle {
     font-family: 'Space Grotesk', sans-serif;
-    font-size: 24px;
-    font-weight: 700;
+    font-size: 16px !important;
+    font-weight: 600;
     color: var(--foreground);
     letter-spacing: -0.04em;
+    max-width: 50% !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .topbar-right {
@@ -1622,7 +1626,7 @@ h4,
         max-width: 100% !important;
     }
 
-    /* Topbar Layout */
+    /* Topbar Layout & Título */
     .topbar {
         height: 64px;
         padding: 0 16px;
@@ -1635,6 +1639,11 @@ h4,
         align-items: center !important;
         justify-content: space-between !important;
         gap: 10px;
+    }
+
+    #pageTitle {
+        font-size: 13px !important;
+        max-width: 45% !important;
     }
 
     .topbar-right {
