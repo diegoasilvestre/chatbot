@@ -106,25 +106,20 @@
             </div>
         </aside>
 
+        <div class="main-content">
             <header class="topbar">
-                <div style="display:flex; align-items:center; gap:12px">
-                    <button class="btn-ghost" id="mobileMenuBtn" onclick="toggleSidebar()" style="display:none; padding:8px; font-size:18px"><i class="fas fa-bars"></i></button>
-                    <button class="btn-ghost" onclick="openGlobalSearch()" style="padding:8px; font-size:16px; color:var(--text-secondary)"><i class="fas fa-search"></i></button>
-                    <div id="pageBreadcrumb" style="font-size:13px; font-weight:500; color:var(--text-secondary)">
-                        Painel <i class="fas fa-chevron-right" style="font-size:10px; margin:0 8px"></i> <span id="topbarCurrentPage" style="color:var(--text-primary)">Dashboard</span>
-                    </div>
+                <div id="pageBreadcrumb" style="font-size:13px; font-weight:500; color:var(--text-secondary)">
+                    Painel <i class="fas fa-chevron-right" style="font-size:10px; margin:0 8px"></i> <span id="topbarCurrentPage" style="color:var(--text-primary)">Dashboard</span>
                 </div>
-                <style>@media(max-width:768px){ #mobileMenuBtn{display:block !important;} #pageBreadcrumb{font-size:12px;} }</style>
 
-                <div class="topbar-right" style="display:flex; align-items:center; gap:16px">
-                    <div class="server-status" id="serverStatus" style="display:flex; align-items:center; gap:6px; font-size:10px; font-weight:700; color:var(--success)">
-                        <div style="width:6px; height:6px; background:var(--success); border-radius:50%"></div>
-                        <span class="desktop-only">Conectado</span>
+                <div class="topbar-right" style="display:flex; align-items:center; gap:20px">
+                    <div class="server-status" style="display:flex; align-items:center; gap:8px; font-size:11px; font-weight:700; color:var(--success)">
+                        <div style="width:6px; height:6px; background:var(--success); border-radius:50%; box-shadow:0 0 8px var(--success)"></div>
+                        Conectado
                     </div>
-                    <span id="lojaNameTopbar" class="topbar-loja-name" style="font-size:11px; font-weight:600; color:var(--accent); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:80px">WavePod</span>
-                    <div class="avatar" id="topbarAvatar" style="width:28px; height:28px; background:var(--bg-secondary); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700">AD</div>
+                    <span id="lojaNameTopbar" class="topbar-loja-name" style="font-size:12px; font-weight:600; color:var(--accent)">WavePod</span>
+                    <div class="avatar" id="topbarAvatar" style="width:32px; height:32px; background:var(--bg-secondary); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700">AD</div>
                 </div>
-                <style>@media(max-width:768px){ .desktop-only{display:none;} .topbar-right{gap:10px;} }</style>
             </header>
 
             <div class="page-content" id="pageContent" style="flex:1; overflow-y:auto">
@@ -145,19 +140,7 @@
     <div class="modal-overlay" id="modalOverlay">
         <div class="modal" id="modalContent"></div>
     </div>
-    <!-- ══ GLOBAL SEARCH MODAL ════════════════════════════════════════════════════ -->
-    <div class="search-overlay" id="searchOverlay" onclick="if(event.target==this)closeGlobalSearch()">
-        <div class="search-modal">
-            <div class="search-header">
-                <i class="fas fa-search"></i>
-                <input type="text" id="globalSearchInput" placeholder="O que você está buscando?" oninput="handleGlobalSearch(this.value)" autocomplete="off">
-                <div class="search-esc-hint">ESC</div>
-            </div>
-            <div class="search-results" id="globalSearchResults">
-                <!-- Resultados via JS -->
-            </div>
-        </div>
-    </div>
+    <div class="toast-container" id="toastContainer"></div>
 
     <script src="app.js?v=20.0"></script>
 </body>
