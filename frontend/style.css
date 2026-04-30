@@ -1538,7 +1538,7 @@ h4,
         display: none !important;
     }
 
-    /* Menu Inferior - Totalmente Isolado e Fixo */
+    /* Menu Inferior - Premium & Safe Area */
     .bottom-nav {
         display: flex !important;
         position: fixed !important;
@@ -1546,13 +1546,14 @@ h4,
         left: 0 !important;
         right: 0 !important;
         height: 70px !important;
-        background: #111827 !important;
+        background: #0d1117 !important;
         border-top: 1px solid rgba(255, 255, 255, 0.05);
         z-index: 9999 !important;
         width: 100% !important;
         justify-content: space-around;
         align-items: center;
-        padding-bottom: env(safe-area-inset-bottom, 0);
+        padding-bottom: env(safe-area-inset-bottom, 0) !important;
+        box-sizing: content-box !important;
     }
 
     .bottom-nav .nav-item {
@@ -1580,16 +1581,29 @@ h4,
     .main-content {
         margin-left: 0 !important;
         width: 100% !important;
-        max-width: 100% !important;
         min-height: 100dvh;
-        padding-bottom: 70px; /* Espaço para o menu fixo */
+        padding-bottom: 80px;
     }
 
     .page-content {
         padding: 16px !important;
-        padding-bottom: 90px !important; /* Respiro extra */
+        padding-bottom: 100px !important;
         width: 100% !important;
         box-sizing: border-box;
+        overflow-y: auto !important;
+    }
+
+    /* WhatsApp - Sem Cortes */
+    .whatsapp-layout {
+        height: auto !important;
+        min-height: 100% !important;
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+    }
+
+    .page-content:has(.whatsapp-layout) {
+        overflow: visible !important;
     }
 
     /* Topbar */
@@ -1599,7 +1613,7 @@ h4,
         position: sticky;
         top: 0;
         z-index: 1000;
-        background: rgba(17, 24, 39, 0.8);
+        background: rgba(13, 17, 23, 0.95);
         backdrop-filter: blur(12px);
     }
 
@@ -1608,14 +1622,6 @@ h4,
         font-weight: 700;
         font-size: 18px;
         letter-spacing: -0.02em;
-    }
-
-    /* Fullscreen Components (Omnichat / WhatsApp) */
-    .page-content:has(.omnichat-layout),
-    .page-content:has(.whatsapp-layout) {
-        padding: 0 !important;
-        height: calc(100dvh - 64px);
-        overflow: hidden !important;
     }
 
     /* Omnichat - Navegação Simples */
@@ -1637,7 +1643,7 @@ h4,
         display: none !important;
         width: 100% !important;
         height: 100% !important;
-        min-height: calc(100dvh - 134px) !important; /* Compensa Topbar + Menu */
+        min-height: calc(100dvh - 134px) !important;
         flex-direction: column;
     }
 
@@ -1665,7 +1671,7 @@ h4,
         font-size: 16px !important;
     }
 
-    /* Sidebar mobile (Off-canvas) */
+    /* Sidebar Mobile (Menu Mais) - Premium Style */
     .mobile-sidebar {
         display: flex !important;
         position: fixed;
@@ -1673,11 +1679,12 @@ h4,
         right: -100%;
         width: 280px;
         height: 100dvh;
-        z-index: 10000; /* Acima do menu bottom */
-        transition: right 0.3s ease;
+        z-index: 10000;
+        transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         flex-direction: column;
-        background: #1f2937;
-        padding: 30px 24px;
+        background: #0d1117;
+        padding: 24px 20px;
+        border-left: 1px solid rgba(255, 255, 255, 0.05);
     }
 
     .mobile-sidebar.active {
@@ -1697,16 +1704,77 @@ h4,
         display: block;
     }
 
-    /* Componentes */
-    .stats-grid {
-        grid-template-columns: 1fr !important;
-        gap: 16px;
+    .mobile-nav-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     }
 
-    .card {
+    .mobile-nav-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: #ffffff;
+    }
+
+    .mobile-nav-close {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.05);
+        color: #ffffff;
+        cursor: pointer;
+    }
+
+    .mobile-nav-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px;
+        border-radius: 10px;
+        font-size: 14px;
+        color: #e2e8f0;
+        text-decoration: none;
+        transition: 0.2s;
+        margin-bottom: 4px;
+    }
+
+    .mobile-nav-item:hover,
+    .mobile-nav-item.active {
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--primary);
+    }
+
+    .mobile-nav-item i {
+        width: 20px;
+        text-align: center;
+        color: var(--primary);
+        font-size: 18px;
+    }
+
+    /* Grids & Cards - Normalização Mobile */
+    .stats-grid,
+    .clientes-grid,
+    .cards-container {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        gap: 16px !important;
+        width: 100% !important;
+    }
+
+    .card,
+    .stat-card {
+        width: 100% !important;
+        max-width: 100% !important;
         padding: 20px !important;
-        margin-bottom: 16px;
+        margin-bottom: 0; /* Espaço controlado pelo gap do grid */
         border-radius: 16px !important;
+        box-sizing: border-box !important;
     }
 
     .btn {
