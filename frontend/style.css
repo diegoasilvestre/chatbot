@@ -1531,6 +1531,8 @@ h4,
     html, body {
         overflow-x: hidden !important;
         position: relative;
+        height: auto !important;
+        min-height: 100% !important;
     }
 
     /* Layout geral */
@@ -1538,7 +1540,7 @@ h4,
         display: none !important;
     }
 
-    /* Menu Inferior - Premium & Safe Area */
+    /* Menu Inferior - Fixo & Safe Area */
     .bottom-nav {
         display: flex !important;
         position: fixed !important;
@@ -1553,7 +1555,6 @@ h4,
         justify-content: space-around;
         align-items: center;
         padding-bottom: env(safe-area-inset-bottom, 0) !important;
-        box-sizing: content-box !important;
     }
 
     .bottom-nav .nav-item {
@@ -1566,7 +1567,6 @@ h4,
         gap: 4px;
         color: #94a3b8;
         text-decoration: none;
-        height: 100%;
         justify-content: center;
     }
 
@@ -1581,6 +1581,7 @@ h4,
     .main-content {
         margin-left: 0 !important;
         width: 100% !important;
+        height: auto !important;
         min-height: 100dvh;
         padding-bottom: 80px;
     }
@@ -1589,24 +1590,26 @@ h4,
         padding: 16px !important;
         padding-bottom: 100px !important;
         width: 100% !important;
-        box-sizing: border-box;
+        height: auto !important; /* Remoção de height fixo */
         overflow-y: auto !important;
+        overflow-x: hidden !important;
+        -webkit-overflow-scrolling: touch;
     }
 
-    /* WhatsApp - Sem Cortes */
-    .whatsapp-layout {
-        height: auto !important;
-        min-height: 100% !important;
+    /* Containers de Página (WhatsApp, Agent, Clientes) */
+    .whatsapp-layout,
+    .agente-layout,
+    .clientes-container,
+    .clientes-grid {
         display: flex;
         flex-direction: column;
-        overflow-y: auto;
-    }
-
-    .page-content:has(.whatsapp-layout) {
+        gap: 16px;
+        height: auto !important;
+        min-height: 100% !important;
         overflow: visible !important;
     }
 
-    /* Topbar */
+    /* Topbar Layout */
     .topbar {
         height: 64px;
         padding: 0 16px;
@@ -1615,35 +1618,39 @@ h4,
         z-index: 1000;
         background: rgba(13, 17, 23, 0.95);
         backdrop-filter: blur(12px);
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        gap: 10px;
     }
 
-    .topbar h1 {
-        font-family: 'Space Grotesk', sans-serif;
-        font-weight: 700;
-        font-size: 18px;
-        letter-spacing: -0.02em;
+    .topbar-right {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-shrink: 0;
     }
 
-    /* Omnichat - Navegação Simples */
+    /* Omnichat - Navegação Estável Sem Height Fixo */
     .omnichat-layout {
         display: flex;
         flex-direction: column;
         width: 100% !important;
-        height: 100% !important;
+        height: auto !important;
         transform: none !important;
     }
 
     .oc-sidebar-panel {
         display: flex !important;
         width: 100% !important;
+        height: auto !important;
     }
 
     .oc-chat-panel,
     .oc-crm-panel {
         display: none !important;
         width: 100% !important;
-        height: 100% !important;
-        min-height: calc(100dvh - 134px) !important;
+        height: auto !important;
         flex-direction: column;
     }
 
@@ -1656,8 +1663,8 @@ h4,
 
     .oc-messages-area {
         flex: 1 !important;
+        min-height: 300px;
         overflow-y: auto !important;
-        -webkit-overflow-scrolling: touch;
         padding: 16px !important;
     }
 
@@ -1667,11 +1674,7 @@ h4,
         padding-bottom: env(safe-area-inset-bottom, 12px) !important;
     }
 
-    .oc-composer textarea {
-        font-size: 16px !important;
-    }
-
-    /* Sidebar Mobile (Menu Mais) - Premium Style */
+    /* Sidebar Mobile (Menu Mais) */
     .mobile-sidebar {
         display: flex !important;
         position: fixed;
@@ -1704,33 +1707,6 @@ h4,
         display: block;
     }
 
-    .mobile-nav-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 24px;
-        padding-bottom: 16px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    }
-
-    .mobile-nav-title {
-        font-size: 16px;
-        font-weight: 600;
-        color: #ffffff;
-    }
-
-    .mobile-nav-close {
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: rgba(255, 255, 255, 0.05);
-        color: #ffffff;
-        cursor: pointer;
-    }
-
     .mobile-nav-item {
         display: flex;
         align-items: center;
@@ -1740,14 +1716,7 @@ h4,
         font-size: 14px;
         color: #e2e8f0;
         text-decoration: none;
-        transition: 0.2s;
         margin-bottom: 4px;
-    }
-
-    .mobile-nav-item:hover,
-    .mobile-nav-item.active {
-        background: rgba(255, 255, 255, 0.05);
-        color: var(--primary);
     }
 
     .mobile-nav-item i {
@@ -1757,7 +1726,7 @@ h4,
         font-size: 18px;
     }
 
-    /* Grids & Cards - Normalização Mobile */
+    /* Grids & Cards */
     .stats-grid,
     .clientes-grid,
     .cards-container {
@@ -1772,7 +1741,6 @@ h4,
         width: 100% !important;
         max-width: 100% !important;
         padding: 20px !important;
-        margin-bottom: 0; /* Espaço controlado pelo gap do grid */
         border-radius: 16px !important;
         box-sizing: border-box !important;
     }
