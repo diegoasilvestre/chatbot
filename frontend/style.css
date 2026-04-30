@@ -266,15 +266,16 @@ h1, h2, h3, h4, .brand-name, .card-title, .stat-value {
 }
 
 .sidebar {
-    width: 260px;
-    background: var(--sidebar-bg);
+    width: 270px;
+    background: rgba(9, 9, 11, 0.8);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     border-right: 1px solid var(--sidebar-border);
     display: flex;
     flex-direction: column;
     position: fixed;
     top: 0; left: 0; bottom: 0;
     z-index: 100;
-    overflow-y: auto;
 }
 
 .main-content {
@@ -314,9 +315,11 @@ h1, h2, h3, h4, .brand-name, .card-title, .stat-value {
     justify-content: space-between;
     align-items: center;
     gap: 12px;
-    padding: 16px 24px;
+    padding: 24px 32px;
     border-bottom: 1px solid var(--border);
-    background: var(--card);
+    background: rgba(17, 24, 39, 0.4);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     position: sticky;
     top: 0;
     z-index: 10;
@@ -324,8 +327,27 @@ h1, h2, h3, h4, .brand-name, .card-title, .stat-value {
 
 .page-body {
     flex: 1;
-    padding: 24px;
+    padding: 32px;
     overflow-y: auto;
+    position: relative;
+    z-index: 5;
+}
+
+.card {
+    background: rgba(24, 24, 27, 0.6);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    box-shadow: var(--shadow-md);
+    transition: var(--transition);
+}
+
+.card:hover {
+    border-color: rgba(255, 215, 0, 0.15);
+    background: rgba(24, 24, 27, 0.8);
+    transform: translateY(-2px);
 }
 
 /* ══ SIDEBAR COMPONENTS ══════════════════════════════════════════════════════ */
@@ -376,8 +398,9 @@ h1, h2, h3, h4, .brand-name, .card-title, .stat-value {
 }
 
 .nav-item.active {
-    background: var(--accent);
+    background: linear-gradient(135deg, var(--accent) 0%, #D4AF37 100%);
     color: var(--accent-foreground);
+    box-shadow: 0 4px 12px rgba(212, 175, 55, 0.15);
     font-weight: 600;
 }
 
@@ -394,26 +417,39 @@ h1, h2, h3, h4, .brand-name, .card-title, .stat-value {
 }
 
 .oc-bubble {
-    padding: 12px 16px;
-    border-radius: 12px;
-    font-size: 14px;
-    line-height: 1.5;
-    max-width: 80%;
+    padding: 14px 18px;
+    border-radius: 18px;
+    font-size: 14.5px;
+    line-height: 1.6;
+    max-width: 82%;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    position: relative;
+    animation: fadeIn 0.3s ease-out;
 }
 
 .oc-bubble.user {
     align-self: flex-start;
-    background: #27272a;
-    color: #fff;
-    border-bottom-left-radius: 2px;
+    background: #1e1e21;
+    color: #f4f4f5;
+    border-bottom-left-radius: 4px;
+    border: 1px solid rgba(255,255,255,0.03);
 }
 
 .oc-bubble.assistant {
     align-self: flex-end;
-    background: var(--accent);
-    color: var(--accent-foreground);
-    border-bottom-right-radius: 2px;
+    background: linear-gradient(135deg, var(--accent) 0%, #D4AF37 100%);
+    color: #000;
+    border-bottom-right-radius: 4px;
     font-weight: 500;
+    box-shadow: 0 4px 20px rgba(212, 175, 55, 0.2);
+}
+
+.oc-bubble .time {
+    font-size: 10px;
+    opacity: 0.5;
+    margin-top: 6px;
+    display: block;
+    text-align: right;
 }
 
 /* ══ MOBILE OPTIMIZATION ════════════════════════════════════════════════════ */

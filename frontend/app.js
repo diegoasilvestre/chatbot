@@ -797,40 +797,42 @@ async function renderConversas() {
     if (!state.lojaId) { c.innerHTML = noLojaMsg(); return; }
 
     c.innerHTML = `
-    <div class="omnichat-layout" id="omnichatLayout">
-        <!-- Coluna 1: Contatos -->
-        <div class="oc-sidebar-panel">
-            <div class="oc-panel-header">
-                <span class="oc-panel-title">Caixa de Conversas</span>
-                <div style="display:flex;align-items:center;gap:8px">
-                    <span class="oc-counter" id="ocBadge">0</span>
-                    <button class="sidebar-logout-btn" style="padding:4px" onclick="ocLoadContacts()" title="Atualizar">
-                        <i class="fas fa-sync-alt"></i>
-                    </button>
+    <div class="page-wrapper">
+        <div class="omnichat-layout" id="omnichatLayout" style="height: calc(100vh - 72px)">
+            <!-- Coluna 1: Contatos -->
+            <div class="oc-sidebar-panel">
+                <div class="oc-panel-header">
+                    <span class="oc-panel-title">Caixa de Conversas</span>
+                    <div style="display:flex;align-items:center;gap:8px">
+                        <span class="oc-counter" id="ocBadge">0</span>
+                        <button class="sidebar-logout-btn" style="padding:4px" onclick="ocLoadContacts()" title="Atualizar">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="oc-search-bar">
+                    <input class="oc-search-input" type="text" id="ocSearch" placeholder="Buscar..." oninput="ocFilterContacts(this.value)">
+                </div>
+                <div class="oc-contact-list" id="ocContactList">
+                    <div class="spinner" style="margin:24px auto"></div>
                 </div>
             </div>
-            <div class="oc-search-bar">
-                <input class="oc-search-input" type="text" id="ocSearch" placeholder="Buscar por nome ou número..." oninput="ocFilterContacts(this.value)">
-            </div>
-            <div class="oc-contact-list" id="ocContactList">
-                <div class="spinner" style="margin:24px auto"></div>
-            </div>
-        </div>
 
-        <!-- Coluna 2: Chat -->
-        <div class="oc-chat-panel" id="ocChatPanel">
-            <div class="empty-state" style="height:100%; display:flex; flex-direction:column; justify-content:center">
-                <div style="font-size:48px; opacity:0.1; margin-bottom:16px"><i class="fas fa-comment-dots"></i></div>
-                <h3 style="font-size:16px; color:var(--text-secondary)">Selecione uma conversa</h3>
-                <p style="font-size:12px; color:var(--sidebar-muted)">Clique em um contato na lateral para gerenciar o atendimento.</p>
+            <!-- Coluna 2: Chat -->
+            <div class="oc-chat-panel" id="ocChatPanel">
+                <div class="empty-state" style="height:100%; display:flex; flex-direction:column; justify-content:center">
+                    <div style="font-size:48px; opacity:0.1; margin-bottom:16px"><i class="fas fa-comment-dots"></i></div>
+                    <h3 style="font-size:16px; color:var(--text-secondary)">Selecione uma conversa</h3>
+                    <p style="font-size:12px; color:var(--sidebar-muted)">Gerencie o atendimento em tempo real.</p>
+                </div>
             </div>
-        </div>
 
-        <!-- Coluna 3: CRM Profile -->
-        <div class="oc-crm-panel" id="ocCrmPanel">
-            <div style="text-align:center; padding-top:40px; color:var(--sidebar-muted)">
-                <i class="fas fa-user-circle" style="font-size:48px; opacity:0.1; margin-bottom:12px"></i>
-                <div style="font-size:12px">Perfil do Lead</div>
+            <!-- Coluna 3: CRM Profile -->
+            <div class="oc-crm-panel" id="ocCrmPanel">
+                <div style="text-align:center; padding-top:40px; color:var(--sidebar-muted)">
+                    <i class="fas fa-user-circle" style="font-size:48px; opacity:0.1; margin-bottom:12px"></i>
+                    <div style="font-size:12px">Informações do Cliente</div>
+                </div>
             </div>
         </div>
     </div>`;
@@ -1274,10 +1276,17 @@ async function loadWAStatus() {
 
         if (wa.status === 'conectado') {
             card.innerHTML = `
-            <div class="wa-status-icon">📱</div>
-            <div style="font-size:20px;font-weight:700;color:var(--success);font-family:'Space Grotesk',sans-serif">Conectado!</div>
-            <div style="font-size:13px;color:var(--text-secondary);margin:8px 0">Número: ${esc(wa.numero)}</div>
-            <span class="badge badge-success" style="margin-top:4px">● Operante — IA respondendo</span>`;
+            <div style="padding:24px; background:rgba(16, 185, 129, 0.03); border-radius:16px; border:1px solid rgba(16, 185, 129, 0.1); display:flex; align-items:center; gap:24px">
+                <div class="wa-status-icon" style="font-size:32px; background:var(--bg-primary); width:72px; height:72px; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 0 30px rgba(16, 185, 129, 0.15); border:1px solid rgba(16, 185, 129, 0.2)">📱</div>
+                <div style="flex:1">
+                    <div style="font-size:22px; font-weight:700; color:var(--success); font-family:'Space Grotesk',sans-serif; letter-spacing:-0.02em">WhatsApp Conectado</div>
+                    <div style="font-size:14px; color:var(--text-secondary); margin:4px 0">Instância oficial ativa: <strong style="color:var(--text-primary)">${esc(wa.numero)}</strong></div>
+                    <div style="display:flex; align-items:center; gap:8px; margin-top:10px">
+                        <span class="badge" style="background:rgba(16, 185, 129, 0.1); color:var(--success); font-size:10px; border:1px solid rgba(16, 185, 129, 0.1)">● SISTEMA OPERANTE</span>
+                        <span class="badge" style="background:rgba(255, 215, 0, 0.1); color:var(--accent); font-size:10px; border:1px solid rgba(255, 215, 0, 0.1)">IA RAG ATIVA</span>
+                    </div>
+                </div>
+            </div>`;
             if (btnWA) btnWA.style.display = 'none';
             if (btnD) btnD.style.display = 'flex';
             if (pairingBox) pairingBox.style.display = 'none';
@@ -1373,18 +1382,18 @@ async function loadClientes() {
         el.innerHTML = `
         <div class="stats-grid">
             ${lojas.map(l => `
-            <div class="card" style="display:flex; flex-direction:column; gap:20px">
+            <div class="card" style="display:flex; flex-direction:column; gap:20px; border:1px solid rgba(255,255,255,0.03); background:rgba(255,255,255,0.02)">
                 <div style="display:flex; justify-content:space-between; align-items:flex-start">
                     <div style="display:flex; align-items:center; gap:16px">
-                        <div style="width:48px; height:48px; border-radius:12px; background:rgba(255, 215, 0, 0.1); border:1px solid rgba(255,215,0,0.2); color:var(--accent); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:18px">
+                        <div style="width:52px; height:52px; border-radius:14px; background:linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, rgba(212, 175, 55, 0.05) 100%); border:1px solid rgba(255,215,0,0.15); color:var(--accent); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:20px; box-shadow:0 4px 15px rgba(0,0,0,0.2)">
                             ${l.nome.substring(0, 1).toUpperCase()}
                         </div>
                         <div>
-                            <div style="font-weight:600; font-size:16px">${esc(l.nome)}</div>
-                            <div class="text-muted">Desde ${new Date(l.criado_em).toLocaleDateString('pt-BR')}</div>
+                            <div style="font-weight:700; font-size:17px; letter-spacing:-0.01em">${esc(l.nome)}</div>
+                            <div class="text-muted" style="font-size:12px">Ativo desde ${new Date(l.criado_em).toLocaleDateString('pt-BR')}</div>
                         </div>
                     </div>
-                    <div class="status-badge" style="background:${l.ativa ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)'}; color:${l.ativa ? 'var(--success)' : 'var(--danger)'}; border-color:${l.ativa ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)'}">
+                    <div class="status-badge" style="padding:4px 12px; font-size:10px; border-radius:20px; font-weight:700; background:${l.ativa ? 'rgba(16, 185, 129, 0.05)' : 'rgba(239, 68, 68, 0.05)'}; color:${l.ativa ? 'var(--success)' : 'var(--danger)'}; border:1px solid ${l.ativa ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)'}">
                         ${l.ativa ? 'ATIVO' : 'INATIVO'}
                     </div>
                 </div>
