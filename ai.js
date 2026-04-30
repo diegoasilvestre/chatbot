@@ -23,7 +23,7 @@ async function getCatalogo(numero_wa) {
             .eq('disponivel_para_ia', true);
 
         if (error || !data || data.length === 0) return 'Nenhum produto cadastrado no catálogo.';
-        
+
         return data.map(p => `- ${p.nome_produto}: R$ ${p.preco} (${p.descricao || 'Sem descrição'})`).join('\n');
     } catch (e) {
         console.error(`[CRM] Erro ao buscar catálogo: ${e.message}`);
@@ -90,9 +90,9 @@ function buildSystemPrompt(config, context, catalogo, isFirstMessage) {
     const persona = config.prompt_base || 'Você é um assistente virtual útil.';
     const tom = config.tom_voz || 'Profissional e educado';
     const regras = config.regras || 'Seja sempre cordial.';
-    
-    const saudacaoRegra = isFirstMessage 
-        ? `Inicie com uma saudação breve e pergunte como pode ajudar.` 
+
+    const saudacaoRegra = isFirstMessage
+        ? `Inicie com uma saudação breve e pergunte como pode ajudar.`
         : 'Vá direto ao ponto, evite saudações repetitivas.';
 
     return `Você é um consultor de vendas oficial da empresa "${empresa}".
@@ -131,7 +131,7 @@ async function callGroq(messages) {
             });
             const json = await res.json();
             if (res.ok && json.choices?.[0]?.message?.content) return json.choices[0].message.content;
-        } catch (e) {}
+        } catch (e) { }
     }
     return null;
 }
@@ -152,7 +152,7 @@ async function callGemini(messages) {
 async function generateResponse(userMessage, numero_wa, remoteJid, conversa_id) {
     try {
         console.log(`[AI] 🤖 Processando para ${numero_wa} | Cliente: ${remoteJid}`);
-        
+
         // 1. Busca Configurações
         const { data: config, error: configError } = await supabase.from('agentes_config').select('*').eq('numero_wa', numero_wa).maybeSingle();
         if (configError || !config) {
@@ -179,12 +179,12 @@ async function generateResponse(userMessage, numero_wa, remoteJid, conversa_id) 
             if (histError) throw histError;
 
             const isFirstMessage = !history || history.length <= 1;
-            
+
             messages = [
                 { role: 'system', content: buildSystemPrompt(config, context, catalogo, isFirstMessage) },
-                ...(history || []).reverse().map(m => ({ 
-                    role: m.remetente_tipo === 'user' ? 'user' : 'assistant', 
-                    content: m.conteudo 
+                ...(history || []).reverse().map(m => ({
+                    role: m.remetente_tipo === 'user' ? 'user' : 'assistant',
+                    content: m.conteudo
                 })),
                 { role: 'user', content: userMessage }
             ];
@@ -202,7 +202,7 @@ async function generateResponse(userMessage, numero_wa, remoteJid, conversa_id) 
             console.warn('[AI] Groq falhou, tentando Gemini...');
             response = await callGemini(messages);
         }
-        
+
         return response || "Desculpe, tive um problema ao processar sua resposta. Pode repetir?";
     } catch (e) {
         console.error(`[AI] 💥 Erro crítico em generateResponse: ${e.message}`);
@@ -263,7 +263,7 @@ async function scrapeAndSave(url, numero_wa, customTitle = null) {
         const embedding = await generateEmbedding(chunks[i]);
         await supabase.from('base_conhecimento').insert([{
             numero_wa, tipo_fonte: 'web_scraping',
-            titulo_fonte: `${titulo} (P${i+1})`,
+            titulo_fonte: `${titulo} (P${i + 1})`,
             conteudo: chunks[i], embedding, url_fonte: url
         }]);
     }

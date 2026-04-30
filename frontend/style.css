@@ -13,14 +13,16 @@
     --muted-foreground: #94a3b8;
     --accent: #FFD700;
     --accent-foreground: #000000;
-    --border: rgba(148, 163, 184, 0.15); /* Silver-ish border */
+    --border: rgba(148, 163, 184, 0.15);
+    /* Silver-ish border */
     --sidebar-bg: #0d1117;
     --sidebar-border: rgba(148, 163, 184, 0.1);
     --sidebar-fg: #f8fafc;
     --sidebar-muted: #64748b;
     --input: rgba(255, 255, 255, 0.04);
     --ring: #FFD700;
-    --radius: 8px; /* Precise, Senior rounding */
+    --radius: 8px;
+    /* Precise, Senior rounding */
     --radius-sm: 6px;
     --shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
     --primary-gradient: linear-gradient(135deg, #FFD700 0%, #D4AF37 100%);
@@ -45,15 +47,22 @@ body {
     min-height: 100vh;
 }
 
-h1, h2, h3, h4, .brand-name, .card-title, .stat-value {
+h1,
+h2,
+h3,
+h4,
+.brand-name,
+.card-title,
+.stat-value {
     font-family: 'Space Grotesk', sans-serif;
 }
 
 /* ══ IMMERSIVE MESH BACKGROUND (SENIOR EDITION) ════════════════════════════ */
-.login-screen, .app-layout {
+.login-screen,
+.app-layout {
     min-height: 100vh;
     background-color: #050505;
-    background-image: 
+    background-image:
         radial-gradient(circle at 0% 0%, rgba(212, 175, 55, 0.07) 0%, transparent 35%),
         radial-gradient(circle at 100% 0%, rgba(148, 163, 184, 0.05) 0%, transparent 35%),
         radial-gradient(circle at 50% 50%, rgba(17, 24, 39, 1) 0%, #050505 100%);
@@ -61,7 +70,8 @@ h1, h2, h3, h4, .brand-name, .card-title, .stat-value {
     overflow-x: hidden;
 }
 
-.login-screen::before, .app-layout::before {
+.login-screen::before,
+.app-layout::before {
     content: '';
     position: absolute;
     inset: 0;
@@ -74,7 +84,7 @@ h1, h2, h3, h4, .brand-name, .card-title, .stat-value {
 .login-bg-grid {
     position: absolute;
     inset: 0;
-    background-image: 
+    background-image:
         linear-gradient(rgba(255, 255, 255, 0.01) 1px, transparent 1px),
         linear-gradient(90deg, rgba(255, 255, 255, 0.01) 1px, transparent 1px);
     background-size: 40px 40px;
@@ -352,13 +362,16 @@ h1, h2, h3, h4, .brand-name, .card-title, .stat-value {
     width: 4px;
     height: 4px;
 }
+
 ::-webkit-scrollbar-track {
     background: transparent;
 }
+
 ::-webkit-scrollbar-thumb {
     background: rgba(255, 255, 255, 0.05);
     border-radius: 10px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
     background: var(--primary-glow);
 }
@@ -370,7 +383,9 @@ h1, h2, h3, h4, .brand-name, .card-title, .stat-value {
     display: none;
 }
 
-.sidebar, .oc-contact-list, .oc-crm-panel {
+.sidebar,
+.oc-contact-list,
+.oc-crm-panel {
     scrollbar-width: none;
     -ms-overflow-style: none;
 }
@@ -382,14 +397,16 @@ h1, h2, h3, h4, .brand-name, .card-title, .stat-value {
     animation: fadeIn 0.3s ease;
     display: flex;
     flex-direction: column;
-    overflow: hidden; /* Important for inner scrolls */
+    overflow: hidden;
+    /* Important for inner scrolls */
 }
 
 /* Fix for full-screen components like Omnichat */
-.page-content:has(.omnichat-layout), 
+.page-content:has(.omnichat-layout),
 .page-content:has(.whatsapp-layout) {
     padding: 0 !important;
-    height: calc(100vh - 72px); /* Subtract topbar height */
+    height: calc(100dvh - 72px);
+    overflow: hidden;
 }
 
 @keyframes fadeIn {
@@ -397,6 +414,7 @@ h1, h2, h3, h4, .brand-name, .card-title, .stat-value {
         opacity: 0;
         transform: translateY(8px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -705,7 +723,11 @@ h1, h2, h3, h4, .brand-name, .card-title, .stat-value {
 }
 
 /* ══ GRIDS ══════════════════════════════════════════════════════════════════ */
-.agente-grid, .rag-grid, .scraping-grid, .whatsapp-grid, .form-grid {
+.agente-grid,
+.rag-grid,
+.scraping-grid,
+.whatsapp-grid,
+.form-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 24px;
@@ -928,7 +950,7 @@ h1, h2, h3, h4, .brand-name, .card-title, .stat-value {
     max-width: 520px;
     box-shadow: var(--shadow-lg);
     animation: fadeIn 0.18s ease;
-    max-height: 90vh;
+    max-height: 90dvh;
     overflow-y: auto;
 }
 
@@ -1037,17 +1059,17 @@ h1, h2, h3, h4, .brand-name, .card-title, .stat-value {
     color: #dc2626;
 }
 
-/* ══ OMNICHAT ═══════════════════════════════════════════════════════════════ */
-.omnichat-layout {
-    display: flex;
-    height: 100%;
-    width: 100%;
-    background: var(--background);
+/* ══ OMNICHAT / FULLSCREEN FIX ═══════════════════════════════════════ */
+.page-content:has(.omnichat-layout),
+.page-content:has(.whatsapp-layout) {
+    padding: 0 !important;
+    height: calc(100dvh - 72px);
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
 
 .oc-sidebar-panel {
-    width: 320px;
     border-right: 1px solid var(--border);
     display: flex;
     flex-direction: column;
@@ -1059,8 +1081,9 @@ h1, h2, h3, h4, .brand-name, .card-title, .stat-value {
     flex: 1;
     display: flex;
     flex-direction: column;
-    background: var(--background);
-    border-right: 1px solid var(--border);
+    overflow: hidden;
+    height: 100%;
+    background: transparent;
 }
 
 .oc-crm-panel {
@@ -1073,16 +1096,69 @@ h1, h2, h3, h4, .brand-name, .card-title, .stat-value {
 }
 
 /* CRM Components */
-.crm-section { margin-bottom: 24px; }
-.crm-label { font-size: 11px; text-transform: uppercase; color: var(--sidebar-muted); font-weight: 700; margin-bottom: 8px; letter-spacing: 0.05em; }
-.crm-value { font-size: 14px; font-weight: 600; color: var(--foreground); }
-.crm-memory-box { background: var(--muted); border-radius: 12px; padding: 16px; font-size: 13px; color: var(--muted-foreground); line-height: 1.5; border: 1px solid var(--border); }
-.crm-score-badge { display: inline-block; padding: 4px 12px; border-radius: 100px; background: var(--primary-glow); color: var(--primary); font-weight: 700; font-size: 12px; }
+.crm-section {
+    margin-bottom: 24px;
+}
+
+.crm-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    color: var(--sidebar-muted);
+    font-weight: 700;
+    margin-bottom: 8px;
+    letter-spacing: 0.05em;
+}
+
+.crm-value {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--foreground);
+}
+
+.crm-memory-box {
+    background: var(--muted);
+    border-radius: 12px;
+    padding: 16px;
+    font-size: 13px;
+    color: var(--muted-foreground);
+    line-height: 1.5;
+    border: 1px solid var(--border);
+}
+
+.crm-score-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 100px;
+    background: var(--primary-glow);
+    color: var(--primary);
+    font-weight: 700;
+    font-size: 12px;
+}
 
 /* Quick Actions */
-.oc-quick-actions { display: flex; gap: 8px; padding: 8px 16px; background: var(--card); border-top: 1px solid var(--border); }
-.btn-quick { padding: 6px 12px; font-size: 11px; border-radius: 8px; background: var(--secondary); color: var(--foreground); border: 1px solid var(--border); cursor: pointer; transition: 0.2s; }
-.btn-quick:hover { background: var(--primary-glow); border-color: var(--primary); }
+.oc-quick-actions {
+    display: flex;
+    gap: 8px;
+    padding: 8px 16px;
+    background: var(--card);
+    border-top: 1px solid var(--border);
+}
+
+.btn-quick {
+    padding: 6px 12px;
+    font-size: 11px;
+    border-radius: 8px;
+    background: var(--secondary);
+    color: var(--foreground);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-quick:hover {
+    background: var(--primary-glow);
+    border-color: var(--primary);
+}
 
 .oc-panel-header {
     padding: 16px 18px;
@@ -1227,19 +1303,15 @@ h1, h2, h3, h4, .brand-name, .card-title, .stat-value {
 }
 
 /* Chat panel */
-.oc-chat-panel {
-    display: flex;
-    flex-direction: column;
-    background: var(--background);
-    overflow: hidden;
-}
+
 
 /* ══ OMNICHAT: FIXING SCROLL & BACKGROUND (v18.0) ═══════════════════════════ */
 .omnichat-layout {
-    display: flex;
-    height: calc(100vh - 72px) !important; /* Forces layout to viewport height */
+    display: grid;
+    grid-template-columns: 320px 1fr 320px;
+    height: calc(100vh - 72px);
     width: 100%;
-    overflow: hidden !important;
+    overflow: hidden;
     background: #0b0b0c;
 }
 
@@ -1247,9 +1319,9 @@ h1, h2, h3, h4, .brand-name, .card-title, .stat-value {
     flex: 1;
     display: flex;
     flex-direction: column;
-    background: transparent;
     overflow: hidden;
     height: 100%;
+    background: transparent;
 }
 
 .oc-messages-area {
@@ -1288,7 +1360,8 @@ h1, h2, h3, h4, .brand-name, .card-title, .stat-value {
     align-self: flex-start;
 }
 
-.oc-msg-row.assistant, .oc-msg-row.human {
+.oc-msg-row.assistant,
+.oc-msg-row.human {
     align-self: flex-end;
 }
 
@@ -1298,14 +1371,14 @@ h1, h2, h3, h4, .brand-name, .card-title, .stat-value {
     font-size: 14px;
     line-height: 1.5;
     position: relative;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 .oc-bubble.user {
     background: #27272a;
     color: #ffffff;
     border-bottom-left-radius: 2px;
-    border: 1px solid rgba(255,255,255,0.05);
+    border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .oc-bubble.assistant {
@@ -1328,7 +1401,8 @@ h1, h2, h3, h4, .brand-name, .card-title, .stat-value {
     font-weight: 500;
 }
 
-.oc-msg-row.assistant .oc-msg-time, .oc-msg-row.human .oc-msg-time {
+.oc-msg-row.assistant .oc-msg-time,
+.oc-msg-row.human .oc-msg-time {
     text-align: right;
 }
 
@@ -1354,7 +1428,8 @@ h1, h2, h3, h4, .brand-name, .card-title, .stat-value {
 }
 
 .oc-back-btn {
-    display: none; /* Hidden on desktop */
+    display: none;
+    /* Hidden on desktop */
 }
 
 .oc-chat-header-info {
@@ -1431,88 +1506,42 @@ h1, h2, h3, h4, .brand-name, .card-title, .stat-value {
 }
 
 /* ══ MOBILE OVERLAYS (HIDDEN ON DESKTOP) ══════════════════════════════════ */
-.mobile-sidebar, 
+.mobile-sidebar,
 .mobile-sidebar-overlay,
 .bottom-nav {
     display: none;
 }
 
-/* ══ RESPONSIVE (MOBILE FIRST OVERHAUL) ══════════════════════════════════════ */
-
 /* ══ MOBILE RESPONSIVENESS (OFF-CANVAS & CLEANUP) ═══════════════════════════ */
 @media (max-width: 768px) {
-    :root {
-        --sidebar-width: 0px; 
-    }
-
-    .bottom-nav {
-        display: flex !important;
-    }
-
-    /* Blindagem Desktop: Garante que o menu principal suma APENAS no mobile */
-    .sidebar {
-        display: none !important;
-    }
-
-    .main-content {
-        margin-left: 0 !important;
-        padding-bottom: 80px; 
-    }
-
     .topbar {
-        padding: 0 16px;
-        height: 64px;
-        position: sticky;
-        top: 0;
         background: rgba(17, 24, 39, 0.8);
         backdrop-filter: blur(12px);
     }
 
     .topbar h1 {
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 700;
         font-size: 18px;
+        letter-spacing: -0.02em;
     }
 
-    .page-content {
-        padding: 16px !important;
-    }
-
-    /* Mobile Sidebar (Off-canvas) - Fundo Cinza Técnico */
     .mobile-sidebar {
-        display: flex !important; /* Overrides global none */
-        position: fixed;
-        top: 0;
-        right: -300px;
-        width: 300px;
-        height: 100vh;
-        background: #2a2a2a; 
-        z-index: 2001;
-        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        background: #2a2a2a;
         padding: 30px 24px;
-        flex-direction: column;
         border-left: 1px solid rgba(255, 255, 255, 0.05);
     }
 
     .mobile-sidebar-overlay {
-        position: fixed;
-        inset: 0;
         background: rgba(0, 0, 0, 0.85);
         backdrop-filter: blur(8px);
-        z-index: 2000;
-        display: none;
         animation: fadeIn 0.2s ease;
     }
 
-    .mobile-sidebar.active {
-        transform: translateX(-300px);
-    }
-
     .mobile-nav-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 40px;
         border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         padding-bottom: 20px;
+        margin-bottom: 40px;
     }
 
     .mobile-nav-title {
@@ -1527,6 +1556,144 @@ h1, h2, h3, h4, .brand-name, .card-title, .stat-value {
         background: rgba(255, 255, 255, 0.05);
         border: 1px solid rgba(255, 255, 255, 0.1);
         color: #ffffff;
+    }
+
+    .mobile-nav-item {
+        color: #e2e8f0;
+        text-decoration: none;
+        font-weight: 500;
+        transition: 0.2s;
+        background: rgba(255, 255, 255, 0.02);
+    }
+
+    .mobile-nav-item i {
+        font-size: 18px;
+        color: var(--primary);
+    }
+
+    .mobile-nav-item.active {
+        background: rgba(255, 215, 0, 0.08);
+        color: var(--primary);
+        border: 1px solid rgba(255, 215, 0, 0.15);
+    }
+
+    .card {
+        border-radius: 16px !important;
+    }
+
+    .btn {
+        font-weight: 700;
+    }
+@media (max-width: 768px) {
+    :root {
+        --sidebar-width: 0px;
+    }
+
+    /* Layout geral */
+    .sidebar {
+        display: none !important;
+    }
+
+    .bottom-nav {
+        display: flex !important;
+    }
+
+    .main-content {
+        margin-left: 0 !important;
+        padding-bottom: 80px;
+    }
+
+    .page-content {
+        padding: 16px !important;
+        overflow-x: hidden;
+    }
+
+    /* Fullscreen (Omnichat / WhatsApp) */
+    .page-content:has(.omnichat-layout),
+    .page-content:has(.whatsapp-layout) {
+        height: auto;
+        min-height: calc(100dvh - 64px);
+        padding-bottom: 80px;
+        overflow: visible;
+    }
+
+    /* Omnichat */
+    .omnichat-layout {
+        display: flex;
+        width: 300%;
+        transform: translateX(0%);
+        transition: transform 0.3s ease;
+        height: 100% !important;
+    }
+
+    .omnichat-layout.chat-open {
+        transform: translateX(-100%);
+    }
+
+    .omnichat-layout.crm-open {
+        transform: translateX(-200%);
+    }
+
+    .oc-sidebar-panel,
+    .oc-chat-panel,
+    .oc-crm-panel {
+        width: 100%;
+        flex-shrink: 0;
+    }
+
+    .oc-chat-panel {
+        height: 100%;
+    }
+
+    /* Chat UX */
+    .oc-back-btn {
+        display: block;
+    }
+
+    /* Topbar */
+    .topbar {
+        height: 64px;
+        padding: 0 16px;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+    }
+
+    /* Sidebar mobile (Off-canvas) */
+    .mobile-sidebar {
+        display: flex !important;
+        position: fixed;
+        top: 0;
+        right: -300px;
+        width: 300px;
+        height: 100dvh;
+        z-index: 2001;
+        transition: right 0.3s ease;
+        flex-direction: column;
+    }
+
+    .mobile-sidebar.active {
+        right: 0;
+    }
+
+    .mobile-sidebar-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 2000;
+        display: none;
+    }
+
+    .mobile-sidebar-overlay.active {
+        display: block;
+    }
+
+    .mobile-nav-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .mobile-nav-close {
         width: 36px;
         height: 36px;
         border-radius: 50%;
@@ -1541,26 +1708,13 @@ h1, h2, h3, h4, .brand-name, .card-title, .stat-value {
         align-items: center;
         gap: 14px;
         padding: 16px;
-        color: #e2e8f0; /* Prata/Silver */
-        text-decoration: none;
         border-radius: 12px;
         margin-bottom: 10px;
-        font-weight: 500;
-        transition: 0.2s;
-        background: rgba(255, 255, 255, 0.02);
     }
 
     .mobile-nav-item i {
         width: 20px;
         text-align: center;
-        font-size: 18px;
-        color: var(--primary);
-    }
-
-    .mobile-nav-item.active {
-        background: rgba(255, 215, 0, 0.08);
-        color: var(--primary);
-        border: 1px solid rgba(255, 215, 0, 0.15);
     }
 
     /* Layout Cleaning Mobile */
@@ -1571,18 +1725,11 @@ h1, h2, h3, h4, .brand-name, .card-title, .stat-value {
 
     .card {
         padding: 20px !important;
-        border-radius: 16px !important;
     }
 
     .btn {
         width: 100% !important;
         height: 48px !important;
         justify-content: center;
-        font-weight: 700;
-    }
-
-    /* Specific Chat Fix for Mobile */
-    .omnichat-layout {
-        height: calc(100vh - 134px) !important;
     }
 }

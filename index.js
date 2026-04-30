@@ -183,14 +183,14 @@ async function startWhatsApp(numero_wa, res = null) {
                     if (errContato) console.error(`[DB] Erro ao buscar contato: ${errContato.message}`);
 
                     if (!contato) {
-                        const { data: novo, error: errNovo } = await supabase.from('contatos_crm').insert([{ 
-                            numero_wa, 
-                            telefone_cliente: telefoneCliente, 
+                        const { data: novo, error: errNovo } = await supabase.from('contatos_crm').insert([{
+                            numero_wa,
+                            telefone_cliente: telefoneCliente,
                             nome: msg.pushName || telefoneCliente,
                             status: 'Lead',
                             ultima_interacao: new Date()
                         }]).select().single();
-                        
+
                         if (errNovo) {
                             console.error(`[DB] Erro ao criar contato: ${errNovo.message}`);
                             continue; // Não podemos prosseguir sem contato
@@ -210,10 +210,10 @@ async function startWhatsApp(numero_wa, res = null) {
                     if (errConv) console.error(`[DB] Erro ao buscar conversa: ${errConv.message}`);
 
                     if (!conversa) {
-                        const { data: nova, error: errNova } = await supabase.from('conversas').insert([{ 
-                            numero_wa, 
-                            contato_id: contato.id, 
-                            ia_ativa: true 
+                        const { data: nova, error: errNova } = await supabase.from('conversas').insert([{
+                            numero_wa,
+                            contato_id: contato.id,
+                            ia_ativa: true
                         }]).select().single();
 
                         if (errNova) {
@@ -228,19 +228,19 @@ async function startWhatsApp(numero_wa, res = null) {
                         continue;
                     }
 
-                    const { error: errMsg } = await supabase.from('mensagens').insert([{ 
-                        conversa_id: conversa.id, 
-                        remetente_tipo: 'user', 
-                        conteudo: textMessage 
+                    const { error: errMsg } = await supabase.from('mensagens').insert([{
+                        conversa_id: conversa.id,
+                        remetente_tipo: 'user',
+                        conteudo: textMessage
                     }]);
                     if (errMsg) console.error(`[DB] Erro ao salvar mensagem do usuário: ${errMsg.message}`);
 
                     if (conversa.ia_ativa) {
                         console.log(`[AI] 🧠 Gerando resposta para ${telefoneCliente}...`);
-                        
+
                         try {
                             const aiReply = await generateResponse(textMessage, numero_wa, remoteJid, conversa.id);
-                            
+
                             // Limpeza de tags
                             const handoffTriggered = aiReply.includes('[CHAMAR_HUMANO]');
                             const mensagemLimpa = aiReply.replace(/\[CHAMAR_HUMANO\]/g, '').trim();
@@ -256,10 +256,10 @@ async function startWhatsApp(numero_wa, res = null) {
                             }
 
                             // Registro no banco
-                            await supabase.from('mensagens').insert([{ 
-                                conversa_id: conversa.id, 
-                                remetente_tipo: 'humano', 
-                                conteudo: mensagemLimpa 
+                            await supabase.from('mensagens').insert([{
+                                conversa_id: conversa.id,
+                                remetente_tipo: 'humano',
+                                conteudo: mensagemLimpa
                             }]);
 
                             if (handoffTriggered) {
@@ -288,7 +288,7 @@ app.post('/auth/login', async (req, res) => {
     const { email, password } = req.body;
     try {
         const isAdmin = ['admin@robotibr.com.br', 'diegossilvestre@live.com', 'diegoasilvestre@live.com'].includes(email);
-        
+
         // 1. Tenta buscar na nova tabela de usuários
         const { data: user, error: userError } = await supabase
             .from('usuarios')
@@ -301,16 +301,16 @@ app.post('/auth/login', async (req, res) => {
             if (match) {
                 // Atualiza último login (sem travar se der erro)
                 supabase.from('usuarios').update({ ultimo_login: new Date() }).eq('id', user.id).then();
-                
-                return res.json({ 
-                    user: { 
-                        email, 
-                        nome: user.nome, 
-                        numero_wa: user.loja_id, 
+
+                return res.json({
+                    user: {
+                        email,
+                        nome: user.nome,
+                        numero_wa: user.loja_id,
                         role: user.role,
                         loja_nome: user.agentes_config?.nome_empresa
-                    }, 
-                    is_admin: isAdmin 
+                    },
+                    is_admin: isAdmin
                 });
             }
         }
@@ -341,9 +341,9 @@ app.get('/admin/equipe/:loja_id', async (req, res) => {
         .select('*')
         .eq('loja_id', loja_id)
         .order('criado_em', { ascending: true });
-    
+
     if (error) return res.status(500).json({ erro: error.message });
-    
+
     // Mapeia 'role' para 'cargo' para o frontend
     const mapped = data.map(u => ({
         ...u,
@@ -364,7 +364,7 @@ app.post('/admin/equipe/convidar', async (req, res) => {
             nome,
             role
         }]).select();
-        
+
         if (error) throw error;
         res.json({ ok: true, user: data[0] });
     } catch (e) { res.status(500).json({ erro: e.message }); }
@@ -375,7 +375,7 @@ app.post('/admin/equipe/update', async (req, res) => {
     try {
         const updateData = { nome };
         if (cargo) updateData.role = cargo.toLowerCase();
-        
+
         const { error } = await supabase.from('usuarios').update(updateData).eq('id', id);
         if (error) throw error;
         res.json({ ok: true });
@@ -429,7 +429,7 @@ app.delete('/admin/lojas/:id', async (req, res) => {
     try {
         // Limpeza em cascata (Supabase pode ter isso via FK, mas garantimos aqui)
         await supabase.from('base_conhecimento').delete().eq('numero_wa', id);
-        
+
         const { data: convs } = await supabase.from('conversas').select('id').eq('numero_wa', id);
         if (convs && convs.length > 0) {
             const ids = convs.map(c => c.id);
@@ -437,10 +437,10 @@ app.delete('/admin/lojas/:id', async (req, res) => {
             await supabase.from('conversas').delete().in('id', ids);
         }
         await supabase.from('contatos_crm').delete().eq('numero_wa', id);
-        
+
         const { error } = await supabase.from('agentes_config').delete().eq('numero_wa', id);
         if (error) throw error;
-        
+
         res.json({ ok: true });
     } catch (e) {
         res.status(500).json({ erro: e.message });
@@ -510,7 +510,7 @@ app.get('/chat/contato/:numero_wa/:telefone', async (req, res) => {
             .eq('numero_wa', numero_wa)
             .eq('telefone_cliente', telefone)
             .maybeSingle();
-        
+
         if (error) throw error;
         res.json(contato || {});
     } catch (e) {
@@ -521,11 +521,11 @@ app.get('/chat/contato/:numero_wa/:telefone', async (req, res) => {
 app.get('/chat/conversas/:numero_wa', async (req, res) => {
     try {
         const { data } = await supabase.from('conversas').select('id, ia_ativa, contato_id, contatos_crm(nome, telefone_cliente)').eq('numero_wa', req.params.numero_wa);
-        res.json(data?.map(c => ({ 
-            id: c.id, 
-            nome: c.contatos_crm?.nome || 'Cliente', 
-            numero_cliente: c.contatos_crm?.telefone_cliente || '', 
-            ia_ativa: c.ia_ativa 
+        res.json(data?.map(c => ({
+            id: c.id,
+            nome: c.contatos_crm?.nome || 'Cliente',
+            numero_cliente: c.contatos_crm?.telefone_cliente || '',
+            ia_ativa: c.ia_ativa
         })) || []);
     } catch (e) { res.json([]); }
 });
@@ -686,7 +686,7 @@ app.post("/chat/send-manual", async (req, res) => {
         if (!chat) return res.status(404).json({ erro: "Contato não encontrado." });
 
         console.log(`[CHAT] 🚀 Enviando para ${chat.telefoneReal} (JID: ${chat.jid})`);
-        
+
         try {
             await sock.sendMessage(chat.jid, { text: mensagem });
         } catch (err) {
@@ -740,5 +740,5 @@ app.listen(PORT, async () => {
     await warmupModel();
     await autoLoadSessions();
 });
-// Version: BackUp+Tuning - Wed Apr 29 12:21:37 PM GMT 2026
 // Version: MASTER - PONTO APICE - Thu Apr 30 12:56:41 AM GMT 2026
+

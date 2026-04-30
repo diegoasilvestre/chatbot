@@ -1467,14 +1467,14 @@ async function renderEquipe() {
         'Suporte': 'badge-default',
     }[cargo] || 'badge-default');
 
-function ocFilterGlobalList(inputId, targetBodyId, rowSelector) {
-    const q = document.getElementById(inputId).value.toLowerCase();
-    const rows = document.querySelectorAll(`#${targetBodyId} ${rowSelector}`);
-    rows.forEach(row => {
-        const text = row.textContent.toLowerCase();
-        row.style.display = text.includes(q) ? '' : 'none';
-    });
-}
+    function ocFilterGlobalList(inputId, targetBodyId, rowSelector) {
+        const q = document.getElementById(inputId).value.toLowerCase();
+        const rows = document.querySelectorAll(`#${targetBodyId} ${rowSelector}`);
+        rows.forEach(row => {
+            const text = row.textContent.toLowerCase();
+            row.style.display = text.includes(q) ? '' : 'none';
+        });
+    }
 
     const cargoIcon = cargo => ({
         'Admin': '👑',
@@ -1913,10 +1913,6 @@ async function renderMore() {
     }
 }
 
-// ══════════════════════════════════════════════════════════════════════════════
-//  HELPERS
-// ══════════════════════════════════════════════════════════════════════════════
-
 function toggleField(id) {
     const el = document.getElementById(id);
     if (!el) return;
@@ -1929,9 +1925,8 @@ function toggleField(id) {
     if (isHidden) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
-// ══════════════════════════════════════════════════════════════════════════════
-//  INICIALIZAÇÃO
-// ══════════════════════════════════════════════════════════════════════════════
+// ─── INICIALIZAÇÃO ──────────────────────────────────────────────────────────
+
 
 async function initLojas() {
     try {
@@ -2088,7 +2083,8 @@ async function deleteProduto(id) {
 }
 
 
-// ─── UTILS & THEME ────────────────────────────────────────────────────────────
+
+
 
 function toggleTheme() {
     const html = document.documentElement;
@@ -2103,7 +2099,7 @@ function toggleTheme() {
 
 function _applyThemeIcons(theme) {
     const isDark = theme === 'dark';
-    
+
     // Login Screen icons
     const loginIcon = document.getElementById('loginThemeIcon');
     const loginLabel = document.getElementById('loginThemeLabel');
