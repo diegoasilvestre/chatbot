@@ -108,7 +108,10 @@
 
         <div class="main-content">
             <header class="topbar">
-                <div id="pageBreadcrumb" style="font-size:13px; font-weight:500; color:var(--text-secondary)">
+                <button class="btn-ghost" id="mobileMenuBtn" onclick="toggleMobileMenu()" style="display:none; padding:8px; color:var(--text-secondary); margin-right:8px">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+                </button>
+                <div id="pageBreadcrumb" style="font-size:13px; font-weight:500; color:var(--text-secondary); flex:1; min-width:0">
                     Painel <i class="fas fa-chevron-right" style="font-size:10px; margin:0 8px"></i> <span id="topbarCurrentPage" style="color:var(--text-primary)">Dashboard</span>
                 </div>
 
@@ -136,6 +139,28 @@
             <a href="#" class="nav-item" onclick="navigate('clientes');return false;"><i class="fas fa-building"></i></a>
         </nav>
     </div>
+
+    <div class="mobile-overlay" id="mobileOverlay" onclick="toggleMobileMenu()"></div>
+    <aside class="mobile-sidebar" id="mobileSidebar">
+        <div style="padding:24px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--border-color)">
+            <div style="font-weight:700; color:var(--accent)">RoboTI BR</div>
+            <button onclick="toggleMobileMenu()" style="background:none; border:none; color:var(--text-secondary)"><i class="fas fa-times"></i></button>
+        </div>
+        <nav style="flex:1; padding:16px; overflow-y:auto">
+            <a href="#" class="mobile-nav-item" onclick="navigate('dashboard'); toggleMobileMenu(); return false;"><i class="fas fa-th-large"></i> Dashboard</a>
+            <a href="#" class="mobile-nav-item" onclick="navigate('conversas'); toggleMobileMenu(); return false;"><i class="fas fa-comments"></i> Conversas</a>
+            <a href="#" class="mobile-nav-item" onclick="navigate('whatsapp'); toggleMobileMenu(); return false;"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+            <a href="#" class="mobile-nav-item" onclick="navigate('clientes'); toggleMobileMenu(); return false;"><i class="fas fa-building"></i> Clientes</a>
+            <a href="#" class="mobile-nav-item" onclick="navigate('agente'); toggleMobileMenu(); return false;"><i class="fas fa-robot"></i> Configurar IA</a>
+            <a href="#" class="mobile-nav-item" onclick="navigate('rag'); toggleMobileMenu(); return false;"><i class="fas fa-brain"></i> Cérebro (RAG)</a>
+            <a href="#" class="mobile-nav-item" onclick="navigate('diagnostics'); toggleMobileMenu(); return false;"><i class="fas fa-tools"></i> Diagnóstico</a>
+        </nav>
+        <div style="padding:20px; border-top:1px solid var(--border-color)">
+            <button onclick="doLogout()" style="width:100%; padding:12px; border-radius:8px; background:rgba(239,68,68,0.1); color:var(--danger); border:1px solid rgba(239,68,68,0.2); display:flex; align-items:center; justify-content:center; gap:8px">
+                <i class="fas fa-power-off"></i> Sair do Painel
+            </button>
+        </div>
+    </aside>
 
     <div class="modal-overlay" id="modalOverlay">
         <div class="modal" id="modalContent"></div>

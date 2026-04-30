@@ -893,7 +893,9 @@ function ocRenderContactList(list) {
             : `<span class="crm-score-badge" style="font-size:9px; padding:2px 6px; background:var(--warning); color:#000">AGUARDANDO</span>`;
 
         return `<div class="oc-contact-item${active ? ' active' : ''}" onclick="ocSelectContact('${esc(c.id)}')">
-            <div class="sidebar-user-avatar" style="width:40px; height:40px; font-size:12px; margin-right:12px">${ocInitials(c.nome)}</div>
+            <div class="sidebar-user-avatar" style="width:40px; height:40px; border-radius:50%; background:#1f2937; color:#9ca3af; display:flex; align-items:center; justify-content:center; margin-right:12px">
+                <svg viewBox="0 0 24 24" fill="currentColor" style="width:20px; height:20px"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+            </div>
             <div class="oc-contact-body">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px">
                     <div class="oc-contact-name">${esc(c.nome || c.numero_cliente)}</div>
@@ -933,7 +935,9 @@ async function ocSelectContact(id) {
     panel.innerHTML = `
     <div class="oc-chat-header" style="background:var(--card-bg); border-bottom:1px solid var(--border-color); padding:12px 20px; display:flex; align-items:center; gap:12px">
         <button class="oc-back-btn" onclick="backToContacts()" style="background:transparent; border:none; color:var(--text-primary); cursor:pointer; display:none"><i class="fas fa-arrow-left"></i></button>
-        <div class="sidebar-user-avatar" style="width:40px; height:40px; font-size:14px">${ocInitials(contact.nome)}</div>
+        <div class="sidebar-user-avatar" style="width:40px; height:40px; border-radius:50%; background:#1f2937; color:#9ca3af; display:flex; align-items:center; justify-content:center">
+            <svg viewBox="0 0 24 24" fill="currentColor" style="width:20px; height:20px"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+        </div>
         <div style="flex:1">
             <div style="font-size:15px; font-weight:600; color:var(--text-primary); cursor:pointer" onclick="ocToggleCrmView()">${esc(contact.nome || contact.numero_cliente)} <i class="fas fa-chevron-right" style="font-size:10px; opacity:0.5; margin-left:4px"></i></div>
             <div style="font-size:11px; color:var(--text-secondary)">${esc(contact.numero_cliente)}</div>
@@ -1002,7 +1006,9 @@ async function ocRenderCrmProfile(telefone) {
         </div>
         <style>@media(max-width:768px){ #crmBackBtn{display:block !important;} }</style>
         <div class="crm-section" style="text-align:center; margin-bottom:32px">
-            <div class="sidebar-user-avatar" style="width:80px; height:80px; font-size:24px; margin:0 auto 16px">${ocInitials(crm.nome || telefone)}</div>
+            <div class="sidebar-user-avatar" style="width:80px; height:80px; border-radius:50%; background:#1f2937; color:#9ca3af; display:flex; align-items:center; justify-content:center; margin:0 auto 16px">
+                <svg viewBox="0 0 24 24" fill="currentColor" style="width:40px; height:40px"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+            </div>
             <div style="font-size:18px; font-weight:700; color:var(--text-primary)">${esc(crm.nome || 'Lead s/ Nome')}</div>
             <div style="font-size:12px; color:var(--sidebar-muted)">${esc(telefone)}</div>
         </div>

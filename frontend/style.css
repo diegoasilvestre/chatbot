@@ -308,6 +308,14 @@ h1, h2, h3, h4, .brand-name, .card-title, .stat-value {
         height: 56px !important;
         padding: 0 16px !important;
     }
+
+    #mobileMenuBtn {
+        display: block !important;
+    }
+
+    .page-header {
+        padding: 16px 20px !important;
+    }
     
     .page-title {
         font-size: 16px;
@@ -1036,4 +1044,67 @@ h1, h2, h3, h4, .brand-name, .card-title, .stat-value {
 .search-item-meta {
     font-size: 11px;
     color: var(--text-secondary);
+}
+/* ══ MOBILE NAVIGATION COMPONENTS ═══════════════════════════════════════════ */
+.mobile-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+    z-index: 2000;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.mobile-overlay.active {
+    display: block;
+    opacity: 1;
+}
+
+.mobile-sidebar {
+    position: fixed;
+    top: 0;
+    left: -260px;
+    width: 260px;
+    height: 100%;
+    background: #09090b;
+    z-index: 2001;
+    display: flex;
+    flex-direction: column;
+    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.5);
+    border-right: 1px solid var(--border-color);
+}
+
+.mobile-sidebar.active {
+    left: 0;
+}
+
+.mobile-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    margin-bottom: 4px;
+}
+
+.mobile-nav-item:hover, .mobile-nav-item.active {
+    background: rgba(255, 215, 0, 0.1);
+    color: var(--accent);
+}
+
+.mobile-nav-item i {
+    width: 20px;
+    text-align: center;
+    font-size: 16px;
 }
