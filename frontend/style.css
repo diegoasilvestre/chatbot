@@ -1258,3 +1258,74 @@ h1, h2, h3, h4, .brand-name, .card-title, .stat-value {
         grid-template-columns: 1fr;
     }
 }
+
+/* ══ CLIENT DATA TABLE (ENTERPRISE LIST VIEW) ════════════════════════════════ */
+
+.client-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.client-table th {
+    padding: 16px 24px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background: rgba(255, 255, 255, 0.02);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.client-table td {
+    padding: 16px 24px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    vertical-align: middle;
+    transition: var(--transition);
+}
+
+.client-table tr:hover td {
+    background: rgba(255, 255, 255, 0.01);
+}
+
+.client-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--accent) 0%, #D4AF37 100%);
+    color: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.mono-id {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--accent);
+    background: rgba(255, 215, 0, 0.05);
+    padding: 4px 8px;
+    border-radius: 6px;
+}
+
+.btn-sm {
+    padding: 6px 10px;
+    font-size: 12px;
+}
+
+@media (max-width: 1024px) {
+    .client-table th:nth-child(4),
+    .client-table td:nth-child(4) {
+        display: none;
+    }
+}
+
+@media (max-width: 640px) {
+    .client-table th:nth-child(2),
+    .client-table td:nth-child(2) {
+        display: none;
+    }
+}

@@ -1210,8 +1210,8 @@ async function renderWhatsApp() {
                 <p class="text-muted">Gerencie conexões e monitore o status de pareamento em tempo real.</p>
             </div>
             <div class="page-actions">
-                <button class="btn btn-primary" onclick="navigate('clientes')">
-                    <i class="fas fa-plus"></i> Nova Conexão
+                <button class="btn btn-primary" onclick="openModalNovaLoja()">
+                    <i class="fas fa-plus"></i> Nova Instância
                 </button>
             </div>
         </div>
@@ -1397,43 +1397,52 @@ async function loadClientes() {
             return;
         }
         el.innerHTML = `
-        <div class="stats-grid">
-            ${lojas.map(l => `
-            <div class="card" style="display:flex; flex-direction:column; gap:20px; border:1px solid rgba(255,255,255,0.03); background:rgba(255,255,255,0.02)">
-                <div style="display:flex; justify-content:space-between; align-items:flex-start">
-                    <div style="display:flex; align-items:center; gap:16px">
-                        <div style="width:52px; height:52px; border-radius:14px; background:linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, rgba(212, 175, 55, 0.05) 100%); border:1px solid rgba(255,215,0,0.15); color:var(--accent); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:20px; box-shadow:0 4px 15px rgba(0,0,0,0.2)">
-                            ${l.nome.substring(0, 1).toUpperCase()}
-                        </div>
-                        <div>
-                            <div style="font-weight:700; font-size:17px; letter-spacing:-0.01em">${esc(l.nome)}</div>
-                            <div class="text-muted" style="font-size:12px">Ativo desde ${new Date(l.criado_em).toLocaleDateString('pt-BR')}</div>
-                        </div>
-                    </div>
-                    <div class="status-badge" style="padding:4px 12px; font-size:10px; border-radius:20px; font-weight:700; background:${l.ativa ? 'rgba(16, 185, 129, 0.05)' : 'rgba(239, 68, 68, 0.05)'}; color:${l.ativa ? 'var(--success)' : 'var(--danger)'}; border:1px solid ${l.ativa ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)'}">
-                        ${l.ativa ? 'ATIVO' : 'INATIVO'}
-                    </div>
-                </div>
-                
-                <div style="background:var(--bg-primary); padding:12px; border-radius:12px; border:1px solid var(--border-color)">
-                    <div style="font-size:11px; color:var(--text-secondary); margin-bottom:4px; text-transform:uppercase; letter-spacing:0.5px">ID da Instância</div>
-                    <code style="font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--accent)">${esc(l.wa_id)}</code>
-                </div>
-
-                <div style="display:grid; grid-template-columns:1fr; gap:12px; margin-top:auto">
-                    <button class="btn btn-primary" onclick="selecionarCliente('${esc(l.id)}')" style="justify-content:center">
-                        <i class="fas fa-sign-in-alt"></i> Acessar Painel
-                    </button>
-                    <div style="display:flex; gap:8px">
-                        <button class="btn btn-secondary" onclick="editarCliente('${esc(l.id)}')" style="flex:1; justify-content:center">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="btn btn-ghost" onclick="excluirCliente('${esc(l.id)}')" style="flex:1; justify-content:center; color:var(--danger)">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>`).join('')}
+        <div class="card" style="padding:0; overflow:hidden; border:1px solid var(--border-color)">
+            <table class="client-table">
+                <thead>
+                    <tr>
+                        <th>Empresa</th>
+                        <th>ID Instância</th>
+                        <th>Status</th>
+                        <th>Criado em</th>
+                        <th style="text-align:right">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${lojas.map(l => `
+                    <tr>
+                        <td>
+                            <div style="display:flex; align-items:center; gap:12px">
+                                <div class="client-avatar">${l.nome.substring(0, 1).toUpperCase()}</div>
+                                <div>
+                                    <div style="font-weight:600; font-size:14px">${esc(l.nome)}</div>
+                                    <div style="font-size:11px; color:var(--text-secondary)">SaaS Partner</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td><code class="mono-id">${esc(l.wa_id)}</code></td>
+                        <td>
+                            <span class="badge ${l.ativa ? 'badge-success' : 'badge-danger'}" style="font-size:9px">
+                                ${l.ativa ? 'Ativo' : 'Inativo'}
+                            </span>
+                        </td>
+                        <td><span style="font-size:13px; color:var(--text-secondary)">${new Date(l.criado_em).toLocaleDateString('pt-BR')}</span></td>
+                        <td>
+                            <div style="display:flex; justify-content:flex-end; gap:8px">
+                                <button class="btn btn-secondary btn-sm" onclick="selecionarCliente('${esc(l.id)}')" title="Acessar Painel">
+                                    <i class="fas fa-sign-in-alt"></i>
+                                </button>
+                                <button class="btn btn-secondary btn-sm" onclick="editarCliente('${esc(l.id)}')" title="Editar">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-ghost btn-sm" onclick="excluirCliente('${esc(l.id)}')" style="color:var(--danger)" title="Excluir">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>`).join('')}
+                </tbody>
+            </table>
         </div>`;
     } catch (e) { el.innerHTML = errMsg(e); }
 }
