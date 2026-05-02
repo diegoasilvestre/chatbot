@@ -1227,6 +1227,12 @@ async function renderWhatsApp() {
 
     await loadWAInstances();
     waPolling = setInterval(loadWAInstances, 5000);
+
+    if (state.pendingAutoConnect) {
+        const idToConnect = state.pendingAutoConnect;
+        state.pendingAutoConnect = null;
+        setTimeout(() => conectarWA(idToConnect), 500);
+    }
 }
 
 async function loadWAInstances() {
@@ -1546,7 +1552,9 @@ async function criarLoja() {
         state.lojaId = wa_id;
         state.loja = state.lojas.find(l => l.id === wa_id) || null;
         populateLojaSelect();
-        navigate('agente');
+        
+        state.pendingAutoConnect = wa_id;
+        navigate('whatsapp');
     } catch (e) { toast(e.message, 'error'); btn.innerHTML = '<i class="fas fa-plus"></i> Criar Cliente'; btn.disabled = false; }
 }
 
