@@ -1108,3 +1108,153 @@ h1, h2, h3, h4, .brand-name, .card-title, .stat-value {
     text-align: center;
     font-size: 16px;
 }
+
+/* ══ INSTANCE MANAGER (ENTERPRISE UI) ════════════════════════════════════════ */
+
+.instance-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 24px;
+    margin-top: 10px;
+}
+
+.instance-card {
+    background: rgba(24, 24, 27, 0.4);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    position: relative;
+    overflow: hidden;
+    transition: var(--transition);
+}
+
+.instance-card:hover {
+    border-color: rgba(255, 215, 0, 0.3);
+    background: rgba(24, 24, 27, 0.6);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+}
+
+.instance-card.online {
+    border-left: 4px solid var(--success);
+}
+
+.instance-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.instance-name {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 6px;
+}
+
+.instance-icon {
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+}
+
+.instance-card.online .instance-icon {
+    color: var(--success);
+    background: rgba(16, 185, 129, 0.1);
+    border-color: rgba(16, 185, 129, 0.2);
+}
+
+.instance-number {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 15px;
+    color: var(--text-secondary);
+    letter-spacing: 0.5px;
+}
+
+/* Pairing Code Style */
+.pairing-container {
+    margin-top: 15px;
+    background: rgba(255, 215, 0, 0.03);
+    border: 1px dashed rgba(255, 215, 0, 0.2);
+    border-radius: 12px;
+    padding: 16px;
+    text-align: center;
+    animation: fadeIn 0.4s ease;
+}
+
+.pairing-container label {
+    display: block;
+    font-size: 10px;
+    font-weight: 800;
+    color: var(--accent);
+    margin-bottom: 8px;
+    letter-spacing: 0.1em;
+}
+
+.pairing-code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--accent);
+    letter-spacing: 4px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.pairing-code:active {
+    transform: scale(0.95);
+}
+
+.pairing-container small {
+    display: block;
+    margin-top: 8px;
+    font-size: 11px;
+    color: var(--text-secondary);
+}
+
+.instance-actions {
+    margin-top: auto;
+    display: flex;
+    gap: 10px;
+}
+
+.instance-actions .w-full {
+    width: 100%;
+}
+
+/* Status Badge com Ponto Pulsante */
+.badge .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    display: inline-block;
+    margin-right: 6px;
+}
+
+.badge-success .dot {
+    box-shadow: 0 0 8px var(--success);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.2); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+@media (max-width: 768px) {
+    .instance-grid {
+        grid-template-columns: 1fr;
+    }
+}

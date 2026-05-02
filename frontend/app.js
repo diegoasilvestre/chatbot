@@ -1200,151 +1200,154 @@ function ocHandleKey(e, id) {
 
 async function renderWhatsApp() {
     const c = document.getElementById('pageContent');
-    if (!state.lojaId) { c.innerHTML = noLojaMsg(); return; }
     if (waPolling) { clearInterval(waPolling); waPolling = null; }
 
     c.innerHTML = `
     <div class="page-wrapper">
         <div class="page-header">
             <div>
-                <h1 class="page-title">Canal de Atendimento</h1>
-                <p class="text-muted">Gerencie a conexão oficial do seu WhatsApp.</p>
+                <h1 class="page-title">Instâncias de WhatsApp</h1>
+                <p class="text-muted">Gerencie conexões e monitore o status de pareamento em tempo real.</p>
             </div>
             <div class="page-actions">
-                <button class="btn btn-secondary" onclick="renderWhatsApp()">
-                    <i class="fas fa-sync-alt"></i> Sincronizar
+                <button class="btn btn-primary" onclick="navigate('clientes')">
+                    <i class="fas fa-plus"></i> Nova Conexão
                 </button>
             </div>
         </div>
         <div class="page-body">
-            <div style="max-width:800px; margin:0 auto">
-                <div class="card wa-status-card" id="waStatusCard" style="margin-bottom:24px; border-radius:16px"><div class="spinner"></div></div>
-                
-                <div class="card" style="border-radius:20px; overflow:hidden">
-                    <div style="display:flex; align-items:flex-start; gap:32px; flex-wrap:wrap">
-                        <div style="flex:1; min-width:300px">
-                            <h2 style="font-size:18px; font-weight:600; margin-bottom:20px">📱 Vincular Novo Aparelho</h2>
-                            <div style="font-size:14px; color:var(--text-secondary); line-height:1.8">
-                                <div style="display:flex; gap:16px; margin-bottom:16px">
-                                    <div style="width:28px; height:28px; min-width:28px; border-radius:50%; background:var(--bg-primary); color:var(--accent); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; border:1px solid var(--border-color)">1</div>
-                                    <div>Clique no botão <strong>Gerar Código</strong> ao lado.</div>
-                                </div>
-                                <div style="display:flex; gap:16px; margin-bottom:16px">
-                                    <div style="width:28px; height:28px; min-width:28px; border-radius:50%; background:var(--bg-primary); color:var(--accent); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; border:1px solid var(--border-color)">2</div>
-                                    <div>Abra o WhatsApp no seu celular.</div>
-                                </div>
-                                <div style="display:flex; gap:16px; margin-bottom:16px">
-                                    <div style="width:28px; height:28px; min-width:28px; border-radius:50%; background:var(--bg-primary); color:var(--accent); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; border:1px solid var(--border-color)">3</div>
-                                    <div>Vá em <strong>Configurações</strong> > <strong>Aparelhos Conectados</strong>.</div>
-                                </div>
-                                <div style="display:flex; gap:16px">
-                                    <div style="width:28px; height:28px; min-width:28px; border-radius:50%; background:var(--bg-primary); color:var(--accent); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; border:1px solid var(--border-color)">4</div>
-                                    <div>Toque em <strong>Conectar um aparelho</strong> e use o código de 8 dígitos.</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div style="flex:1; min-width:300px; background:var(--bg-primary); padding:24px; border-radius:16px; border:1px solid var(--border-color)">
-                            <div class="form-group" style="margin-bottom:24px">
-                                <label class="form-label" style="text-align:center">ID do Cliente</label>
-                                <input class="form-input" id="waNumero" value="${esc(state.lojaId)}" disabled style="background:transparent; font-weight:700; font-family:'JetBrains Mono',monospace; text-align:center; font-size:16px; letter-spacing:1px">
-                            </div>
-                            
-                            <div id="pairingCodeBox" style="display:none; margin:24px 0; text-align:center; animation:fadeIn 0.5s ease">
-                                <label class="form-label">Código de Pareamento</label>
-                                <div id="pairingCodeValue" style="font-size:32px; font-weight:700; letter-spacing:4px; color:var(--accent); padding:16px; border:2px dashed var(--accent); border-radius:12px; cursor:pointer; background:rgba(255,215,0,0.05)" title="Clique para copiar"
-                                    onclick="navigator.clipboard.writeText(this.textContent.replace(/-/g,''));toast('Código copiado!')">----</div>
-                                <p style="font-size:11px; color:var(--text-secondary); margin-top:12px">Este código expira rapidamente.</p>
-                            </div>
-
-                            <button class="btn btn-primary" style="width:100%; justify-content:center; height:52px; font-size:15px" onclick="conectarWA()" id="btnWA">
-                                <i class="fab fa-whatsapp"></i> Gerar Código
-                            </button>
-                            <button class="btn btn-danger" style="width:100%; justify-content:center; margin-top:12px; height:48px; display:none" onclick="desconectarWA()" id="btnDesconectar">
-                                <i class="fas fa-unlink"></i> Desconectar Conta
-                            </button>
-                        </div>
-                    </div>
+            <div id="instancesGrid" class="instance-grid">
+                <div class="loading-state" style="grid-column: 1/-1; text-align: center; padding: 40px;">
+                    <div class="spinner" style="margin: 0 auto 20px;"></div>
+                    <p>Sincronizando instâncias...</p>
                 </div>
             </div>
         </div>
     </div>`;
 
-    loadWAStatus();
-    waPolling = setInterval(loadWAStatus, 4000);
+    await loadWAInstances();
+    waPolling = setInterval(loadWAInstances, 5000);
 }
 
-async function loadWAStatus() {
+async function loadWAInstances() {
     try {
-        const wa = await api.get('/wa/status/' + state.lojaId);
-        const card = document.getElementById('waStatusCard');
-        if (!card) { clearInterval(waPolling); waPolling = null; return; }
-        const btnWA = document.getElementById('btnWA');
-        const btnD = document.getElementById('btnDesconectar');
-        const pairingBox = document.getElementById('pairingCodeBox');
+        const stores = await api.get('/admin/lojas');
+        const grid = document.getElementById('instancesGrid');
+        if (!grid) { clearInterval(waPolling); return; }
 
-        if (wa.status === 'conectado') {
-            card.innerHTML = `
-            <div style="padding:24px; background:rgba(16, 185, 129, 0.03); border-radius:16px; border:1px solid rgba(16, 185, 129, 0.1); display:flex; align-items:center; gap:24px">
-                <div class="wa-status-icon" style="font-size:32px; background:var(--bg-primary); width:72px; height:72px; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 0 30px rgba(16, 185, 129, 0.15); border:1px solid rgba(16, 185, 129, 0.2)">📱</div>
-                <div style="flex:1">
-                    <div style="font-size:22px; font-weight:700; color:var(--success); font-family:'Space Grotesk',sans-serif; letter-spacing:-0.02em">WhatsApp Conectado</div>
-                    <div style="font-size:14px; color:var(--text-secondary); margin:4px 0">Instância oficial ativa: <strong style="color:var(--text-primary)">${esc(wa.numero)}</strong></div>
-                    <div style="display:flex; align-items:center; gap:8px; margin-top:10px">
-                        <span class="badge" style="background:rgba(16, 185, 129, 0.1); color:var(--success); font-size:10px; border:1px solid rgba(16, 185, 129, 0.1)">● SISTEMA OPERANTE</span>
-                        <span class="badge" style="background:rgba(255, 215, 0, 0.1); color:var(--accent); font-size:10px; border:1px solid rgba(255, 215, 0, 0.1)">IA RAG ATIVA</span>
+        const myStores = (state.role === 'master' || state.role === 'admin' || state.is_admin) 
+            ? stores 
+            : stores.filter(s => String(s.wa_id) === String(state.lojaId));
+
+        if (myStores.length === 0) {
+            grid.innerHTML = `<div class="empty-state" style="grid-column: 1/-1">
+                <div class="empty-icon">🔌</div>
+                <h2>Nenhuma instância configurada</h2>
+                <p>Adicione um cliente ou configure seu ID para começar.</p>
+            </div>`;
+            return;
+        }
+
+        const statusPromises = myStores.map(s => api.get(`/wa/status/${s.wa_id}`).catch(() => ({ status: 'erro' })));
+        const statuses = await Promise.all(statusPromises);
+
+        let html = '';
+        myStores.forEach((store, i) => {
+            const wa = statuses[i];
+            const isOnline = wa.status === 'conectado';
+            const isWaiting = wa.status === 'aguardando';
+            const isError = wa.status === 'erro';
+
+            let statusBadge = `<span class="badge badge-danger"><span class="dot"></span> Desconectado</span>`;
+            if (isOnline) statusBadge = `<span class="badge badge-success"><span class="dot"></span> Conectado</span>`;
+            if (isWaiting) statusBadge = `<span class="badge badge-warning"><span class="dot"></span> Pareando</span>`;
+
+            html += `
+            <div class="card instance-card ${isOnline ? 'online' : ''}" id="card-${store.wa_id}">
+                <div class="instance-header">
+                    <div class="instance-info">
+                        <h3 class="instance-name">${esc(store.nome)}</h3>
+                        ${statusBadge}
+                    </div>
+                    <div class="instance-icon">
+                        <i class="fab fa-whatsapp"></i>
                     </div>
                 </div>
+
+                <div class="instance-body">
+                    <div class="instance-number">${formatPhone(store.wa_id)}</div>
+                    
+                    ${isWaiting && wa.pairingCode ? `
+                        <div class="pairing-container">
+                            <label>CÓDIGO DE PAREAMENTO</label>
+                            <div class="pairing-code" onclick="copyText('${wa.pairingCode.replace(/-/g,'')}')">
+                                ${wa.pairingCode}
+                            </div>
+                            <small>Digite este código no seu WhatsApp</small>
+                        </div>
+                    ` : ''}
+
+                    ${isError ? `<p style="color:var(--danger); font-size:12px; margin-top:8px">Falha na API do servidor</p>` : ''}
+                </div>
+
+                <div class="instance-actions">
+                    ${isOnline ? `
+                        <button class="btn btn-secondary btn-sm" onclick="renderDiagnostics('${store.wa_id}')">
+                            <i class="fas fa-stethoscope"></i> Diagnóstico
+                        </button>
+                        <button class="btn btn-danger btn-sm" onclick="desconectarWA('${store.wa_id}')">
+                            <i class="fas fa-unlink"></i> Desconectar
+                        </button>
+                    ` : `
+                        <button class="btn btn-primary" style="width:100%; justify-content:center" onclick="conectarWA('${store.wa_id}')" id="btn-conn-${store.wa_id}">
+                            <i class="fas fa-qrcode"></i> ${isWaiting ? 'Gerar Novo Código' : 'Gerar Código'}
+                        </button>
+                    `}
+                </div>
             </div>`;
-            if (btnWA) btnWA.style.display = 'none';
-            if (btnD) btnD.style.display = 'flex';
-            if (pairingBox) pairingBox.style.display = 'none';
-        } else if (wa.status === 'aguardando') {
-            card.innerHTML = `
-            <div class="wa-status-icon">⏳</div>
-            <div style="font-size:18px;font-weight:700;font-family:'Space Grotesk',sans-serif">Aguardando Pareamento</div>
-            <div style="font-size:13px;color:var(--text-secondary);margin-top:10px">Digite o código no WhatsApp do celular.</div>`;
-            if (wa.pairingCode) {
-                const val = document.getElementById('pairingCodeValue');
-                if (val) val.textContent = wa.pairingCode;
-                if (pairingBox) pairingBox.style.display = 'block';
-            }
-        } else {
-            card.innerHTML = `
-            <div class="wa-status-icon">🔌</div>
-            <div style="font-size:18px;font-weight:700;font-family:'Space Grotesk',sans-serif">Desconectado</div>
-            <div style="font-size:13px;color:var(--text-secondary);margin-top:10px">Gere o código para conectar o WhatsApp.</div>`;
-            if (btnWA) btnWA.style.display = 'flex';
-            if (btnD) btnD.style.display = 'none';
-        }
-    } catch { /* silencioso */ }
+        });
+
+        grid.innerHTML = html;
+    } catch (e) {
+        console.error("Erro ao carregar instâncias:", e);
+    }
 }
 
-async function conectarWA() {
-    const numero = document.getElementById('waNumero').value;
-    const btn = document.getElementById('btnWA');
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Aguardando...'; btn.disabled = true;
+async function conectarWA(numero_wa) {
+    const btn = document.getElementById(`btn-conn-${numero_wa}`);
+    if (btn) { btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Gerando...'; btn.disabled = true; }
+    
     try {
-        const r = await api.post('/wa/connect', { numero });
-        if (r.pairingCode) {
-            const box = document.getElementById('pairingCodeBox');
-            const val = document.getElementById('pairingCodeValue');
-            if (val) val.textContent = r.pairingCode;
-            if (box) box.style.display = 'block';
-            toast('Código gerado! Digite-o no WhatsApp.');
-        } else if (r.status === 'ja_conectado') {
-            toast('Este cliente já está conectado!');
-        }
-    } catch (e) { toast(e.message, 'error'); }
-    finally { btn.innerHTML = '<i class="fab fa-whatsapp"></i> Gerar Código de Pareamento'; btn.disabled = false; }
+        await api.post('/wa/connect', { numero: numero_wa });
+        toast('Comando enviado! Aguardando código...', 'info');
+        await loadWAInstances();
+    } catch (e) { 
+        toast(e.message, 'error'); 
+    } finally {
+        if (btn) { btn.innerHTML = '<i class="fas fa-qrcode"></i> Gerar Código'; btn.disabled = false; }
+    }
 }
 
-async function desconectarWA() {
-    if (!confirm('Deseja desconectar o WhatsApp deste cliente?')) return;
+async function desconectarWA(numero_wa) {
+    if (!confirm(`Deseja desconectar a instância ${numero_wa}?`)) return;
     try {
-        await api.post('/wa/disconnect', { numero: state.lojaId });
-        toast('WhatsApp desconectado.');
-        renderWhatsApp();
-    } catch (e) { toast(e.message, 'error'); }
+        await api.post('/wa/disconnect', { numero: numero_wa });
+        toast('Instância desconectada com sucesso.');
+        await loadWAInstances();
+    } catch (e) { 
+        toast(e.message, 'error'); 
+    }
+}
+
+function formatPhone(num) {
+    const s = String(num);
+    if (s.length < 10) return s;
+    return `+${s.slice(0, 2)} ${s.slice(2, 4)} ${s.slice(4, 9)}-${s.slice(9)}`;
+}
+
+function copyText(txt) {
+    navigator.clipboard.writeText(txt);
+    toast('Código copiado para a área de transferência!');
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
