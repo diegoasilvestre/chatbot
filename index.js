@@ -569,6 +569,7 @@ app.get('/admin/diagnostics/:numero_wa', async (req, res) => {
 
 app.get('/admin/stats/:loja_id', async (req, res) => {
     try {
+        console.log(`[STATS] Buscando métricas para: ${req.params.loja_id}`);
         const { loja_id } = req.params;
         // Busca conversas da loja
         const { data: convs } = await supabase.from('conversas').select('id').eq('numero_wa', loja_id);

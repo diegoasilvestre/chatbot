@@ -221,7 +221,7 @@ async function runDiagnostics(numero_wa) {
 
     try {
         // 1. Testa Supabase Agentes
-        const { data, error: sError } = await supabase.from('agentes_config').select('id').eq('numero_wa', numero_wa).maybeSingle();
+        const { data, error: sError } = await supabase.from('agentes_config').select('numero_wa').eq('numero_wa', numero_wa).maybeSingle();
         result.supabase.agentes_config = sError ? `erro: ${sError.message}` : (data ? 'ok' : 'nao_encontrado');
 
         // 2. Testa RAG Count
