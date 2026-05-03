@@ -6,6 +6,7 @@ require('dotenv').config();
 
 const { createClient } = require('@supabase/supabase-js');
 const fetch = require('node-fetch');
+const { fetchMagicDreamData } = require('./magicDreamProvider');
 
 // ─── SUPABASE ─────────────────────────────────────────────────────────────────
 const supabase = createClient(
@@ -161,10 +162,35 @@ async function generateResponse(userMessage, numero_wa, remoteJid, conversa_id) 
         }
 
         // 2. Busca Contexto (RAG) e Catálogo
-        const [context, catalogo] = await Promise.all([
-            getContext(userMessage, numero_wa),
-            getCatalogo(numero_wa)
-        ]);
+        let context = '';
+        let catalogo = '';
+
+        // --- REGRA DE EXCEÇÃO: ATELIÊ MAGIC DREAM ---
+        if (numero_wa === '5511994415879') {
+            console.log('[MAGIC_DREAM] 🛡️ Ativando blindagem de dados real-time.');
+            const produtosApi = await fetchMagicDreamData(userMessage);
+            
+            if (produtosApi) {
+                context = `[DADOS REAIS DA API]
+Encontrei os seguintes produtos no banco de dados para o termo "${userMessage}":
+${produtosApi.map(p => `- ${p.nome}: R$ ${p.preco_partir} (A partir de)
+  Link: ${p.link}
+  Descrição: ${p.descricao}`).join('\n\n')}
+
+INSTRUÇÃO PARA IA: Use os links acima exatamente como fornecidos. Se houver variações, informe sempre o menor preço.`;
+            } else {
+                context = 'Não encontrei produtos específicos para esse termo no banco de dados agora.';
+            }
+            catalogo = 'Consulta via API Real-time ativa.';
+        } else {
+            // Fluxo Original para outros clientes
+            const [ragContext, dbCatalogo] = await Promise.all([
+                getContext(userMessage, numero_wa),
+                getCatalogo(numero_wa)
+            ]);
+            context = ragContext;
+            catalogo = dbCatalogo;
+        }
 
         // 3. Busca Histórico Recente (com Fallback)
         let messages = [];
@@ -259,6 +285,13 @@ async function scrapePage(url) {
 async function scrapeAndSave(url, numero_wa, customTitle = null) {
     const chunks = await scrapePage(url);
     const titulo = customTitle || `Site: ${url}`;
+
+    // Bloqueio de segurança para Magic Dream
+    if (url.includes('ateliemagicdream.com.br')) {
+        console.error('[SCRAPING] ⛔ Bloqueado: Ateliê Magic Dream deve usar apenas API.');
+        return { ok: false, error: 'Este domínio usa integração via API protegida.' };
+    }
+
     for (let i = 0; i < chunks.length; i++) {
         const embedding = await generateEmbedding(chunks[i]);
         await supabase.from('base_conhecimento').insert([{
