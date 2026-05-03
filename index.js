@@ -567,6 +567,45 @@ app.get('/admin/diagnostics/:numero_wa', async (req, res) => {
     }
 });
 
+app.get('/admin/stats/:loja_id', async (req, res) => {
+    try {
+        const { loja_id } = req.params;
+        // Busca conversas da loja
+        const { data: convs } = await supabase.from('conversas').select('id').eq('numero_wa', loja_id);
+        const convIds = (convs || []).map(c => c.id);
+
+        if (convIds.length === 0) {
+            return res.json({ total_msgs: 0, sent: 0, received: 0, tokens: 0, history: [] });
+        }
+
+        // Busca mensagens
+        const { data: msgs } = await supabase
+            .from('mensagens')
+            .select('remetente_tipo, conteudo, criado_em')
+            .in('conversa_id', convIds)
+            .order('criado_em', { ascending: true });
+
+        const received = msgs.filter(m => m.remetente_tipo === 'user').length;
+        const sent = msgs.filter(m => m.remetente_tipo === 'humano' || m.remetente_tipo === 'bot').length;
+        
+        // Estimativa de tokens (char / 4)
+        const tokens = msgs.reduce((acc, m) => acc + (m.conteudo?.length || 0), 0) / 4;
+
+        // Histórico simplificado para o gráfico (últimos 7 dias)
+        const history = []; // Logica de agrupamento por dia seria ideal aqui
+
+        res.json({
+            total_msgs: msgs.length,
+            sent,
+            received,
+            tokens: Math.round(tokens),
+            history
+        });
+    } catch (e) {
+        res.status(500).json({ erro: e.message });
+    }
+});
+
 app.post('/cliente/scrape', async (req, res) => {
     const { url, numero_wa, loja_id, titulo } = req.body;
     const target_wa = numero_wa || loja_id;

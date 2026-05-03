@@ -695,7 +695,7 @@ h1, h2, h3, h4, .brand-name, .card-title, .stat-value {
 
 .form-input, .form-textarea, .form-select {
     width: 100%;
-    background: rgba(255, 255, 255, 0.03);
+    background: #18181b;
     border: 1px solid var(--border-color);
     border-radius: var(--radius-md);
     padding: 12px 16px;
@@ -703,11 +703,27 @@ h1, h2, h3, h4, .brand-name, .card-title, .stat-value {
     font-size: 14px;
     transition: var(--transition);
     outline: none;
+    appearance: none;
 }
 
-.form-input:focus {
+.form-select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23a1a1aa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 40px;
+    cursor: pointer;
+}
+
+.form-select option {
+    background-color: #18181b;
+    color: #fafafa;
+    padding: 12px;
+}
+
+.form-input:focus, .form-select:focus {
     border-color: var(--accent);
-    background: rgba(255, 255, 255, 0.05);
+    background: #1c1c1f;
+    box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.1);
 }
 
 /* ══ OMNICHAT PREMIUM UI ════════════════════════════════════════════════════ */
@@ -1329,3 +1345,49 @@ h1, h2, h3, h4, .brand-name, .card-title, .stat-value {
         display: none;
     }
 }
+/* ══ DASHBOARD TELEMETRY & CHARTS ══════════════════════════════════════════ */
+
+.chart-container {
+    position: relative;
+    height: 300px;
+    width: 100%;
+}
+
+.analytics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 24px;
+    margin-top: 24px;
+}
+
+@media (max-width: 768px) {
+    .analytics-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ══ DIAGNOSTICS CONSOLE ═════════════════════════════════════════════════════ */
+.diag-console {
+    background: #09090b;
+    border: 1px solid #27272a;
+    border-radius: 12px;
+    padding: 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: #a1a1aa;
+    line-height: 1.6;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.diag-line {
+    margin-bottom: 8px;
+    display: flex;
+    gap: 12px;
+}
+
+.diag-time { color: #52525b; }
+.diag-success { color: var(--success); }
+.diag-error { color: var(--danger); }
+.diag-warning { color: var(--warning); }
+.diag-info { color: var(--accent); }

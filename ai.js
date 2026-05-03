@@ -274,7 +274,7 @@ module.exports = {
     generateResponse,
     warmupModel: async () => { await getExtractor(); },
     supabase,
-    runDiagnostics: async (wa) => { return { status: 'ok' }; },
+    runDiagnostics,
     scrapeAndSave,
     generateEmbedding
 };

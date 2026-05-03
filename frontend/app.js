@@ -358,80 +358,132 @@ async function renderDashboard() {
     const c = document.getElementById('pageContent');
     if (!state.lojaId) { c.innerHTML = noLojaMsg(); return; }
     try {
-        const [wa, docs] = await Promise.all([
+        const [wa, docs, stats] = await Promise.all([
             api.get('/wa/status/' + state.lojaId),
             api.get('/cliente/rag/' + state.lojaId),
+            api.get('/admin/stats/' + state.lojaId)
         ]);
 
         const waStatus = wa.status === 'conectado'
-            ? '<span style="color:var(--success)">● Conectado</span>'
-            : '<span style="color:var(--destructive)">○ Desconectado</span>';
+            ? '<span style="color:var(--success); font-weight:700">● Conectado</span>'
+            : '<span style="color:var(--danger); font-weight:700">○ Desconectado</span>';
 
         c.innerHTML = `
         <div class="page-wrapper">
             <div class="page-header">
                 <div>
                     <h1 class="page-title">Visão Geral</h1>
-                    <p class="text-muted">Acompanhe o desempenho do seu assistente em tempo real.</p>
+                    <p class="text-muted">Desempenho de IA e tráfego de mensagens para <strong>${state.loja?.nome || 'Cliente'}</strong></p>
                 </div>
                 <div class="page-actions">
                     <button class="btn btn-secondary" onclick="renderDashboard()">
-                        <i class="fas fa-sync-alt"></i> Atualizar
+                        <i class="fas fa-sync-alt"></i> Sincronizar Dados
                     </button>
                 </div>
             </div>
+            
             <div class="page-body">
                 <div class="stats-grid">
                     <div class="card">
-                        <div class="text-muted" style="margin-bottom:8px">Conversas Ativas</div>
-                        <div style="font-size:32px; font-weight:700" id="dashAtivas">--</div>
+                        <div class="text-muted" style="font-size:12px; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:12px">Mensagens (Total)</div>
+                        <div style="font-size:32px; font-weight:700; letter-spacing:-0.03em">${stats.total_msgs}</div>
                         <div style="font-size:12px; color:var(--success); margin-top:8px">
-                            <i class="fas fa-arrow-up"></i> Fluxo de atendimento ativo
+                            <i class="fas fa-arrow-up"></i> ${stats.received} recebidas / ${stats.sent} enviadas
                         </div>
                     </div>
                     <div class="card">
-                        <div class="text-muted" style="margin-bottom:8px">Base de Conhecimento</div>
-                        <div style="font-size:32px; font-weight:700">${docs.length}</div>
-                        <div class="text-muted" style="margin-top:8px">Documentos indexados</div>
+                        <div class="text-muted" style="font-size:12px; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:12px">Uso de IA (Tokens)</div>
+                        <div style="font-size:32px; font-weight:700; letter-spacing:-0.03em">${stats.tokens.toLocaleString()}</div>
+                        <div style="font-size:12px; color:var(--accent); margin-top:8px">
+                            <i class="fas fa-microchip"></i> Estimativa de processamento
+                        </div>
                     </div>
                     <div class="card">
-                        <div class="text-muted" style="margin-bottom:8px">Status do WhatsApp</div>
-                        <div style="margin-top:12px">${waStatus}</div>
-                        <div class="text-muted" style="margin-top:8px">${wa.numero || 'Canal de atendimento'}</div>
+                        <div class="text-muted" style="font-size:12px; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:12px">WhatsApp Service</div>
+                        <div style="margin-top:8px">${waStatus}</div>
+                        <div class="text-muted" style="font-size:12px; margin-top:12px">${wa.numero || 'Sem número vinculado'}</div>
                     </div>
                     <div class="card">
-                        <div class="text-muted" style="margin-bottom:8px">Nível de IA</div>
-                        <div style="font-size:32px; font-weight:700">Groq</div>
-                        <div style="font-size:12px; color:var(--accent); margin-top:8px">Modelo: Llama 3 (Ultra Rápido)</div>
+                        <div class="text-muted" style="font-size:12px; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:12px">Base RAG</div>
+                        <div style="font-size:32px; font-weight:700; letter-spacing:-0.03em">${docs.length}</div>
+                        <div class="text-muted" style="font-size:12px; margin-top:8px">Documentos indexados</div>
                     </div>
                 </div>
-                
-                <div style="margin-top:32px">
-                    <h2 style="font-size:16px; font-weight:600; margin-bottom:16px">🚀 Ações Sugeridas</h2>
-                    <div class="stats-grid">
-                        <div class="card" style="display:flex; align-items:center; gap:16px; cursor:pointer" onclick="navigate('whatsapp')">
-                            <div style="width:48px; height:48px; border-radius:12px; background:rgba(37, 211, 102, 0.1); color:#25D366; display:flex; align-items:center; justify-content:center; font-size:20px">
-                                <i class="fab fa-whatsapp"></i>
-                            </div>
-                            <div>
-                                <div style="font-weight:600">Conectar WhatsApp</div>
-                                <div class="text-muted">Inicie conversas com seus clientes.</div>
-                            </div>
+
+                <div class="analytics-grid">
+                    <div class="card">
+                        <h3 style="font-size:14px; font-weight:600; margin-bottom:20px">Tráfego de Mensagens</h3>
+                        <div class="chart-container">
+                            <canvas id="msgChart"></canvas>
                         </div>
-                        <div class="card" style="display:flex; align-items:center; gap:16px; cursor:pointer" onclick="navigate('rag')">
-                            <div style="width:48px; height:48px; border-radius:12px; background:rgba(255, 215, 0, 0.1); color:var(--accent); display:flex; align-items:center; justify-content:center; font-size:20px">
-                                <i class="fas fa-brain"></i>
-                            </div>
-                            <div>
-                                <div style="font-weight:600">Treinar Cérebro</div>
-                                <div class="text-muted">Adicione novos conhecimentos à IA.</div>
-                            </div>
+                    </div>
+                    <div class="card">
+                        <h3 style="font-size:14px; font-weight:600; margin-bottom:20px">Distribuição de Tokens</h3>
+                        <div class="chart-container">
+                            <canvas id="tokenChart"></canvas>
                         </div>
                     </div>
                 </div>
             </div>
         </div>`;
+
+        setTimeout(() => initDashboardCharts(stats), 100);
     } catch (e) { c.innerHTML = errMsg(e); }
+}
+
+function initDashboardCharts(stats) {
+    const ctxMsg = document.getElementById('msgChart')?.getContext('2d');
+    const ctxToken = document.getElementById('tokenChart')?.getContext('2d');
+
+    if (ctxMsg) {
+        new Chart(ctxMsg, {
+            type: 'bar',
+            data: {
+                labels: ['Enviadas', 'Recebidas'],
+                datasets: [{
+                    label: 'Mensagens',
+                    data: [stats.sent, stats.received],
+                    backgroundColor: ['#ffd700', 'rgba(255,215,0,0.2)'],
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#a1a1aa' } },
+                    x: { grid: { display: false }, ticks: { color: '#a1a1aa' } }
+                }
+            }
+        });
+    }
+
+    if (ctxToken) {
+        new Chart(ctxToken, {
+            type: 'line',
+            data: {
+                labels: ['IA Processing'],
+                datasets: [{
+                    label: 'Tokens',
+                    data: [stats.tokens],
+                    borderColor: '#ffd700',
+                    backgroundColor: 'rgba(255,215,0,0.1)',
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#a1a1aa' } },
+                    x: { grid: { display: false }, ticks: { color: '#a1a1aa' } }
+                }
+            }
+        });
+    }
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -1848,72 +1900,79 @@ async function removerUsuarioEquipe(id, nome) {
 
 async function renderDiagnostics() {
     const c = document.getElementById('pageContent');
+    if (!state.lojaId) { c.innerHTML = noLojaMsg(); return; }
+    
     c.innerHTML = `
     <div class="page-wrapper">
         <div class="page-header">
-            <h1 class="page-title">Saúde do Sistema</h1>
+            <div>
+                <h1 class="page-title">Saúde do Sistema</h1>
+                <p class="text-muted">Verifique a conectividade com os LLMs, Banco de Dados e RAG em tempo real.</p>
+            </div>
             <div class="page-actions">
-                <button class="btn btn-ghost" onclick="renderDiagnostics()" style="width:36px; height:36px; padding:0">
-                    <i class="fas fa-sync-alt"></i>
+                <button class="btn btn-primary" id="btnRunDiag" onclick="runFullDiagnostics()">
+                    <i class="fas fa-play"></i> Iniciar Varredura
                 </button>
             </div>
         </div>
+        
         <div class="page-body">
-            <div class="card">
-                <p style="font-size:13px;color:var(--text-secondary);margin-bottom:20px">
-                    Verifica conectividade com os LLMs (Groq, Gemini), Supabase e a base RAG do cliente selecionado.
-                </p>
-                <button class="btn btn-primary" onclick="executarDiagnostico()" id="btnDiag">
-                    <i class="fas fa-play"></i> Executar Diagnóstico
-                </button>
-                <div id="diagResult" style="margin-top:24px"></div>
+            <div id="diagOutput" class="diag-console">
+                <div class="diag-line">> Aguardando comando para iniciar varredura técnica...</div>
             </div>
-
-            <div class="card">
-                <div class="card-title" style="margin-bottom:12px">ℹ️ Informações da Sessão</div>
-                <div style="font-size:13px;line-height:2.2;font-family:'JetBrains Mono',monospace">
-                    <div>Cliente ativo: <strong style="color:var(--accent)">${esc(state.lojaId || 'nenhum')}</strong></div>
-                    <div>Servidor: <strong>${API}</strong></div>
-                    <div>Versão: <strong>4.0</strong></div>
-                    <div>Tema: <strong id="diagTheme">${document.documentElement.getAttribute('data-theme') || 'light'}</strong></div>
+            
+            <div class="card" style="margin-top:24px; background:rgba(255,255,255,0.02)">
+                <div style="font-size:12px; font-weight:700; color:var(--accent); text-transform:uppercase; margin-bottom:12px">Informações da Sessão Admin</div>
+                <div style="font-family:'JetBrains Mono',monospace; font-size:13px; line-height:1.8">
+                    <div>CLIENT_ID: <span style="color:var(--text-primary)">${state.lojaId}</span></div>
+                    <div>GATEWAY: <span style="color:var(--text-primary)">${API}</span></div>
+                    <div>VERSION: <span style="color:var(--text-primary)">4.0.0-PRO</span></div>
                 </div>
             </div>
         </div>
     </div>`;
 }
 
-async function executarDiagnostico() {
-    const btn = document.getElementById('btnDiag');
-    const el = document.getElementById('diagResult');
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando...'; btn.disabled = true;
-    el.innerHTML = '<div class="spinner"></div>';
+async function runFullDiagnostics() {
+    const out = document.getElementById('diagOutput');
+    const btn = document.getElementById('btnRunDiag');
+    if (!out || !btn) return;
+
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Testando...';
+    out.innerHTML = '';
+
+    const log = (msg, type = 'info') => {
+        const time = new Date().toLocaleTimeString();
+        const html = `
+            <div class="diag-line">
+                <span class="diag-time">[${time}]</span>
+                <span class="diag-${type}">${msg}</span>
+            </div>`;
+        out.innerHTML += html;
+        out.scrollTop = out.scrollHeight;
+    };
+
+    log('Iniciando sequência de diagnósticos para ' + state.lojaId, 'accent');
+    
     try {
-        const id = state.lojaId || 'nenhum';
-        const d = await api.get('/admin/diagnostics/' + id);
-        const icon = v => {
-            if (typeof v === 'string' && (v.startsWith('ok') || v.includes('documentos') || v === 'chave configurada')) return '✅';
-            if (v === 'chave não configurada') return '⚠️';
-            return '❌';
-        };
-        el.innerHTML = `
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-            <div style="padding:16px;background:var(--bg-secondary);border-radius:var(--radius);font-size:13px;line-height:2.2;border:1px solid var(--border-color)">
-                <div style="font-weight:700;margin-bottom:8px;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--accent)">LLMs</div>
-                <div>${icon(d.llm?.groq)} Groq: <code style="background:var(--card-bg);padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono',monospace">${d.llm?.groq}</code></div>
-                <div>${icon(d.llm?.gemini)} Gemini: <code style="background:var(--card-bg);padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono',monospace">${d.llm?.gemini}</code></div>
-                <div>${icon(d.llm?.openrouter)} OpenRouter: <code style="background:var(--card-bg);padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono',monospace">${d.llm?.openrouter || '—'}</code></div>
-            </div>
-            <div style="padding:16px;background:var(--bg-secondary);border-radius:var(--radius);font-size:13px;line-height:2.2;border:1px solid var(--border-color)">
-                <div style="font-weight:700;margin-bottom:8px;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--accent)">Supabase & RAG</div>
-                <div>${icon(d.supabase?.agentes_config)} agentes_config: <code style="background:var(--card-bg);padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono',monospace">${d.supabase?.agentes_config}</code></div>
-                <div>${icon(d.rag?.documentos)} Documentos: <code style="background:var(--card-bg);padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono',monospace">${d.rag?.documentos}</code></div>
-                <div>${icon(d.rag?.rpc_buscar_conhecimento)} Função RPC: <code style="background:var(--card-bg);padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono',monospace">${d.rag?.rpc_buscar_conhecimento}</code></div>
-            </div>
-        </div>
-        <div style="font-size:11px;color:var(--text-secondary);margin-top:12px">Verificado em: ${d.timestamp}</div>`;
+        log('Testando conexão com Servidor Central...', 'info');
+        const res = await api.get('/admin/diagnostics/' + state.lojaId);
+        
+        log('LLM Groq: ' + (res.llm?.groq === 'ok' ? '✓ Operacional' : '✗ Falha'), res.llm?.groq === 'ok' ? 'success' : 'error');
+        log('LLM Gemini: ' + (res.llm?.gemini === 'ok' ? '✓ Operacional' : '✗ Falha'), res.llm?.gemini === 'ok' ? 'success' : 'error');
+        log('Supabase DB: ' + (res.supabase?.agentes_config === 'ok' ? '✓ Conectado' : '✗ Erro de acesso'), res.supabase?.agentes_config === 'ok' ? 'success' : 'error');
+        log('Base RAG: ' + (res.rag?.documentos || 0) + ' documentos encontrados', 'info');
+        
+        if (res.rag?.documentos === 0) log('AVISO: Cliente sem base de conhecimento ativa.', 'warning');
+        
+        log('Varredura finalizada. Sistema operando conforme esperado.', 'success');
     } catch (e) {
-        el.innerHTML = `<div style="padding:14px;background:var(--destructive-subtle);border:1px solid rgba(220,38,38,0.2);border-radius:var(--radius);font-size:13px;color:var(--destructive)">${e.message}</div>`;
-    } finally { btn.innerHTML = '<i class="fas fa-play"></i> Executar Diagnóstico'; btn.disabled = false; }
+        log('ERRO CRÍTICO: ' + e.message, 'error');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-play"></i> Iniciar Varredura';
+    }
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
